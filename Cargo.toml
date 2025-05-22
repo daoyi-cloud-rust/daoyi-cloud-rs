@@ -5,6 +5,11 @@ edition.workspace = true
 [workspace]
 members = [
     ".",
+    "daoyi-cloud-api",
+    "daoyi-cloud-common",
+    "daoyi-cloud-core",
+    "daoyi-cloud-middleware",
+    "daoyi-cloud-system",
     "migration"
 ]
 
@@ -16,6 +21,10 @@ license = "MIT"
 [dependencies]
 
 [workspace.dependencies]
+daoyi-cloud-api = { path = "daoyi-cloud-api" }
+daoyi-cloud-common = { path = "daoyi-cloud-common" }
+daoyi-cloud-core = { path = "daoyi-cloud-core" }
+daoyi-cloud-middleware = { path = "daoyi-cloud-middleware" }
 spring = "0"
 spring-web = "0"
 spring-sea-orm = "0"

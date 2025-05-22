@@ -1,0 +1,17 @@
+[package]
+name = "daoyi-cloud-system"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[dependencies]
+spring = { workspace = true }
+spring-web = { workspace = true }
+spring-sea-orm = { workspace = true, features = [
+    "mysql",
+    "with-web",
+] }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+sea-orm = { workspace = true }
+serde = { workspace = true }

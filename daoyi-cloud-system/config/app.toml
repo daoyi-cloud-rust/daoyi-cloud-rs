@@ -1,0 +1,22 @@
+[web]
+binding = "0.0.0.0"  # 要绑定的网卡IP地址，默认0.0.0.0
+port = 11020              # 要绑定的端口号，默认8080
+connect_info = true     # 是否使用客户端连接信息，默认false
+graceful = true          # 是否开启优雅停机, 默认false
+
+# web中间件配置
+[web.middlewares]
+compression = { enable = true }  # 开启压缩中间件
+catch_panic = { enable = true }  # 捕获handler产生的panic
+logger = { enable = true, level = "info" }            # 开启日志中间件
+limit_payload = { enable = true, body_limit = "500MB" } # 限制请求体大小
+timeout_request = { enable = true, timeout = 600000 }  # 请求超时时间60s
+
+[sea-orm]
+uri = "${DATABASE_URL}"
+enable_logging = true
+
+[sea-orm-web]
+one_indexed = true
+max_page_size = 100
+default_page_size = 10
