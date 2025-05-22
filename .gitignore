@@ -3,3 +3,4 @@ Cargo.lock
 .idea
 **/*-prod.toml
 **/*-local.toml
+.env

@@ -1,6 +1,25 @@
 [package]
 name = "daoyi-cloud-rs"
-version = "0.1.0"
+version.workspace = true
+edition.workspace = true
+[workspace]
+members = [
+    ".",
+    "migration"
+]
+
+[workspace.package]
 edition = "2024"
+version = "0.1.0"
+license = "MIT"
 
 [dependencies]
+
+[workspace.dependencies]
+spring = "0"
+spring-web = "0"
+spring-sea-orm = "0"
+tokio = "1"
+anyhow = "1"
+sea-orm = "1"
+serde = "1"
