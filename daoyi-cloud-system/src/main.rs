@@ -1,7 +1,8 @@
 use spring::{App, auto_config};
 use spring_sea_orm::SeaOrmPlugin;
-use spring_web::{WebConfigurator, WebPlugin};
+use spring_web::{get, WebConfigurator, WebPlugin};
 use std::path::PathBuf;
+use spring_web::axum::response::IntoResponse;
 
 #[auto_config(WebConfigurator)]
 #[tokio::main]
@@ -13,4 +14,9 @@ async fn main() {
         .add_plugin(WebPlugin)
         .run()
         .await
+}
+
+#[get("/")]
+async fn hello_word() -> impl IntoResponse {
+    "hello word"
 }
