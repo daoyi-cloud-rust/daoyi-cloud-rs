@@ -1,12 +1,9 @@
-use daoyi_cloud_middleware::auth_middleware::auth_middleware;
+use daoyi_cloud_middleware::router_middleware;
 use spring::App;
 use spring_sea_orm::SeaOrmPlugin;
 use spring_web::axum::response::IntoResponse;
-use spring_web::axum::middleware;
-use spring_web::middleware::timeout::TimeoutLayer;
-use spring_web::{get, Router, WebConfigurator, WebPlugin};
+use spring_web::{get, WebConfigurator, WebPlugin};
 use std::path::PathBuf;
-use std::time::Duration;
 
 #[tokio::main]
 async fn main() {
@@ -15,16 +12,9 @@ async fn main() {
         .use_config_file(config_path.to_str().unwrap())
         .add_plugin(SeaOrmPlugin)
         .add_plugin(WebPlugin)
-        .add_router(router())
+        .add_router(router_middleware::root_router())
         .run()
         .await
-}
-
-fn router() -> Router {
-    Router::new()
-        .merge(spring_web::handler::auto_router())
-        .layer(TimeoutLayer::new(Duration::from_secs(10)))
-        .layer(middleware::from_fn(auth_middleware))
 }
 
 #[get("/")]
