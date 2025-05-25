@@ -4,3 +4,41 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+[workspace]
+resolver = "3"
+members = [
+    ".",
+    "daoyi-cloud-system",
+]
+[workspace.package]
+authors = ["Gemiman <gemiman@vip.qq.com>"]
+edition = "2024"
+homepage = "https://www.gemiman.com/"
+license = "MIT"
+publish = false
+rust-version = "1.87.0"
+version = "0.1.0"
+repository = "https://github.com/daoyi-cloud-rust/daoyi-cloud-rust"
+[workspace.dependencies]
+anyhow = "1"
+figment = "0"
+jsonwebtoken = "9"
+rust-embed = "8"
+salvo = "0"
+serde = "1"
+thiserror = "2"
+time = "0"
+tokio = "1"
+tracing = "0"
+validator = "0"
+ulid = "1"
+argon2 = "0"
+cookie = "0"
+dotenvy = "0"
+tracing-appender = "0"
+tracing-subscriber = "0"
+sea-orm = "1"
+askama = "0"
+rand = "0"
+toml = "0"
+serde-toml-merge = "0"
