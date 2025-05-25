@@ -1,5 +1,8 @@
+use daoyi_cloud_common::error::CusErr;
+use daoyi_cloud_common::res::Res;
+use spring_web::axum::response::{IntoResponse, Response};
 use spring_web::{
-    axum::{http, middleware, response},
+    axum::middleware,
     extractor,
 };
 
@@ -7,7 +10,7 @@ pub async fn auth_middleware(
     // Component(db): Component<DbConn>,
     req: extractor::Request,
     next: middleware::Next,
-) -> Result<response::Response, http::StatusCode> {
+) -> Response {
     // 校验 Token
     let token = req
         .headers()
@@ -17,7 +20,7 @@ pub async fn auth_middleware(
 
     // 假的校验
     if token != "123" {
-        return Err(http::StatusCode::UNAUTHORIZED);
+        return Res::<String>::error(anyhow::Error::from(CusErr::AppRuleError("翻天调了".to_string()))).into_response();
     }
 
     let user_id = "123"; // 调用认证服务
@@ -26,5 +29,5 @@ pub async fn auth_middleware(
     let mut req = req;
     req.extensions_mut().insert(user_id);
 
-    Ok(next.run(req).await)
+    next.run(req).await
 }

@@ -1,6 +1,6 @@
+use crate::auth_middleware::auth_middleware;
 use spring_web::axum::middleware;
 use spring_web::Router;
-use crate::auth_middleware::auth_middleware;
 
 pub fn root_router() -> Router {
     Router::new()

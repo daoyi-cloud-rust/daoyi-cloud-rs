@@ -16,3 +16,4 @@ anyhow = { workspace = true }
 sea-orm = { workspace = true }
 serde = { workspace = true }
 daoyi-cloud-middleware = { workspace = true }
+daoyi-cloud-common = { workspace = true }
