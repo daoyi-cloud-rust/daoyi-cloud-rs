@@ -1,0 +1,14 @@
+[web]
+listen_addr = "${WEB_LISTEN_ADDR:127.0.0.1:8008}"
+
+[db]
+url = "${DATABASE_URL:mysql://root:root@localhost/daoyi-cloud-system}"
+
+[jwt]
+secret = "${JWT_SECRET:yoursecret}"
+expiry = "${JWT_EXPIRY:3600}"
+
+[log]
+file_name = "${LOG_FILE_NAME:app.log}"
+rolling = "${LOG_ROLLING:daily}"
+filter_level = "${LOG_LEVEL:info}"
