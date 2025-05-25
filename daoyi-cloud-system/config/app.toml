@@ -20,3 +20,16 @@ enable_logging = true
 one_indexed = true
 max_page_size = 100
 default_page_size = 10
+
+[redis]
+uri = "${REDIS_URL}"        # redis 数据库地址
+# 下面都是可选配置
+#    connection_timeout = 10000        # 连接超时时间，单位毫秒
+#    response_timeout = 1000           # 响应超时时间，单位毫秒
+#    number_of_retries = 6             # 重试次数，间隔时间按指数增长
+#    exponent_base = 2                 # 间隔时间指数基数，单位毫秒
+#    factor = 100                      # 间隔时间增长因子，默认100倍增长
+#    max_delay = 60000                 # 最大间隔时间，单位毫秒
+[tenant]
+header_key = "tenant-id"
+ignore_urls = ["/health"]

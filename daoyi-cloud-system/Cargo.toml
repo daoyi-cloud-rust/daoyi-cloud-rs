@@ -11,6 +11,7 @@ spring-sea-orm = { workspace = true, features = [
     "mysql",
     "with-web",
 ] }
+spring-redis = { workspace = true }
 tokio = { workspace = true }
 anyhow = { workspace = true }
 sea-orm = { workspace = true }

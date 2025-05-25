@@ -6,7 +6,9 @@ license.workspace = true
 
 [dependencies]
 spring-web = { workspace = true }
+spring-redis = { workspace = true }
 anyhow = { workspace = true }
 daoyi-cloud-common = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
+spring = { workspace = true }

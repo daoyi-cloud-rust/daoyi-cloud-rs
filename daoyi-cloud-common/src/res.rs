@@ -33,7 +33,8 @@ impl<T> Res<T> {
         let code = if e.downcast_ref::<CusErr>().is_some() {
             match e.downcast_ref::<CusErr>() {
                 Some(CusErr::AppRuleError(_)) => 400,
-                _ => 404,
+                Some(CusErr::AuthError(_)) => 401,
+                _ => 500,
             }
         } else {
             500

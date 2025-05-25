@@ -28,6 +28,7 @@ daoyi-cloud-middleware = { path = "daoyi-cloud-middleware" }
 spring = "0"
 spring-web = "0"
 spring-sea-orm = "0"
+spring-redis = "0"
 tokio = "1"
 anyhow = "1"
 thiserror = "2"

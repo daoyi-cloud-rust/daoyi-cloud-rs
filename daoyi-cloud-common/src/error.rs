@@ -12,6 +12,9 @@ pub enum CusErr {
     #[error("App rule: {0}")]
     AppRuleError(String),
     
-    #[error("")]
+    #[error("认证失败：{0}")]
     AuthError(String),
+
+    #[error("{1}")]
+    ServiceException(u64, String),
 }
