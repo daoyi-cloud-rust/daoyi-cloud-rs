@@ -27,11 +27,11 @@ impl<T> CommonResult<T> {
         }
     }
 
-    pub fn build(code: StatusCode, data: Option<T>) -> Self {
+    pub fn build(code: StatusCode, data: Option<T>, msg: Option<String>) -> Self {
         Self {
             code: code.as_u16(),
             data,
-            msg: code.to_string(),
+            msg: msg.unwrap_or_else(|| code.to_string()),
         }
     }
     pub fn error(e: anyhow::Error) -> Self {

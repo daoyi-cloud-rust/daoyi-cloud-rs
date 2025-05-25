@@ -90,7 +90,7 @@ impl Writer for AppError {
             }
             Self::HttpStatus(e) => e,
             e => StatusError::internal_server_error()
-                .brief(format!("Unknown error happened: {e}"))
+                .brief(format!("{e}"))
                 .cause(e),
         };
         res.render(data);
