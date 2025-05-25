@@ -1,3 +1,5 @@
+pub mod common_result;
+
 use salvo::oapi::ToSchema;
 use serde::Serialize;
 

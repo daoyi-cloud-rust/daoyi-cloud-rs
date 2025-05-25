@@ -35,7 +35,7 @@ async fn main() {
     config::init().await;
     let config = config::get();
     let service = Service::new(routers::root())
-        .catcher(Catcher::default().hoop(hoops::error_404))
+        .catcher(Catcher::default().hoop(hoops::error_handler::http_error_handler))
         .hoop(hoops::cors_hoop());
     println!("🔄 在以下位置监听 {}", &config.web.listen_addr);
     //Acme 支持，自动从 Let's Encrypt 获取 TLS 证书。例子请看 https://github.com/salvo-rs/salvo/blob/main/examples/acme-http01-quinn/src/main.rs
