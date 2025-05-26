@@ -1,7 +1,7 @@
 use askama::Template;
 use salvo::prelude::*;
 
-use crate::AppResult;
+use crate::app::AppResult;
 
 #[handler]
 pub async fn hello(req: &mut Request) -> AppResult<Text<String>> {

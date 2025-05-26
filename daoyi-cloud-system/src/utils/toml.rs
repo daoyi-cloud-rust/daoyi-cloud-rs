@@ -1,4 +1,4 @@
-use crate::error::{AppError, Result};
+use crate::app::error::{AppError, Result};
 use anyhow::Context;
 use serde::de::DeserializeOwned;
 use std::fs;

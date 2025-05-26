@@ -1,4 +1,4 @@
-use crate::AppError;
+use crate::app::AppError;
 use salvo::{http::StatusCode, oapi, prelude::*, Response, Scribe};
 use serde::Serialize;
 

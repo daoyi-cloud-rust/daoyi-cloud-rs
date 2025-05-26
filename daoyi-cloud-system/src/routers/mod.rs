@@ -4,7 +4,7 @@ use salvo::serve_static::{static_embed, EmbeddedFileExt};
 
 mod demos;
 
-use crate::{config, empty_ok, hoops, Empty, JsonResult};
+use crate::{config, app::empty_ok, hoops, app::Empty, app::JsonResult};
 
 #[derive(RustEmbed)]
 #[folder = "assets"]

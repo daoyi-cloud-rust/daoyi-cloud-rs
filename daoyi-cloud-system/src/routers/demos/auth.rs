@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::entities::users::Model;
 use crate::entities::{prelude::Users, users};
 use crate::hoops::jwt;
-use crate::{db, json_ok, utils, AppResult, JsonResult};
+use crate::{db, app::json_ok, utils, app::AppResult, app::JsonResult};
 
 #[handler]
 pub async fn login_page(res: &mut Response) -> AppResult<()> {

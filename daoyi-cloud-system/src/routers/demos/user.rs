@@ -9,7 +9,7 @@ use crate::hoops::jwt;
 
 use crate::entities::{prelude::Users, users};
 use crate::models::SafeUser;
-use crate::{db, empty_ok, json_ok, utils, AppResult, EmptyResult, JsonResult};
+use crate::{db, app::empty_ok, app::json_ok, utils, app::AppResult, app::EmptyResult, app::JsonResult};
 
 #[derive(Template)]
 #[template(path = "user_list_page.html")]
