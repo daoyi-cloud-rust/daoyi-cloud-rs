@@ -1,6 +1,6 @@
 use daoyi_cloud_config::config;
 use daoyi_cloud_hoops::hoops;
-use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_ok, json_ok};
+use daoyi_cloud_models::models::common_result::{json_ok, JsonResult};
 use salvo::prelude::*;
 
 mod demos;
@@ -36,5 +36,5 @@ pub fn root() -> Router {
 /// 根路由
 #[endpoint]
 pub fn root_handler() -> JsonResult<String> {
-    json_ok(String::from("daoyi-cloud-system"))
+    json_ok(String::from("daoyi-cloud-biz-demo"))
 }

@@ -1,0 +1,22 @@
+[package]
+name = "daoyi-cloud-biz-demo"
+version = { workspace = true}
+edition = {workspace = true}
+rust-version = {workspace = true}
+readme = "./README.md"
+
+[dependencies]
+anyhow = { workspace = true }
+salvo = { workspace = true, features = ["full"] }
+serde = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+validator = { workspace = true, features = ["derive"] }
+ulid = { workspace = true }
+cookie = { workspace = true }
+sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
+daoyi-cloud-entities = { workspace = true }
+daoyi-cloud-utils = { workspace = true }
+daoyi-cloud-app = { workspace = true }
+daoyi-cloud-models = { workspace = true }
+daoyi-cloud-config = { workspace = true }
+daoyi-cloud-hoops = { workspace = true }
