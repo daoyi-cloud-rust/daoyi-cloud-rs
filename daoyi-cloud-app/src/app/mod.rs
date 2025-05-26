@@ -21,10 +21,10 @@ pub async fn start(router: Router) {
             "📖 Open API Page: https://{}/scalar",
             listen_addr.replace("0.0.0.0", "127.0.0.1")
         );
-        println!(
-            "🔑 Login Page: https://{}/login",
-            listen_addr.replace("0.0.0.0", "127.0.0.1")
-        );
+        // println!(
+        //     "🔑 Login Page: https://{}/login",
+        //     listen_addr.replace("0.0.0.0", "127.0.0.1")
+        // );
         let config = RustlsConfig::new(Keycert::new().cert(tls.cert.clone()).key(tls.key.clone()));
         let acceptor = TcpListener::new(listen_addr).rustls(config).bind().await;
         let server = Server::new(acceptor);
@@ -35,10 +35,10 @@ pub async fn start(router: Router) {
             "📖 Open API 页面: http://{}/scalar",
             config.web.listen_addr.replace("0.0.0.0", "127.0.0.1")
         );
-        println!(
-            "🔑 Login Page: http://{}/login",
-            config.web.listen_addr.replace("0.0.0.0", "127.0.0.1")
-        );
+        // println!(
+        //     "🔑 Login Page: http://{}/login",
+        //     config.web.listen_addr.replace("0.0.0.0", "127.0.0.1")
+        // );
         let acceptor = TcpListener::new(&config.web.listen_addr).bind().await;
         let server = Server::new(acceptor);
         tokio::spawn(shutdown_signal(server.handle()));

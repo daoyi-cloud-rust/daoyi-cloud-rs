@@ -1,4 +1,3 @@
-use askama::Template;
 use cookie::Cookie;
 use salvo::oapi::extract::*;
 use salvo::prelude::*;
@@ -9,25 +8,8 @@ use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::demos::users::Model;
 use daoyi_cloud_entities::entities::demos::{prelude::Users, users};
 use daoyi_cloud_hoops::hoops::jwt;
-use daoyi_cloud_models::models::common_result::{AppResult, JsonResult, json_ok};
+use daoyi_cloud_models::models::common_result::{json_ok, JsonResult};
 use daoyi_cloud_utils::utils;
-
-#[handler]
-pub async fn login_page(res: &mut Response) -> AppResult<()> {
-    #[derive(Template)]
-    #[template(path = "login.html")]
-    struct LoginTemplate {}
-    if let Some(cookie) = res.cookies().get("jwt_token") {
-        let token = cookie.value().to_string();
-        if jwt::decode_token(&token) {
-            res.render(Redirect::other("/users"));
-            return Ok(());
-        }
-    }
-    let hello_tmpl = LoginTemplate {};
-    res.render(Text::Html(hello_tmpl.render().unwrap()));
-    Ok(())
-}
 
 #[derive(Deserialize, ToSchema, Default, Debug)]
 pub struct LoginInData {

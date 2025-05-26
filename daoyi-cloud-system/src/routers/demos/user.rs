@@ -1,5 +1,3 @@
-use askama::Template;
-use daoyi_cloud_hoops::hoops::jwt;
 use salvo::oapi::extract::*;
 use salvo::prelude::*;
 use sea_orm::{
@@ -12,40 +10,8 @@ use validator::Validate;
 use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::demos::{prelude::Users, users};
 use daoyi_cloud_models::models::SafeUser;
-use daoyi_cloud_models::models::common_result::{
-    AppResult, EmptyResult, JsonResult, empty_ok, json_ok,
-};
+use daoyi_cloud_models::models::common_result::{EmptyResult, JsonResult, empty_ok, json_ok};
 use daoyi_cloud_utils::utils;
-
-#[derive(Template)]
-#[template(path = "user_list_page.html")]
-pub struct UserListPageTemplate {}
-
-#[derive(Template)]
-#[template(path = "user_list_frag.html")]
-pub struct UserListFragTemplate {}
-
-#[handler]
-pub async fn list_page(req: &mut Request, res: &mut Response) -> AppResult<()> {
-    let is_fragment = req.headers().get("X-Fragment-Header");
-    if let Some(cookie) = res.cookies().get("jwt_token") {
-        let token = cookie.value().to_string();
-        if !jwt::decode_token(&token) {
-            res.render(Redirect::other("/login"));
-        }
-    }
-    match is_fragment {
-        Some(_) => {
-            let hello_tmpl = UserListFragTemplate {};
-            res.render(Text::Html(hello_tmpl.render().unwrap()));
-        }
-        None => {
-            let hello_tmpl = UserListPageTemplate {};
-            res.render(Text::Html(hello_tmpl.render().unwrap()));
-        }
-    }
-    Ok(())
-}
 
 #[derive(Deserialize, Debug, Validate, ToSchema, Default)]
 pub struct CreateInData {

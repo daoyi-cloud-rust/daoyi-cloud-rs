@@ -7,7 +7,6 @@ readme = "./README.md"
 
 [dependencies]
 anyhow = { workspace = true }
-rust-embed = { workspace = true }
 salvo = { workspace = true, features = ["full"] }
 serde = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
@@ -15,7 +14,6 @@ validator = { workspace = true, features = ["derive"] }
 ulid = { workspace = true }
 cookie = { workspace = true }
 sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
-askama = { workspace = true }
 daoyi-cloud-entities = { workspace = true }
 daoyi-cloud-utils = { workspace = true }
 daoyi-cloud-app = { workspace = true }
