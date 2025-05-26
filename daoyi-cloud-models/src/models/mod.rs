@@ -1,4 +1,5 @@
 pub mod common_result;
+pub mod error;
 
 use salvo::oapi::ToSchema;
 use serde::Serialize;

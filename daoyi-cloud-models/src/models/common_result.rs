@@ -1,6 +1,19 @@
-use crate::app::AppError;
 use salvo::{http::StatusCode, oapi, prelude::*, Response, Scribe};
 use serde::Serialize;
+use crate::models::error::AppError;
+
+pub type AppResult<T> = Result<T, AppError>;
+pub type JsonResult<T> = Result<CommonResult<T>, AppError>;
+pub type EmptyResult = Result<CommonResult<Empty>, AppError>;
+
+pub fn json_ok<T>(data: T) -> JsonResult<T> {
+    Ok(CommonResult::success(data))
+}
+#[derive(Serialize, ToSchema, Clone, Copy, Debug)]
+pub struct Empty {}
+pub fn empty_ok() -> JsonResult<Empty> {
+    Ok(CommonResult::success(Empty {}))
+}
 
 /// 通用返回
 #[derive(Debug, Serialize, ToSchema)]

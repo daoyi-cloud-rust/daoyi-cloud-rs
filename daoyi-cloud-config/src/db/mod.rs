@@ -1,8 +1,6 @@
-use std::sync::OnceLock;
-use std::time::Duration;
+use std::{sync::OnceLock, time::Duration};
 
-use sea_orm::entity::prelude::DatabaseConnection;
-use sea_orm::{ConnectOptions, Database};
+use sea_orm::{ConnectOptions, Database, entity::prelude::DatabaseConnection};
 
 use crate::config::DbConfig;
 

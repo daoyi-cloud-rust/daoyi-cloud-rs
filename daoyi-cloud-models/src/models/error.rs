@@ -13,7 +13,7 @@ pub enum AppError {
     #[error("internal: `{0}`")]
     Internal(String),
     #[error("salvo internal error: `{0}`")]
-    Salvo(#[from] ::salvo::Error),
+    Salvo(#[from] salvo::Error),
     #[error("http status error: `{0}`")]
     HttpStatus(#[from] StatusError),
     #[error("http parse error:`{0}`")]
@@ -98,7 +98,7 @@ impl Writer for AppError {
     }
 }
 impl EndpointOutRegister for AppError {
-    fn register(components: &mut salvo::oapi::Components, operation: &mut salvo::oapi::Operation) {
+    fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
         operation.responses.insert(
             StatusCode::INTERNAL_SERVER_ERROR.as_str(),
             oapi::Response::new("系统错误").add_content(

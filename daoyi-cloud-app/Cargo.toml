@@ -10,3 +10,9 @@ version.workspace = true
 repository.workspace = true
 
 [dependencies]
+salvo = { workspace = true, features = ["full"] }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+daoyi-cloud-models = {workspace = true}
+daoyi-cloud-config = {workspace = true}
+daoyi-cloud-hoops = {workspace = true}

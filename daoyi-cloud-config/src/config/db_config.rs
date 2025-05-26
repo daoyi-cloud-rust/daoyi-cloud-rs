@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::utils::toml::Configurable;
+use daoyi_cloud_utils::utils::toml::Configurable;
 use super::default_false;
 
 #[derive(Deserialize, Serialize, Clone, Debug)]

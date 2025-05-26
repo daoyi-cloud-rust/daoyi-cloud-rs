@@ -1,4 +1,4 @@
-use crate::models::common_result::CommonResult;
+use daoyi_cloud_models::models::common_result::CommonResult;
 use salvo::http::ResBody;
 use salvo::prelude::*;
 use salvo::{handler, FlowCtrl, Response};

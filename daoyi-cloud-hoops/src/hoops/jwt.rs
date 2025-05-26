@@ -5,7 +5,7 @@ use salvo::prelude::*;
 use serde::{Deserialize, Serialize};
 use time::{Duration, OffsetDateTime};
 
-use crate::config::{self, JwtConfig};
+use daoyi_cloud_config::config::{self, JwtConfig};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct JwtClaims {

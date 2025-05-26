@@ -1,14 +1,16 @@
-use cookie::Cookie;
 use askama::Template;
+use cookie::Cookie;
 use salvo::oapi::extract::*;
 use salvo::prelude::*;
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 
-use crate::entities::users::Model;
-use crate::entities::{prelude::Users, users};
-use crate::hoops::jwt;
-use crate::{db, app::json_ok, utils, app::AppResult, app::JsonResult};
+use daoyi_cloud_config::db;
+use daoyi_cloud_entities::entities::demos::users::Model;
+use daoyi_cloud_entities::entities::demos::{prelude::Users, users};
+use daoyi_cloud_hoops::hoops::jwt;
+use daoyi_cloud_models::models::common_result::{AppResult, JsonResult, json_ok};
+use daoyi_cloud_utils::utils;
 
 #[handler]
 pub async fn login_page(res: &mut Response) -> AppResult<()> {
@@ -60,8 +62,7 @@ pub async fn post_login(
             .into());
     };
 
-    if utils::verify_password(&idata.password, &password).is_err()
-    {
+    if utils::verify_password(&idata.password, &password).is_err() {
         return Err(StatusError::unauthorized()
             .brief("Addount not exist or password is incorrect.")
             .into());

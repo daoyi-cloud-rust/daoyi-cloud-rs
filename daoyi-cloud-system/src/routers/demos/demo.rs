@@ -1,7 +1,7 @@
 use askama::Template;
 use salvo::prelude::*;
 
-use crate::app::AppResult;
+use daoyi_cloud_models::models::common_result::AppResult;
 
 #[handler]
 pub async fn hello(req: &mut Request) -> AppResult<Text<String>> {

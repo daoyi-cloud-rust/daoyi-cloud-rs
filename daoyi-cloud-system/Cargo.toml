@@ -7,24 +7,18 @@ readme = "./README.md"
 
 [dependencies]
 anyhow = { workspace = true }
-figment = { workspace = true, features = ["env", "toml"] }
-jsonwebtoken = { workspace = true }
 rust-embed = { workspace = true }
 salvo = { workspace = true, features = ["full"] }
 serde = { workspace = true }
-thiserror = { workspace = true }
-time = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
-tracing = { workspace = true }
 validator = { workspace = true, features = ["derive"] }
 ulid = { workspace = true }
-argon2 = { workspace = true }
 cookie = { workspace = true }
-dotenvy = { workspace = true }
-tracing-appender = { workspace = true }
-tracing-subscriber = { workspace = true, features = ["std", "fmt", "env-filter", "tracing-log", "time", "local-time", "json"] }
 sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
 askama = { workspace = true }
-rand = { workspace = true }
-toml = { workspace = true }
-serde-toml-merge = { workspace = true }
+daoyi-cloud-entities = { workspace = true }
+daoyi-cloud-utils = { workspace = true }
+daoyi-cloud-app = { workspace = true }
+daoyi-cloud-models = { workspace = true }
+daoyi-cloud-config = { workspace = true }
+daoyi-cloud-hoops = { workspace = true }

@@ -10,3 +10,5 @@ version.workspace = true
 repository.workspace = true
 
 [dependencies]
+sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
+serde = { workspace = true }

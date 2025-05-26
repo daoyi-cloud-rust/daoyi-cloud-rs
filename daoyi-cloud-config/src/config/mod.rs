@@ -7,9 +7,10 @@ use tracing::log;
 mod log_config;
 pub use log_config::LogConfig;
 mod db_config;
-use crate::utils::env as EnvUtils;
-use crate::utils::toml::{ConfigRegistry, Configurable, TomlConfigRegistry};
+use daoyi_cloud_utils::utils::env as EnvUtils;
+use daoyi_cloud_utils::utils::toml::{ConfigRegistry, Configurable, TomlConfigRegistry};
 pub use db_config::DbConfig;
+use crate::db;
 
 pub static CONFIG: OnceLock<ServerConfig> = OnceLock::new();
 
@@ -35,7 +36,7 @@ pub async fn init(env_path: Option<String>) {
     let db_config = registry
         .get_config::<DbConfig>()
         .expect("db config is required.");
-    crate::db::init(&db_config).await;
+    db::init(&db_config).await;
     log::debug!("db {:#?}", db_config);
     let jwt_config = registry
         .get_config::<JwtConfig>()

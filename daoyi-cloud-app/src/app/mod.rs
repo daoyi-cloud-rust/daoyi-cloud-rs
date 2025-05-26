@@ -1,34 +1,16 @@
-use crate::models::common_result::CommonResult;
-use crate::{config, hoops, routers};
-pub use error::AppError;
+use daoyi_cloud_config::config;
+use daoyi_cloud_hoops::hoops;
+pub use daoyi_cloud_models::models::error::AppError;
 use salvo::catcher::Catcher;
 use salvo::conn::rustls::{Keycert, RustlsConfig};
 use salvo::prelude::*;
 use salvo::server::ServerHandle;
-use serde::Serialize;
 use tokio::signal;
 use tracing::info;
 
-pub mod error;
-
-pub type AppResult<T> = Result<T, AppError>;
-pub type JsonResult<T> = Result<CommonResult<T>, AppError>;
-pub type EmptyResult = Result<CommonResult<Empty>, AppError>;
-
-pub fn json_ok<T>(data: T) -> JsonResult<T> {
-    Ok(CommonResult::success(data))
-}
-#[derive(Serialize, ToSchema, Clone, Copy, Debug)]
-pub struct Empty {}
-pub fn empty_ok() -> JsonResult<Empty> {
-    Ok(CommonResult::success(Empty {}))
-}
-
-#[tokio::main]
-pub async fn start() {
-    config::init(Some(String::from(env!("CARGO_MANIFEST_DIR")))).await;
+pub async fn start(router: Router) {
     let config = config::get();
-    let service = Service::new(routers::root())
+    let service = Service::new(router)
         .catcher(Catcher::default().hoop(hoops::error_handler::http_error_handler))
         .hoop(hoops::cors_hoop());
     println!("🔄 在以下位置监听 {}", &config.web.listen_addr);
@@ -94,13 +76,13 @@ mod tests {
     use salvo::prelude::*;
     use salvo::test::{ResponseExt, TestClient};
 
-    use crate::config;
+    use daoyi_cloud_config::config;
 
     #[tokio::test]
     async fn test_hello_world() {
         config::init(Some(String::from(env!("CARGO_MANIFEST_DIR")))).await;
 
-        let service = Service::new(crate::routers::root());
+        let service = Service::new(Router::new());
 
         let content = TestClient::get(format!(
             "http://{}",

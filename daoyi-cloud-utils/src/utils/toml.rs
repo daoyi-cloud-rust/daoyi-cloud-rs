@@ -1,4 +1,4 @@
-use crate::app::error::{AppError, Result};
+use daoyi_cloud_models::models::error::{AppError, Result};
 use anyhow::Context;
 use serde::de::DeserializeOwned;
 use std::fs;

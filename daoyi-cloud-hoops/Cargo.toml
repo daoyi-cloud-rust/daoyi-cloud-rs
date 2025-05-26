@@ -10,3 +10,10 @@ version.workspace = true
 repository.workspace = true
 
 [dependencies]
+salvo = { workspace = true, features = ["full"] }
+daoyi-cloud-models = { workspace = true }
+anyhow = { workspace = true }
+jsonwebtoken = { workspace = true }
+serde = { workspace = true }
+time = { workspace = true }
+daoyi-cloud-config = { workspace = true }

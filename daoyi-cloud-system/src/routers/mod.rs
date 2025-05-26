@@ -1,10 +1,11 @@
+use daoyi_cloud_config::config;
+use daoyi_cloud_hoops::hoops;
+use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_ok};
 use rust_embed::RustEmbed;
 use salvo::prelude::*;
-use salvo::serve_static::{static_embed, EmbeddedFileExt};
+use salvo::serve_static::{EmbeddedFileExt, static_embed};
 
 mod demos;
-
-use crate::{config, app::empty_ok, hoops, app::Empty, app::JsonResult};
 
 #[derive(RustEmbed)]
 #[folder = "assets"]

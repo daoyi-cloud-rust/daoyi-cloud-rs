@@ -22,7 +22,6 @@ version = "0.1.0"
 repository = "https://github.com/daoyi-cloud-rust/daoyi-cloud-rust"
 [workspace.dependencies]
 anyhow = "1"
-figment = "0"
 jsonwebtoken = "9"
 rust-embed = "8"
 salvo = "0"
@@ -40,6 +39,12 @@ tracing-appender = "0"
 tracing-subscriber = "0"
 sea-orm = "1"
 askama = "0"
-rand = "0"
+rand = "0.9"
 toml = "0"
-serde-toml-merge = "0"
+daoyi-cloud-app = { path = "daoyi-cloud-app", version = "0.1.0" }
+daoyi-cloud-config = { path = "daoyi-cloud-config", version = "0.1.0" }
+daoyi-cloud-entities = { path = "daoyi-cloud-entities", version = "0.1.0" }
+daoyi-cloud-hoops = { path = "daoyi-cloud-hoops", version = "0.1.0" }
+daoyi-cloud-models = { path = "daoyi-cloud-models", version = "0.1.0" }
+daoyi-cloud-utils = { path = "daoyi-cloud-utils", version = "0.1.0" }
+

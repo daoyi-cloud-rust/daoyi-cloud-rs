@@ -10,3 +10,13 @@ version.workspace = true
 repository.workspace = true
 
 [dependencies]
+salvo = { workspace = true, features = ["full"] }
+serde = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
+tokio = { workspace = true, features = ["full"] }
+validator = { workspace = true, features = ["derive"] }
+toml = { workspace = true }
+dotenvy = { workspace = true }
+tracing = { workspace = true }
