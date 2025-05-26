@@ -8,7 +8,8 @@ edition = "2024"
 resolver = "3"
 members = [
     ".",
-    "daoyi-cloud-*"
+    "daoyi-cloud-*",
+    "migration"
 ]
 [workspace.package]
 authors = ["Gemiman <gemiman@vip.qq.com>"]
