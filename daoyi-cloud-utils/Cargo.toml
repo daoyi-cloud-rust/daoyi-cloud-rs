@@ -1,0 +1,12 @@
+[package]
+name = "daoyi-cloud-utils"
+authors.workspace = true
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+version.workspace = true
+repository.workspace = true
+
+[dependencies]
