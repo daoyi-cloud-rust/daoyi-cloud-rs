@@ -5,36 +5,26 @@ use salvo::prelude::*;
 
 mod demos;
 
-pub fn root() -> Router {
-    let router = Router::new()
-        .hoop(Logger::new())
-        .get(root_handler)
-        // 示例路由
-        .push(
-            Router::with_path("demos").push(
-                Router::with_path("api")
-                    .push(Router::with_path("login").post(demos::auth::post_login))
+pub fn routers() -> Router {
+    Router::with_path("demos").get(root_handler).push(
+        Router::with_path("api")
+            .push(Router::with_path("login").post(demos::auth::post_login))
+            .push(
+                Router::with_path("users")
+                    .hoop(hoops::auth_hoop(&config::get().jwt))
+                    .get(demos::user::list_users)
+                    .post(demos::user::create_user)
                     .push(
-                        Router::with_path("users")
-                            .hoop(hoops::auth_hoop(&config::get().jwt))
-                            .get(demos::user::list_users)
-                            .post(demos::user::create_user)
-                            .push(
-                                Router::with_path("{user_id}")
-                                    .put(demos::user::update_user)
-                                    .delete(demos::user::delete_user),
-                            ),
+                        Router::with_path("{user_id}")
+                            .put(demos::user::update_user)
+                            .delete(demos::user::delete_user),
                     ),
             ),
-        );
-    let doc = OpenApi::new("salvo web api", "0.0.1").merge_router(&router);
-    router
-        .unshift(doc.into_router("/api-doc/openapi.json"))
-        .unshift(Scalar::new("/api-doc/openapi.json").into_router("scalar"))
+    )
 }
 
-/// 根路由
-#[endpoint]
+/// demo 根路由
+#[endpoint(tags("示例"))]
 pub fn root_handler() -> JsonResult<String> {
     json_ok(String::from("daoyi-cloud-biz-demo"))
 }

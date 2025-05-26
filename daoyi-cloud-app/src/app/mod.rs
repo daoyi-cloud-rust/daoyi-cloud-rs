@@ -1,3 +1,5 @@
+mod root_router;
+
 use daoyi_cloud_config::config;
 use daoyi_cloud_hoops::hoops;
 pub use daoyi_cloud_models::models::error::AppError;
@@ -10,7 +12,7 @@ use tracing::info;
 
 pub async fn start(router: Router) {
     let config = config::get();
-    let service = Service::new(router)
+    let service = Service::new(root_router::root(router))
         .catcher(Catcher::default().hoop(hoops::error_handler::http_error_handler))
         .hoop(hoops::cors_hoop());
     println!("🔄 在以下位置监听 {}", &config.web.listen_addr);
