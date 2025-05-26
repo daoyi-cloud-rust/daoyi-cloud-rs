@@ -1,5 +1,7 @@
 pub mod env;
 pub mod toml;
+pub mod path_matches;
+
 use argon2::password_hash::rand_core::OsRng;
 use argon2::{password_hash::SaltString, Argon2, PasswordHash};
 use rand::distr::Alphanumeric;

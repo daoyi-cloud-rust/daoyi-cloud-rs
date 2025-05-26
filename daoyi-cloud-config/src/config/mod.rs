@@ -8,14 +8,16 @@ mod log_config;
 pub use log_config::LogConfig;
 mod db_config;
 pub mod redis_config;
+mod tenant_middleware_config;
 
 use crate::config::redis_config::RedisConfig;
+use crate::config::tenant_middleware_config::TenantMiddlewareConfig;
 use crate::{db, redis_util};
 use daoyi_cloud_utils::utils::env as EnvUtils;
 use daoyi_cloud_utils::utils::toml::{ConfigRegistry, Configurable, TomlConfigRegistry};
 pub use db_config::DbConfig;
 
-pub static CONFIG: OnceLock<ServerConfig> = OnceLock::new();
+static CONFIG: OnceLock<ServerConfig> = OnceLock::new();
 
 pub async fn init(env_path: Option<String>) {
     let env_path = env_path.unwrap_or_else(|| env!("CARGO_MANIFEST_DIR").to_string());
@@ -49,6 +51,9 @@ pub async fn init(env_path: Option<String>) {
         .expect("redis config is required.");
     log::debug!("redis {:#?}", redis_config);
     redis_util::init(&redis_config).await;
+    let tenant_middleware_config = registry
+        .get_config::<TenantMiddlewareConfig>()
+        .expect("tenant middleware config is required.");
 
     let config = ServerConfig {
         web: web_config,
@@ -56,6 +61,7 @@ pub async fn init(env_path: Option<String>) {
         jwt: jwt_config,
         tls: tls_config.ok(),
         redis: redis_config,
+        tenant: tenant_middleware_config,
     };
     CONFIG.set(config).expect("config should be set");
 }
@@ -70,6 +76,7 @@ pub struct ServerConfig {
     pub jwt: JwtConfig,
     pub tls: Option<TlsConfig>,
     pub redis: RedisConfig,
+    pub tenant: TenantMiddlewareConfig,
 }
 
 #[derive(Deserialize, Clone, Debug)]
@@ -114,6 +121,10 @@ pub fn default_false() -> bool {
 #[allow(dead_code)]
 pub fn default_true() -> bool {
     true
+}
+
+pub fn default_true_str() -> String {
+    true.to_string()
 }
 
 fn default_listen_addr() -> String {
