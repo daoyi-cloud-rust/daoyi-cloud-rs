@@ -15,19 +15,20 @@ mod routers;
 mod utils;
 
 mod error;
+use crate::models::common_result::CommonResult;
 pub use error::AppError;
 
 pub type AppResult<T> = Result<T, AppError>;
-pub type JsonResult<T> = Result<Json<T>, AppError>;
-pub type EmptyResult = Result<Json<Empty>, AppError>;
+pub type JsonResult<T> = Result<CommonResult<T>, AppError>;
+pub type EmptyResult = Result<CommonResult<Empty>, AppError>;
 
 pub fn json_ok<T>(data: T) -> JsonResult<T> {
-    Ok(Json(data))
+    Ok(CommonResult::success(data))
 }
 #[derive(Serialize, ToSchema, Clone, Copy, Debug)]
 pub struct Empty {}
 pub fn empty_ok() -> JsonResult<Empty> {
-    Ok(Json(Empty {}))
+    Ok(CommonResult::success(Empty {}))
 }
 
 #[tokio::main]

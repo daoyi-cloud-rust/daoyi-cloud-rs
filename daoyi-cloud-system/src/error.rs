@@ -1,8 +1,9 @@
-use std::io;
-use std::io::ErrorKind;
+use crate::models::common_result::CommonResult;
 use salvo::http::{ParseError, StatusCode, StatusError};
 use salvo::oapi::{self, EndpointOutRegister, ToSchema};
 use salvo::prelude::*;
+use std::io;
+use std::io::ErrorKind;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -23,7 +24,7 @@ pub enum AppError {
     Seaorm(#[from] sea_orm::DbErr),
     #[error("validation error:`{0}`")]
     Validation(#[from] validator::ValidationErrors),
-    
+
     /// component not exists
     #[error("{0} component not exists")]
     ComponentNotExist(&'static str),
@@ -100,18 +101,24 @@ impl EndpointOutRegister for AppError {
     fn register(components: &mut salvo::oapi::Components, operation: &mut salvo::oapi::Operation) {
         operation.responses.insert(
             StatusCode::INTERNAL_SERVER_ERROR.as_str(),
-            oapi::Response::new("Internal server error")
-                .add_content("application/json", StatusError::to_schema(components)),
+            oapi::Response::new("系统错误").add_content(
+                "application/json",
+                CommonResult::<()>::to_schema(components),
+            ),
         );
         operation.responses.insert(
             StatusCode::NOT_FOUND.as_str(),
-            oapi::Response::new("Not found")
-                .add_content("application/json", StatusError::to_schema(components)),
+            oapi::Response::new("未找到请求").add_content(
+                "application/json",
+                CommonResult::<()>::to_schema(components),
+            ),
         );
         operation.responses.insert(
             StatusCode::BAD_REQUEST.as_str(),
-            oapi::Response::new("Bad request")
-                .add_content("application/json", StatusError::to_schema(components)),
+            oapi::Response::new("参数错误").add_content(
+                "application/json",
+                CommonResult::<()>::to_schema(components),
+            ),
         );
     }
 }

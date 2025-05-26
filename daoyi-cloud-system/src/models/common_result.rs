@@ -1,13 +1,15 @@
 use crate::AppError;
-use salvo::http::StatusCode;
-use salvo::prelude::*;
-use salvo::{Response, Scribe};
+use salvo::{http::StatusCode, oapi, prelude::*, Response, Scribe};
 use serde::Serialize;
 
-#[derive(Debug, Serialize)]
+/// 通用返回
+#[derive(Debug, Serialize, ToSchema)]
 pub struct CommonResult<T> {
+    /// 状态码
     code: u16,
+    /// 数据
     data: Option<T>,
+    /// 错误信息
     msg: String,
 }
 
@@ -54,5 +56,60 @@ impl<T> CommonResult<T> {
 impl<T: Serialize + Send> Scribe for CommonResult<T> {
     fn render(self, res: &mut Response) {
         res.render(Json(self));
+    }
+}
+
+impl<T> EndpointOutRegister for CommonResult<T>
+where
+    T: ToSchema,
+{
+    fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
+        operation
+            .responses
+            .insert("200", Self::to_response(components));
+    }
+}
+
+impl<C> ToResponse for CommonResult<C>
+where
+    C: ToSchema,
+{
+    fn to_response(components: &mut oapi::Components) -> oapi::RefOr<oapi::response::Response> {
+        let schema_ref = <C as ToSchema>::to_schema(components);
+        let response = oapi::Response::new("成功")
+            .add_content(
+                "application/json",
+                oapi::Content::new(
+                    oapi::Object::new()
+                        .property(
+                            "code",
+                            oapi::Object::new()
+                                .description("状态码")
+                                .schema_type(oapi::schema::SchemaType::basic(
+                                    oapi::schema::BasicType::Integer,
+                                ))
+                                .format(oapi::SchemaFormat::KnownFormat(oapi::KnownFormat::Int32))
+                                .example(0),
+                        )
+                        .required("code")
+                        .property(
+                            "msg",
+                            oapi::Object::new()
+                                .description("错误信息")
+                                .schema_type(oapi::schema::SchemaType::basic(
+                                    oapi::schema::BasicType::String,
+                                ))
+                                .format(oapi::SchemaFormat::KnownFormat(oapi::KnownFormat::String))
+                                .example("success"),
+                        )
+                        .required("msg")
+                        .property("data", schema_ref),
+                ),
+            );
+        components.responses.insert("CommonResult", response);
+        oapi::RefOr::Ref(oapi::Ref::new(format!(
+            "#/components/responses/{}",
+            "CommonResult"
+        )))
     }
 }
