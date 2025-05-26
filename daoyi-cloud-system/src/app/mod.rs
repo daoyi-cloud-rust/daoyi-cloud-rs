@@ -1,6 +1,6 @@
-pub use error::AppError;
 use crate::models::common_result::CommonResult;
 use crate::{config, hoops, routers};
+pub use error::AppError;
 use salvo::catcher::Catcher;
 use salvo::conn::rustls::{Keycert, RustlsConfig};
 use salvo::prelude::*;
@@ -26,7 +26,7 @@ pub fn empty_ok() -> JsonResult<Empty> {
 
 #[tokio::main]
 pub async fn start() {
-    config::init().await;
+    config::init(Some(String::from(env!("CARGO_MANIFEST_DIR")))).await;
     let config = config::get();
     let service = Service::new(routers::root())
         .catcher(Catcher::default().hoop(hoops::error_handler::http_error_handler))
@@ -98,7 +98,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_hello_world() {
-        config::init().await;
+        config::init(Some(String::from(env!("CARGO_MANIFEST_DIR")))).await;
 
         let service = Service::new(crate::routers::root());
 

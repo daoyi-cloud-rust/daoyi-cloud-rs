@@ -13,15 +13,14 @@ pub use db_config::DbConfig;
 
 pub static CONFIG: OnceLock<ServerConfig> = OnceLock::new();
 
-pub async fn init() {
-    let _env0 = EnvUtils::Env::init(Some(
-        format!("{}/.env", env!("CARGO_MANIFEST_DIR")).as_str(),
-    ));
+pub async fn init(env_path: Option<String>) {
+    let env_path = env_path.unwrap_or_else(|| env!("CARGO_MANIFEST_DIR").to_string());
+    let _env0 = EnvUtils::Env::init(Some(format!("{}/.env", env_path).as_str()));
     // let config_path_buf = env::var("APP_CONFIG")
     //     .as_deref()
     //     .unwrap_or(format!("{}/resources/app.toml", env!("CARGO_MANIFEST_DIR")).as_str());
-    let config_path_buf = env::var("APP_CONFIG")
-        .unwrap_or_else(|_| format!("{}/resources/app.toml", env!("CARGO_MANIFEST_DIR")));
+    let config_path_buf =
+        env::var("APP_CONFIG").unwrap_or_else(|_| format!("{}/resources/app.toml", env_path));
     let registry =
         TomlConfigRegistry::new(config_path_buf.as_str()).expect("config registry error.");
     let log_config = registry
