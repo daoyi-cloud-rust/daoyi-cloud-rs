@@ -48,7 +48,7 @@ pub struct CreateInData {
     #[validate(length(min = 6, message = "password length must be greater than 5"))]
     pub password: String,
 }
-#[endpoint(tags("users"))]
+#[endpoint(tags("示例"))]
 pub async fn create_user(idata: JsonBody<CreateInData>) -> JsonResult<SafeUser> {
     let CreateInData { username, password } = idata.into_inner();
     let id = Ulid::new().to_string();
@@ -71,7 +71,7 @@ struct UpdateInData {
     #[validate(length(min = 6, message = "password length must be greater than 5"))]
     password: String,
 }
-#[endpoint(tags("users"), parameters(("user_id", description = "user id")))]
+#[endpoint(tags("示例"), parameters(("user_id", description = "user id")))]
 pub async fn update_user(
     user_id: PathParam<String>,
     idata: JsonBody<UpdateInData>,
@@ -94,7 +94,7 @@ pub async fn update_user(
     })
 }
 
-#[endpoint(tags("users"))]
+#[endpoint(tags("示例"))]
 pub async fn delete_user(user_id: PathParam<String>) -> EmptyResult {
     let user_id = user_id.into_inner();
     let conn = db::pool();
@@ -123,7 +123,7 @@ pub struct UserListResponse {
     pub page_size: u64,
 }
 
-#[endpoint(tags("users"))]
+#[endpoint(tags("示例"))]
 pub async fn list_users(query: &mut Request) -> JsonResult<UserListResponse> {
     let query: UserListQuery = query.extract().await?;
     let conn = db::pool();

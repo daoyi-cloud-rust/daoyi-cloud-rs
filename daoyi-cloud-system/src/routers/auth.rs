@@ -39,7 +39,7 @@ pub struct LoginOutData {
     pub token: String,
     pub exp: i64,
 }
-#[endpoint(tags("auth"))]
+#[endpoint(tags("示例"))]
 pub async fn post_login(
     idata: JsonBody<LoginInData>,
     res: &mut Response,
