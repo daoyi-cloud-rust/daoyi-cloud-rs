@@ -17,3 +17,4 @@ tracing-subscriber = { workspace = true, features = ["std", "fmt", "env-filter",
 daoyi-cloud-utils = { workspace = true }
 time = { workspace = true }
 sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
+redis = { workspace = true, features = ["connection-manager", "tokio-comp"] }

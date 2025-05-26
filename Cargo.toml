@@ -41,6 +41,7 @@ sea-orm = "1"
 askama = "0"
 rand = "0.9"
 toml = "0"
+redis = "0"
 daoyi-cloud-app = { path = "daoyi-cloud-app", version = "0.1.0" }
 daoyi-cloud-config = { path = "daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entities = { path = "daoyi-cloud-entities", version = "0.1.0" }

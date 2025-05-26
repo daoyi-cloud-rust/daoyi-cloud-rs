@@ -7,19 +7,19 @@ use tracing::log;
 mod log_config;
 pub use log_config::LogConfig;
 mod db_config;
+pub mod redis_config;
+
+use crate::config::redis_config::RedisConfig;
+use crate::{db, redis_util};
 use daoyi_cloud_utils::utils::env as EnvUtils;
 use daoyi_cloud_utils::utils::toml::{ConfigRegistry, Configurable, TomlConfigRegistry};
 pub use db_config::DbConfig;
-use crate::db;
 
 pub static CONFIG: OnceLock<ServerConfig> = OnceLock::new();
 
 pub async fn init(env_path: Option<String>) {
     let env_path = env_path.unwrap_or_else(|| env!("CARGO_MANIFEST_DIR").to_string());
     let _env0 = EnvUtils::Env::init(Some(format!("{}/.env", env_path).as_str()));
-    // let config_path_buf = env::var("APP_CONFIG")
-    //     .as_deref()
-    //     .unwrap_or(format!("{}/resources/app.toml", env!("CARGO_MANIFEST_DIR")).as_str());
     let config_path_buf =
         env::var("APP_CONFIG").unwrap_or_else(|_| format!("{}/resources/app.toml", env_path));
     let registry =
@@ -44,20 +44,19 @@ pub async fn init(env_path: Option<String>) {
     log::debug!("jwt {:#?}", jwt_config);
     let tls_config = registry.get_config::<TlsConfig>();
     log::debug!("tls {:#?}", tls_config);
+    let redis_config = registry
+        .get_config::<RedisConfig>()
+        .expect("redis config is required.");
+    log::debug!("redis {:#?}", redis_config);
+    redis_util::init(&redis_config).await;
 
-    let mut config = ServerConfig {
+    let config = ServerConfig {
         web: web_config,
         db: db_config,
         jwt: jwt_config,
         tls: tls_config.ok(),
+        redis: redis_config,
     };
-    if config.db.url.is_empty() {
-        config.db.url = std::env::var("DATABASE_URL").unwrap_or_default();
-    }
-    if config.db.url.is_empty() {
-        eprintln!("DATABASE_URL is not set");
-        std::process::exit(1);
-    }
     CONFIG.set(config).expect("config should be set");
 }
 pub fn get() -> &'static ServerConfig {
@@ -70,6 +69,7 @@ pub struct ServerConfig {
     pub db: DbConfig,
     pub jwt: JwtConfig,
     pub tls: Option<TlsConfig>,
+    pub redis: RedisConfig,
 }
 
 #[derive(Deserialize, Clone, Debug)]

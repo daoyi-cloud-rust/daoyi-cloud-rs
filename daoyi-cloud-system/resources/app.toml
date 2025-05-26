@@ -12,3 +12,13 @@ expiry = "${JWT_EXPIRY:3600}"
 file_name = "${LOG_FILE_NAME:app.log}"
 rolling = "${LOG_ROLLING:daily}"
 filter_level = "${LOG_LEVEL:info}"
+
+[redis]
+uri = "${REDIS_URL:redis://127.0.0.1/}"        # redis 数据库地址
+# 下面都是可选配置
+#    connection_timeout = 10000        # 连接超时时间，单位毫秒
+#    response_timeout = 1000           # 响应超时时间，单位毫秒
+#    number_of_retries = 6             # 重试次数，间隔时间按指数增长
+#    exponent_base = 2                 # 间隔时间指数基数，单位毫秒
+#    factor = 100                      # 间隔时间增长因子，默认100倍增长
+#    max_delay = 60000                 # 最大间隔时间
