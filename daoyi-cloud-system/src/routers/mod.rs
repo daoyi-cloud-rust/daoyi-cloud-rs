@@ -10,7 +10,7 @@ pub fn routers() -> Router {
 }
 
 /// 系统管理模块 根路由
-#[endpoint]
+#[endpoint(tags("管理后台 - 系统管理"))]
 pub fn root_handler() -> JsonResult<String> {
     json_ok(String::from("daoyi-cloud-system"))
 }

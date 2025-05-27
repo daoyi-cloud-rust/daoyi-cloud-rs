@@ -17,8 +17,7 @@ pub fn root(routers: Router) -> Router {
         .unshift(Scalar::new("/api-doc/openapi.json").into_router("scalar"))
 }
 
-/// 根路由
-#[endpoint]
+#[endpoint(tags("根路由"))]
 pub fn root_handler() -> JsonResult<String> {
     json_ok(String::from("Welcome to daoyi-cloud-rs."))
 }
