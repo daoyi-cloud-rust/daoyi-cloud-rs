@@ -1,16 +1,20 @@
+use salvo::oapi;
 use salvo::oapi::extract::*;
 use salvo::prelude::*;
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QuerySelect, Set,
 };
 use serde::{Deserialize, Serialize};
+use std::any::type_name;
 use ulid::Ulid;
 use validator::Validate;
 
 use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::demos::{prelude::Users, users};
 use daoyi_cloud_models::models::SafeUser;
-use daoyi_cloud_models::models::common_result::{EmptyResult, JsonResult, empty_ok, json_ok};
+use daoyi_cloud_models::models::common_result::{
+    EmptyResult, JsonResult, empty_ok, json_ok, to_common_response,
+};
 use daoyi_cloud_utils::utils;
 
 #[derive(Deserialize, Debug, Validate, ToSchema, Default)]
@@ -97,6 +101,22 @@ pub struct UserListResponse {
     pub total: u64,
     pub current_page: u64,
     pub page_size: u64,
+}
+
+impl EndpointOutRegister for UserListResponse {
+    fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
+        operation
+            .responses
+            .insert(StatusCode::OK.as_str(), Self::to_response(components));
+    }
+}
+
+impl ToResponse for UserListResponse {
+    fn to_response(components: &mut oapi::Components) -> oapi::RefOr<oapi::response::Response> {
+        let schema_ref = Self::to_schema(components);
+        let type_name = type_name::<Self>();
+        to_common_response(components, type_name, schema_ref)
+    }
 }
 
 #[endpoint(tags("示例"))]

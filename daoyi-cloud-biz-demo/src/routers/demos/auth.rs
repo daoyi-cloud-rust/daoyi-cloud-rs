@@ -1,14 +1,16 @@
 use cookie::Cookie;
+use salvo::oapi;
 use salvo::oapi::extract::*;
 use salvo::prelude::*;
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
+use std::any::type_name;
 
 use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::demos::users::Model;
 use daoyi_cloud_entities::entities::demos::{prelude::Users, users};
 use daoyi_cloud_hoops::hoops::jwt;
-use daoyi_cloud_models::models::common_result::{json_ok, JsonResult};
+use daoyi_cloud_models::models::common_result::{JsonResult, json_ok, to_common_response};
 use daoyi_cloud_utils::utils;
 
 #[derive(Deserialize, ToSchema, Default, Debug)]
@@ -23,6 +25,23 @@ pub struct LoginOutData {
     pub token: String,
     pub exp: i64,
 }
+
+impl EndpointOutRegister for LoginOutData {
+    fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
+        operation
+            .responses
+            .insert(StatusCode::OK.as_str(), Self::to_response(components));
+    }
+}
+
+impl ToResponse for LoginOutData {
+    fn to_response(components: &mut oapi::Components) -> oapi::RefOr<oapi::response::Response> {
+        let schema_ref = Self::to_schema(components);
+        let type_name = type_name::<Self>();
+        to_common_response(components, type_name, schema_ref)
+    }
+}
+
 #[endpoint(tags("示例"))]
 pub async fn post_login(
     idata: JsonBody<LoginInData>,

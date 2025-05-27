@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use daoyi_cloud_utils::utils::toml::Configurable;
 use super::default_false;
+use daoyi_cloud_utils::utils::toml::Configurable;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct DbConfig {

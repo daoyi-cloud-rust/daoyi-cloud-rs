@@ -1,6 +1,7 @@
-use salvo::{http::StatusCode, oapi, prelude::*, Response, Scribe};
-use serde::Serialize;
 use crate::models::error::AppError;
+use salvo::{Response, Scribe, http::StatusCode, oapi, prelude::*};
+use serde::Serialize;
+use std::any::type_name;
 
 pub type AppResult<T> = Result<T, AppError>;
 pub type JsonResult<T> = Result<CommonResult<T>, AppError>;
@@ -11,6 +12,23 @@ pub fn json_ok<T>(data: T) -> JsonResult<T> {
 }
 #[derive(Serialize, ToSchema, Clone, Copy, Debug)]
 pub struct Empty {}
+
+impl EndpointOutRegister for Empty {
+    fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
+        operation
+            .responses
+            .insert(StatusCode::OK.as_str(), Self::to_response(components));
+    }
+}
+
+impl ToResponse for Empty {
+    fn to_response(components: &mut oapi::Components) -> oapi::RefOr<oapi::response::Response> {
+        let schema_ref = Self::to_schema(components);
+        let type_name = type_name::<Self>();
+        to_common_response(components, type_name, schema_ref)
+    }
+}
+
 pub fn empty_ok() -> JsonResult<Empty> {
     Ok(CommonResult::success(Empty {}))
 }
@@ -74,12 +92,13 @@ impl<T: Serialize + Send> Scribe for CommonResult<T> {
 
 impl<T> EndpointOutRegister for CommonResult<T>
 where
-    T: ToSchema,
+    T: ToSchema + EndpointOutRegister,
 {
     fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
         operation
             .responses
-            .insert("200", Self::to_response(components));
+            .insert(StatusCode::OK.as_str(), Self::to_response(components));
+        T::register(components, operation);
     }
 }
 
@@ -89,40 +108,47 @@ where
 {
     fn to_response(components: &mut oapi::Components) -> oapi::RefOr<oapi::response::Response> {
         let schema_ref = <C as ToSchema>::to_schema(components);
-        let response = oapi::Response::new("成功")
-            .add_content(
-                "application/json",
-                oapi::Content::new(
-                    oapi::Object::new()
-                        .property(
-                            "code",
-                            oapi::Object::new()
-                                .description("状态码")
-                                .schema_type(oapi::schema::SchemaType::basic(
-                                    oapi::schema::BasicType::Integer,
-                                ))
-                                .format(oapi::SchemaFormat::KnownFormat(oapi::KnownFormat::Int32))
-                                .example(0),
-                        )
-                        .required("code")
-                        .property(
-                            "msg",
-                            oapi::Object::new()
-                                .description("错误信息")
-                                .schema_type(oapi::schema::SchemaType::basic(
-                                    oapi::schema::BasicType::String,
-                                ))
-                                .format(oapi::SchemaFormat::KnownFormat(oapi::KnownFormat::String))
-                                .example("success"),
-                        )
-                        .required("msg")
-                        .property("data", schema_ref),
-                ),
-            );
-        components.responses.insert("CommonResult", response);
-        oapi::RefOr::Ref(oapi::Ref::new(format!(
-            "#/components/responses/{}",
-            "CommonResult"
-        )))
+        let type_name = type_name::<Self>();
+        to_common_response(components, type_name, schema_ref)
     }
+}
+
+pub fn to_common_response(
+    components: &mut oapi::Components,
+    type_name: &str,
+    schema_ref: oapi::RefOr<oapi::schema::Schema>,
+) -> oapi::RefOr<oapi::response::Response> {
+    let response = oapi::Response::new("成功").add_content(
+        "application/json",
+        oapi::Content::new(
+            oapi::Object::new()
+                .property(
+                    "code",
+                    oapi::Object::new()
+                        .description("状态码")
+                        .schema_type(oapi::schema::SchemaType::basic(
+                            oapi::schema::BasicType::Integer,
+                        ))
+                        .format(oapi::SchemaFormat::KnownFormat(oapi::KnownFormat::Int32))
+                        .example(0),
+                )
+                .required("code")
+                .property(
+                    "msg",
+                    oapi::Object::new()
+                        .description("错误信息")
+                        .schema_type(oapi::schema::SchemaType::basic(
+                            oapi::schema::BasicType::String,
+                        ))
+                        .format(oapi::SchemaFormat::KnownFormat(oapi::KnownFormat::String))
+                        .example("success"),
+                )
+                .required("msg")
+                .property("data", schema_ref),
+        ),
+    );
+    components.responses.insert(type_name, response);
+    oapi::RefOr::Ref(oapi::Ref::new(format!(
+        "#/components/responses/{type_name}"
+    )))
 }
