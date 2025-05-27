@@ -41,10 +41,11 @@ rand = "0.9"
 toml = "0"
 redis = "0"
 wax = "0"
+derive_more = "2"
 daoyi-cloud-app = { path = "daoyi-cloud-app", version = "0.1.0" }
 daoyi-cloud-config = { path = "daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entities = { path = "daoyi-cloud-entities", version = "0.1.0" }
 daoyi-cloud-hoops = { path = "daoyi-cloud-hoops", version = "0.1.0" }
 daoyi-cloud-models = { path = "daoyi-cloud-models", version = "0.1.0" }
 daoyi-cloud-utils = { path = "daoyi-cloud-utils", version = "0.1.0" }
-
+daoyi-cloud-service = { path = "daoyi-cloud-service", version = "0.1.0" }

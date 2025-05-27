@@ -11,3 +11,4 @@ tokio = { workspace = true, features = ["full"] }
 daoyi-cloud-app = { workspace = true }
 daoyi-cloud-models = { workspace = true }
 daoyi-cloud-config = { workspace = true }
+daoyi-cloud-service = { workspace = true }

@@ -22,3 +22,5 @@ uri = "${REDIS_URL:redis://127.0.0.1/}"        # redis 数据库地址
 #    exponent_base = 2                 # 间隔时间指数基数，单位毫秒
 #    factor = 100                      # 间隔时间增长因子，默认100倍增长
 #    max_delay = 60000                 # 最大间隔时间
+[tenant]
+enabled = "${TENANT_ENABLED:false}"

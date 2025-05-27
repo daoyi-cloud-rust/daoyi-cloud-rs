@@ -30,7 +30,9 @@ pub async fn tenant_middleware(
         }
     } else {
         let path = String::from(req.uri().path());
-        if !path_matches::path_any_matches(&tenant_middleware_config.ignore_urls, &path) {
+        if tenant_middleware_config.enabled()
+            && !path_matches::path_any_matches(&tenant_middleware_config.ignore_urls, &path)
+        {
             res.render(CommonResult::<String>::build(
                 StatusCode::BAD_REQUEST,
                 None,

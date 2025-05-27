@@ -12,3 +12,4 @@ repository.workspace = true
 [dependencies]
 sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
 serde = { workspace = true }
+derive_more = { workspace = true, features = ["full"] }

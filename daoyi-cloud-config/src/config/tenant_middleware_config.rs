@@ -14,6 +14,12 @@ pub struct TenantMiddlewareConfig {
     pub ignore_tables: Vec<String>,
 }
 
+impl TenantMiddlewareConfig {
+    pub fn enabled(&self) -> bool {
+        self.enabled == "true"
+    }
+}
+
 impl Configurable for TenantMiddlewareConfig {
     fn config_prefix() -> &'static str {
         "tenant"
