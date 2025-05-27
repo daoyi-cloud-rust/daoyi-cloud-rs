@@ -6,10 +6,12 @@ use tracing::log;
 
 mod log_config;
 pub use log_config::LogConfig;
+pub mod auth_middleware_config;
 mod db_config;
 pub mod redis_config;
-mod tenant_middleware_config;
+pub mod tenant_middleware_config;
 
+use crate::config::auth_middleware_config::AuthMiddlewareConfig;
 use crate::config::redis_config::RedisConfig;
 use crate::config::tenant_middleware_config::TenantMiddlewareConfig;
 use crate::{db, redis_util};
@@ -30,30 +32,27 @@ pub async fn init(env_path: Option<String>) {
         .get_config::<LogConfig>()
         .expect("log config is required.");
     let _guard = log_config.guard();
-    log::info!("log level: {}", &log_config.filter_level);
     let web_config = registry
         .get_config::<WebConfig>()
         .expect("web config is required.");
-    log::debug!("web {:#?}", web_config);
     let db_config = registry
         .get_config::<DbConfig>()
         .expect("db config is required.");
     db::init(&db_config).await;
-    log::debug!("db {:#?}", db_config);
     let jwt_config = registry
         .get_config::<JwtConfig>()
         .expect("jwt config is required.");
-    log::debug!("jwt {:#?}", jwt_config);
     let tls_config = registry.get_config::<TlsConfig>();
-    log::debug!("tls {:#?}", tls_config);
     let redis_config = registry
         .get_config::<RedisConfig>()
         .expect("redis config is required.");
-    log::debug!("redis {:#?}", redis_config);
     redis_util::init(&redis_config).await;
     let tenant_middleware_config = registry
         .get_config::<TenantMiddlewareConfig>()
         .expect("tenant middleware config is required.");
+    let auth_middleware_config = registry
+        .get_config::<AuthMiddlewareConfig>()
+        .expect("auth middleware config is required.");
 
     let config = ServerConfig {
         web: web_config,
@@ -62,7 +61,9 @@ pub async fn init(env_path: Option<String>) {
         tls: tls_config.ok(),
         redis: redis_config,
         tenant: tenant_middleware_config,
+        auth: auth_middleware_config,
     };
+    log::debug!("config {:#?}", config);
     CONFIG.set(config).expect("config should be set");
 }
 pub fn get() -> &'static ServerConfig {
@@ -77,6 +78,7 @@ pub struct ServerConfig {
     pub tls: Option<TlsConfig>,
     pub redis: RedisConfig,
     pub tenant: TenantMiddlewareConfig,
+    pub auth: AuthMiddlewareConfig,
 }
 
 #[derive(Deserialize, Clone, Debug)]

@@ -1,4 +1,4 @@
-use daoyi_cloud_hoops::hoops::tenant_middleware;
+use daoyi_cloud_hoops::hoops::{auth_middleware, tenant_middleware};
 use daoyi_cloud_models::models::common_result::{JsonResult, json_ok};
 use salvo::Router;
 use salvo::logging::Logger;
@@ -9,6 +9,7 @@ pub fn root(routers: Router) -> Router {
     let router = Router::new()
         .hoop(Logger::new())
         .hoop(tenant_middleware::tenant_middleware)
+        .hoop(auth_middleware::auth_middleware)
         .get(root_handler)
         .push(routers);
     let doc = OpenApi::new("salvo web api", "0.0.1").merge_router(&router);

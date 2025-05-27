@@ -19,18 +19,31 @@ pub struct Model {
     pub mobile: Option<String>,
     pub sex: Option<i8>,
     pub avatar: Option<String>,
+    #[sea_orm(default_value = 0)]
     pub status: i8,
     pub login_ip: Option<String>,
     pub login_date: Option<DateTime>,
     pub creator: Option<String>,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
+    #[sea_orm(default_value = 0)]
     pub tenant_id: i64,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
-impl ActiveModelBehavior for ActiveModel {}
+#[async_trait::async_trait]
+impl ActiveModelBehavior for ActiveModel {
+    async fn before_save<C>(self, _db: &C, insert: bool) -> Result<Self, DbErr>
+    where
+        C: ConnectionTrait,
+    {
+        Ok(self)
+    }
+}

@@ -18,6 +18,7 @@ pub async fn tenant_middleware(
         let tenant_id: Result<i64, _> = header_value.to_str().unwrap_or_default().parse();
         if let Ok(tenant_id) = tenant_id {
             depot.insert(header_name, tenant_id);
+            // 修改租户ID
         } else {
             res.render(CommonResult::<String>::build(
                 StatusCode::BAD_REQUEST,
