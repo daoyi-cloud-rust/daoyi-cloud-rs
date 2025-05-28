@@ -15,12 +15,27 @@ pub async fn auth_middleware(
 ) {
     let auth_middleware_config = &config::get().auth;
     let header_name = auth_middleware_config.header_name.as_str();
+    let login_user_key = auth_middleware_config.login_user_key.as_str();
+    let tenant_middleware_config = &config::get().tenant;
+    let tenant_header_name = tenant_middleware_config.header_name.as_str();
     if let Some(header_value) = req.headers().get(header_name) {
         let authorization: Result<&str, ToStrError> = header_value.to_str();
         if let Ok(authorization) = authorization {
             if authorization.starts_with(auth_middleware_config.prefix.as_str()) {
-                // 修改租户ID
-                depot.insert(header_name, 1i64);
+                if let Ok(tenant_id) = depot.get::<i64>(tenant_header_name) {
+                    println!("tenant_id: {}", tenant_id);
+                    // 修改当前用户信息
+                    depot.insert(login_user_key, 1i64);
+                } else {
+                    res.render(CommonResult::<String>::build(
+                        StatusCode::UNAUTHORIZED,
+                        None,
+                        Some("租户ID错误.".to_string()),
+                    ));
+                    res.status_code(StatusCode::OK);
+                    ctrl.skip_rest();
+                    return;
+                }
             } else {
                 res.render(CommonResult::<String>::build(
                     StatusCode::UNAUTHORIZED,
