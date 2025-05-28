@@ -17,8 +17,8 @@ pub async fn tenant_middleware(
     if let Some(header_value) = req.headers().get(header_name) {
         let tenant_id: Result<i64, _> = header_value.to_str().unwrap_or_default().parse();
         if let Ok(tenant_id) = tenant_id {
-            depot.insert(header_name, tenant_id);
             // 修改租户ID
+            depot.insert(header_name, tenant_id);
         } else {
             res.render(CommonResult::<String>::build(
                 StatusCode::BAD_REQUEST,
