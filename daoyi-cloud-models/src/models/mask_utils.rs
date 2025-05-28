@@ -56,6 +56,7 @@ where
     serializer.serialize_str(&masked_username)
 }
 
+#[allow(dead_code)]
 pub fn serializer_datetime_opt<S>(date: &Option<DateTime>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
@@ -67,6 +68,7 @@ where
     serializer.serialize_str(&formatted.to_string())
 }
 
+#[allow(dead_code)]
 pub fn serializer_datetime<S>(date: &DateTime, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
