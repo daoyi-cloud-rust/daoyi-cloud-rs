@@ -1,3 +1,4 @@
+use crate::rpc_service::system::system_oauth2_access_token::check_access_token;
 use daoyi_cloud_config::config;
 use daoyi_cloud_models::models::common_result::CommonResult;
 use daoyi_cloud_utils::utils::path_matches;
@@ -21,18 +22,37 @@ pub async fn auth_middleware(
     if let Some(header_value) = req.headers().get(header_name) {
         let authorization: Result<&str, ToStrError> = header_value.to_str();
         if let Ok(authorization) = authorization {
-            if authorization.starts_with(auth_middleware_config.prefix.as_str()) {
+            if let Some(token) = authorization.strip_prefix(auth_middleware_config.prefix.as_str())
+            {
                 if let Ok(tenant_id) = depot.get::<i64>(tenant_header_name) {
                     println!("tenant_id: {}", tenant_id);
-                    // 修改当前用户信息
-                    depot.insert(login_user_key, 1i64);
+                    let result = check_access_token(token).await;
+                    match result {
+                        Ok(resp) => {
+                            if let Some(resp_dto) = resp.data() {
+                                depot.insert(login_user_key, resp_dto);
+                            } else {
+                                res.render(CommonResult::<String>::build(
+                                    StatusCode::UNAUTHORIZED,
+                                    None,
+                                    Some("Token无效.".to_string()),
+                                ));
+                                ctrl.skip_rest();
+                                return;
+                            }
+                        }
+                        Err(err) => {
+                            res.render(CommonResult::<String>::error(anyhow::Error::from(err)));
+                            ctrl.skip_rest();
+                            return;
+                        }
+                    }
                 } else {
                     res.render(CommonResult::<String>::build(
                         StatusCode::UNAUTHORIZED,
                         None,
                         Some("租户ID错误.".to_string()),
                     ));
-                    res.status_code(StatusCode::OK);
                     ctrl.skip_rest();
                     return;
                 }
@@ -42,7 +62,6 @@ pub async fn auth_middleware(
                     None,
                     Some("Token无效.".to_string()),
                 ));
-                res.status_code(StatusCode::OK);
                 ctrl.skip_rest();
                 return;
             }
@@ -52,7 +71,6 @@ pub async fn auth_middleware(
                 None,
                 Some("Token无效.".to_string()),
             ));
-            res.status_code(StatusCode::OK);
             ctrl.skip_rest();
             return;
         }
@@ -64,7 +82,6 @@ pub async fn auth_middleware(
                 None,
                 Some("未登录.".to_string()),
             ));
-            res.status_code(StatusCode::OK);
             ctrl.skip_rest();
             return;
         }

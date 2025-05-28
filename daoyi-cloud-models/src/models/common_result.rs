@@ -1,6 +1,6 @@
 use crate::models::error::AppError;
 use salvo::{Response, Scribe, http::StatusCode, oapi, prelude::*};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::any::type_name;
 
 pub type AppResult<T> = Result<T, AppError>;
@@ -34,7 +34,7 @@ pub fn empty_ok() -> JsonResult<Empty> {
 }
 
 /// 通用返回
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Serialize, ToSchema, Deserialize)]
 pub struct CommonResult<T> {
     /// 状态码
     code: u16,
@@ -45,6 +45,32 @@ pub struct CommonResult<T> {
 }
 
 impl<T> CommonResult<T> {
+    pub fn msg(self) -> String {
+        self.msg
+    }
+    pub fn code(&self) -> u16 {
+        self.code
+    }
+    pub fn data(self) -> Option<T> {
+        self.data
+    }
+
+    pub fn is_success(&self) -> bool {
+        self.code == StatusCode::OK.as_u16()
+    }
+
+    pub fn is_fail(&self) -> bool {
+        !self.is_success()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.data.is_none()
+    }
+
+    pub fn is_not_empty(&self) -> bool {
+        !self.is_empty()
+    }
+
     pub fn empty_success() -> Self {
         Self {
             code: StatusCode::OK.as_u16(),
@@ -67,20 +93,29 @@ impl<T> CommonResult<T> {
             msg: msg.unwrap_or_else(|| code.to_string()),
         }
     }
+
     pub fn error(e: anyhow::Error) -> Self {
-        let code = if e.downcast_ref::<AppError>().is_some() {
+        let res = if e.downcast_ref::<AppError>().is_some() {
             match e.downcast_ref::<AppError>() {
-                Some(AppError::HttpStatus(status)) => status.code.as_u16(),
-                _ => StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+                Some(AppError::HttpStatus(status)) => Self {
+                    code: status.code.as_u16(),
+                    data: None,
+                    msg: status.brief.to_string(),
+                },
+                _ => Self {
+                    code: StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+                    data: None,
+                    msg: e.to_string(),
+                },
             }
         } else {
-            StatusCode::INTERNAL_SERVER_ERROR.as_u16()
+            Self {
+                code: StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+                data: None,
+                msg: e.to_string(),
+            }
         };
-        Self {
-            code,
-            data: None,
-            msg: e.to_string(),
-        }
+        res
     }
 }
 

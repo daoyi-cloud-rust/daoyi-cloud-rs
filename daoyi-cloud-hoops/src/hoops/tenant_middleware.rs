@@ -25,7 +25,6 @@ pub async fn tenant_middleware(
                 None,
                 Some("租户ID错误.".to_string()),
             ));
-            res.status_code(StatusCode::OK);
             ctrl.skip_rest();
             return;
         }
@@ -39,7 +38,6 @@ pub async fn tenant_middleware(
                 None,
                 Some("请求的租户标识未传递，请进行排查.".to_string()),
             ));
-            res.status_code(StatusCode::OK);
             ctrl.skip_rest();
             return;
         }

@@ -9,10 +9,12 @@ pub use log_config::LogConfig;
 pub mod auth_middleware_config;
 mod db_config;
 pub mod redis_config;
+pub mod rpc_service_config;
 pub mod tenant_middleware_config;
 
 use crate::config::auth_middleware_config::AuthMiddlewareConfig;
 use crate::config::redis_config::RedisConfig;
+use crate::config::rpc_service_config::RpcServiceConfig;
 use crate::config::tenant_middleware_config::TenantMiddlewareConfig;
 use crate::{db, redis_util};
 use daoyi_cloud_utils::utils::env as EnvUtils;
@@ -53,6 +55,9 @@ pub async fn init(env_path: Option<String>) {
     let auth_middleware_config = registry
         .get_config::<AuthMiddlewareConfig>()
         .expect("auth middleware config is required.");
+    let rpc_service_config = registry
+        .get_config::<RpcServiceConfig>()
+        .expect("rpc service config is required.");
 
     let config = ServerConfig {
         web: web_config,
@@ -62,6 +67,7 @@ pub async fn init(env_path: Option<String>) {
         redis: redis_config,
         tenant: tenant_middleware_config,
         auth: auth_middleware_config,
+        rpc: rpc_service_config,
     };
     log::debug!("config {:#?}", config);
     CONFIG.set(config).expect("config should be set");
@@ -79,6 +85,7 @@ pub struct ServerConfig {
     pub redis: RedisConfig,
     pub tenant: TenantMiddlewareConfig,
     pub auth: AuthMiddlewareConfig,
+    pub rpc: RpcServiceConfig,
 }
 
 #[derive(Deserialize, Clone, Debug)]
