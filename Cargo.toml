@@ -25,6 +25,7 @@ anyhow = "1"
 jsonwebtoken = "9"
 salvo = "0"
 serde = "1"
+serde_json = "1"
 thiserror = "2"
 time = "0"
 tokio = "1"
@@ -42,6 +43,7 @@ toml = "0"
 redis = "0"
 wax = "0"
 derive_more = "2"
+chrono = "0"
 daoyi-cloud-app = { path = "daoyi-cloud-app", version = "0.1.0" }
 daoyi-cloud-config = { path = "daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entities = { path = "daoyi-cloud-entities", version = "0.1.0" }

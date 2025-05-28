@@ -10,7 +10,9 @@ version.workspace = true
 repository.workspace = true
 
 [dependencies]
-daoyi-cloud-models = {workspace = true}
-daoyi-cloud-entities = {workspace = true}
-daoyi-cloud-config = {workspace = true}
+daoyi-cloud-models = { workspace = true }
+daoyi-cloud-entities = { workspace = true }
+daoyi-cloud-config = { workspace = true }
 sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
+salvo = { workspace = true, features = ["full"] }
+chrono = { workspace = true }

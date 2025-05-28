@@ -28,6 +28,14 @@ enabled = "${TENANT_ENABLED:false}"
 header_name = "${TENANT_HEADER_NAME:tenant-id}"
 ignore_urls = [
     "/scalar",
-    "/api-doc/**"
+    "/api-doc/**",
+    "/rpc-api/system/oauth2/token/check"
 ]
 ignore_tables = []
+
+[auth]
+ignore_urls = [
+    "/scalar",
+    "/api-doc/**",
+    "/rpc-api/system/oauth2/token/check"
+]
