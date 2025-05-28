@@ -1,6 +1,8 @@
 use sea_orm::prelude::DateTime;
 use serde::Serializer;
 
+pub static DATE_TIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+
 /// 手机号脱敏函数
 pub fn mask_phone<S>(phone: &str, serializer: S) -> Result<S::Ok, S::Error>
 where
@@ -61,7 +63,7 @@ where
     if date.is_none() {
         return serializer.serialize_none();
     }
-    let formatted = date.unwrap().format("%Y-%m-%d %H:%M:%S"); // 可动态修改格式[3](@ref)
+    let formatted = date.unwrap().format(DATE_TIME_FORMAT); // 可动态修改格式[3](@ref)
     serializer.serialize_str(&formatted.to_string())
 }
 

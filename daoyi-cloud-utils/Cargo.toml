@@ -13,7 +13,7 @@ repository.workspace = true
 argon2 = { workspace = true }
 rand = { workspace = true }
 anyhow = { workspace = true }
-serde = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
 toml = { workspace = true }
 daoyi-cloud-models = { workspace = true }
 dotenvy = { workspace = true }

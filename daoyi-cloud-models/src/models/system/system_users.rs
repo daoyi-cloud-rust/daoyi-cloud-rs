@@ -3,7 +3,6 @@ use crate::models::mask_utils::*;
 use daoyi_cloud_entities::entities::system::system_users::Model;
 use salvo::oapi;
 use salvo::prelude::*;
-use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::any::type_name;
 
@@ -22,8 +21,7 @@ pub struct SystemUsersModel {
     pub sex: Option<i8>,
     pub avatar: Option<String>,
     pub status: i8,
-    #[serde(serialize_with = "serializer_datetime_opt")]
-    pub login_date: Option<DateTime>,
+    pub login_date: String,
 }
 
 impl From<Model> for SystemUsersModel {
@@ -39,7 +37,10 @@ impl From<Model> for SystemUsersModel {
             sex: m.sex,
             avatar: m.avatar,
             status: m.status,
-            login_date: m.login_date,
+            login_date: match m.login_date {
+                Some(date) => date.format(DATE_TIME_FORMAT).to_string(),
+                None => "".to_string(),
+            },
         }
     }
 }

@@ -37,7 +37,7 @@ pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenChec
                 .brief(error_msg),
         ));
     }
-    let json: serde_json::Value = response.json().await.map_err(|e| {
+    let json_str = response.text().await.map_err(|e| {
         log::error!("RPC请求失败: {}", e);
         AppError::HttpStatus(
             StatusError::from_code(StatusCode::SERVICE_UNAVAILABLE)
@@ -45,8 +45,9 @@ pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenChec
                 .brief("认证服务不可用."),
         )
     })?;
-    let resp: CommonResult<OAuth2AccessTokenCheckRespDTO> =
-        serde_json::from_value(json).map_err(|e| {
+    log::debug!("json_str: {json_str}");
+    let resp: CommonResult<OAuth2AccessTokenCheckRespDTO> = serde_json::from_str(&json_str)
+        .map_err(|e| {
             log::error!("数据反序列化失败: {}", e);
             AppError::HttpStatus(
                 StatusError::from_code(StatusCode::UNAUTHORIZED)

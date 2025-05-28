@@ -10,7 +10,7 @@ version.workspace = true
 repository.workspace = true
 
 [dependencies]
-serde = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["std", "fmt", "env-filter", "tracing-log", "time", "local-time", "json"] }

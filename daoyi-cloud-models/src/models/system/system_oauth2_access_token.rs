@@ -1,11 +1,10 @@
 use crate::models::common_result::to_common_response;
-use crate::models::mask_utils::serializer_datetime;
+use crate::models::mask_utils::DATE_TIME_FORMAT;
 use crate::models::system::system_users::SystemUsersModel;
 use daoyi_cloud_entities::entities::system::system_oauth2_access_token::Model;
 use salvo::http::StatusCode;
 use salvo::oapi;
 use salvo::oapi::{EndpointOutRegister, ToResponse, ToSchema};
-use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::any::type_name;
 use std::string::String;
@@ -22,8 +21,7 @@ pub struct OAuth2AccessTokenCheckRespDTO {
     /// 授权范围的数组
     pub scopes: Vec<String>,
     /// 过期时间
-    #[serde(serialize_with = "serializer_datetime")]
-    pub expires_time: DateTime,
+    pub expires_time: String,
     /// 终端编号
     pub terminal_id: Option<String>,
     /// 租户编号
@@ -37,7 +35,7 @@ impl From<Model> for OAuth2AccessTokenCheckRespDTO {
             user_type: m.user_type,
             user_info: None,
             scopes: serde_json::from_str(&m.scopes.unwrap_or_else(|| String::from("[]"))).unwrap(),
-            expires_time: m.expires_time,
+            expires_time: m.expires_time.format(DATE_TIME_FORMAT).to_string(),
             terminal_id: m.terminal_id,
             tenant_id: m.tenant_id,
         }

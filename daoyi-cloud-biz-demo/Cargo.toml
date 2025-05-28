@@ -8,7 +8,7 @@ readme = "./README.md"
 [dependencies]
 anyhow = { workspace = true }
 salvo = { workspace = true, features = ["full"] }
-serde = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
 tokio = { workspace = true, features = ["full"] }
 validator = { workspace = true, features = ["derive"] }
 ulid = { workspace = true }
