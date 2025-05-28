@@ -1,3 +1,4 @@
+use sea_orm::prelude::DateTime;
 use serde::Serializer;
 
 /// 手机号脱敏函数
@@ -51,4 +52,22 @@ where
     };
 
     serializer.serialize_str(&masked_username)
+}
+
+pub fn serializer_datetime_opt<S>(date: &Option<DateTime>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    if date.is_none() {
+        return serializer.serialize_none();
+    }
+    let formatted = date.unwrap().format("%Y-%m-%d %H:%M:%S"); // 可动态修改格式[3](@ref)
+    serializer.serialize_str(&formatted.to_string())
+}
+
+pub fn serializer_datetime<S>(date: &DateTime, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    serializer_datetime_opt(&Some(date.clone()), serializer)
 }

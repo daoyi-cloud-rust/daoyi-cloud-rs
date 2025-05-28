@@ -1,4 +1,5 @@
 use crate::models::common_result::to_common_response;
+use crate::models::mask_utils::serializer_datetime;
 use crate::models::system::system_users::SystemUsersModel;
 use daoyi_cloud_entities::entities::system::system_oauth2_access_token::Model;
 use salvo::http::StatusCode;
@@ -21,6 +22,7 @@ pub struct OAuth2AccessTokenCheckRespDTO {
     /// 授权范围的数组
     pub scopes: Vec<String>,
     /// 过期时间
+    #[serde(serialize_with = "serializer_datetime")]
     pub expires_time: DateTime,
     /// 终端编号
     pub terminal_id: Option<String>,

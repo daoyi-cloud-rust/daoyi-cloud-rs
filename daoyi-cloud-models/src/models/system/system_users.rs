@@ -22,6 +22,7 @@ pub struct SystemUsersModel {
     pub sex: Option<i8>,
     pub avatar: Option<String>,
     pub status: i8,
+    #[serde(serialize_with = "serializer_datetime_opt")]
     pub login_date: Option<DateTime>,
 }
 
