@@ -8,6 +8,7 @@ use std::any::type_name;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema, Default)]
 pub struct SystemUsersModel {
+    pub id: i64,
     #[serde(serialize_with = "mask_username")]
     pub username: String,
     pub nickname: String,
@@ -22,11 +23,13 @@ pub struct SystemUsersModel {
     pub avatar: Option<String>,
     pub status: i8,
     pub login_date: String,
+    pub tenant_id: i64,
 }
 
 impl From<Model> for SystemUsersModel {
     fn from(m: Model) -> Self {
         Self {
+            id: m.id,
             username: m.username,
             nickname: m.nickname,
             remark: m.remark,
@@ -41,6 +44,7 @@ impl From<Model> for SystemUsersModel {
                 Some(date) => date.format(DATE_TIME_FORMAT).to_string(),
                 None => "".to_string(),
             },
+            tenant_id: m.tenant_id,
         }
     }
 }

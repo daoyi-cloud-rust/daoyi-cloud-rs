@@ -1,11 +1,11 @@
 pub mod env;
-pub mod toml;
 pub mod path_matches;
+pub mod toml;
 
 use argon2::password_hash::rand_core::OsRng;
-use argon2::{password_hash::SaltString, Argon2, PasswordHash};
-use rand::distr::Alphanumeric;
+use argon2::{Argon2, PasswordHash, password_hash::SaltString};
 use rand::Rng;
+use rand::distr::Alphanumeric;
 use std::iter;
 
 #[allow(dead_code)]
@@ -33,4 +33,13 @@ pub fn hash_password(password: &str) -> anyhow::Result<String> {
     Ok(PasswordHash::generate(Argon2::default(), password, &salt)
         .map_err(|e| anyhow::anyhow!("failed to generate password hash: {}", e))?
         .to_string())
+}
+
+pub fn generate_token() -> String {
+    loop {
+        let hash_p = hash_password(random_string(64).as_str());
+        if hash_p.is_ok() {
+            return hash_p.unwrap();
+        }
+    }
 }

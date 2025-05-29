@@ -37,5 +37,6 @@ ignore_tables = []
 ignore_urls = [
     "/scalar",
     "/api-doc/**",
-    "/rpc-api/system/oauth2/token/check"
+    "/rpc-api/system/oauth2/token/check",
+    "/admin-api/system/auth/login"
 ]

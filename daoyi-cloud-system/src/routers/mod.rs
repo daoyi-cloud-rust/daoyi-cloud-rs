@@ -23,7 +23,7 @@ pub fn routers() -> Router {
                     )
                     .push(
                         Router::with_path("auth")
-                            .push(Router::with_path("refresh-token").post(system_users::get_by_id)),
+                            .push(Router::with_path("login").post(system_users::login)),
                     ),
             ),
         )

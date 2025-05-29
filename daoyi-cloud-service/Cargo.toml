@@ -16,3 +16,5 @@ daoyi-cloud-config = { workspace = true }
 sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
 salvo = { workspace = true, features = ["full"] }
 chrono = { workspace = true }
+serde_json = { workspace = true }
+daoyi-cloud-utils = { workspace = true }
