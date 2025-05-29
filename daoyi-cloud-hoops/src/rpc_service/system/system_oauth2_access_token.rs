@@ -1,17 +1,22 @@
-use daoyi_cloud_config::config;
-use daoyi_cloud_models::models::common_result::{CommonResult, JsonResult};
+use daoyi_cloud_config::{config, redis_util};
+use daoyi_cloud_models::models::common_result::{CommonResult, JsonResult, json_ok};
 use daoyi_cloud_models::models::error::AppError;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
+use redis::AsyncCommands;
 use reqwest::StatusCode;
 use salvo::http::StatusError;
 use tracing::log;
 
-// pub async fn check_access_token_redis(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
-//     let redis = redis_util::pool().to_owned();
-//     let result: String = redis.get(token).await.context("获取访问令牌失败");
-//
-//     json_ok(OAuth2AccessTokenCheckRespDTO::from(v))
-// }
+pub async fn check_access_token_redis(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
+    let result = redis_util::pool().get::<&str, String>(token).await;
+    if let Ok(json_str) = result {
+        let dto: Result<OAuth2AccessTokenCheckRespDTO, _> = serde_json::from_str(&json_str);
+        if let Ok(dto) = dto {
+            return json_ok(dto);
+        }
+    }
+    check_access_token(token).await
+}
 
 pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
     let check_access_token_url = &config::get().rpc.check_access_token;
@@ -56,6 +61,12 @@ pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenChec
             )
         })?;
     if resp.is_success() {
+        if let Some(dto) = resp.clone().data() {
+            redis_util::pool()
+                .set::<&str, String, String>(token, serde_json::to_string(&dto).unwrap())
+                .await
+                .expect("redis set error");
+        }
         return Ok(resp);
     }
     Err(AppError::HttpStatus(

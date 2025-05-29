@@ -1,4 +1,4 @@
-use crate::rpc_service::system::system_oauth2_access_token::check_access_token;
+use crate::rpc_service::system::system_oauth2_access_token::check_access_token_redis;
 use daoyi_cloud_config::config;
 use daoyi_cloud_models::models::common_result::CommonResult;
 use daoyi_cloud_utils::utils::path_matches;
@@ -26,7 +26,7 @@ pub async fn auth_middleware(
             {
                 if let Ok(tenant_id) = depot.get::<i64>(tenant_header_name) {
                     println!("tenant_id: {}", tenant_id);
-                    let result = check_access_token(token).await;
+                    let result = check_access_token_redis(token).await;
                     match result {
                         Ok(resp) => {
                             if let Some(resp_dto) = resp.data() {

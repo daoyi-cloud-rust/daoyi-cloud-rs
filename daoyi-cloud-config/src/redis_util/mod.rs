@@ -1,6 +1,6 @@
 use crate::config::redis_config::RedisConfig;
 use redis::aio::ConnectionManagerConfig;
-use redis::Client;
+use redis::{AsyncCommands, Client};
 use std::sync::OnceLock;
 use std::time::Duration;
 
@@ -41,8 +41,12 @@ pub async fn init(config: &RedisConfig) {
         Ok(x) => x,
         Err(_) => panic!("redis init failed:{}", url.clone()),
     };
+    let result = pool().set::<&str, &str, String>("test", "test123").await;
+    println!("{:?}", result);
+    let result1 = pool().get::<String, String>("test".to_string()).await;
+    println!("{:?}", result1);
 }
 
-pub fn pool() -> &'static Redis {
-    REDIS_POOL.get().expect("redis pool should set")
+pub fn pool() -> Redis {
+    REDIS_POOL.get().expect("redis pool should set").to_owned()
 }
