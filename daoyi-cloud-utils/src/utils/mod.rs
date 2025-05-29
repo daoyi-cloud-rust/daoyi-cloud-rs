@@ -36,10 +36,5 @@ pub fn hash_password(password: &str) -> anyhow::Result<String> {
 }
 
 pub fn generate_token() -> String {
-    loop {
-        let hash_p = hash_password(random_string(64).as_str());
-        if hash_p.is_ok() {
-            return hash_p.unwrap();
-        }
-    }
+    uuid::Uuid::new_v4().simple().to_string()
 }
