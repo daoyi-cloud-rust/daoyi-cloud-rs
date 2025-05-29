@@ -15,7 +15,7 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
-sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql"] }
+sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql", "macros"] }
 tokio = { workspace = true, features = ["full"] }
 validator = { workspace = true, features = ["derive"] }
 toml = { workspace = true }

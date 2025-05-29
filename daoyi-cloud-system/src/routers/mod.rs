@@ -19,11 +19,15 @@ pub fn routers() -> Router {
                     .get(root_handler)
                     .push(
                         Router::with_path("user")
-                            .push(Router::with_path("get").get(system_users::get_by_id)),
+                            .push(Router::with_path("get").get(system_users::get_by_id))
+                            .push(
+                                Router::with_path("gen-password").get(system_users::hash_password),
+                            ),
                     )
                     .push(
-                        Router::with_path("auth")
-                            .push(Router::with_path("login").post(system_users::login)),
+                        Router::with_path("auth").push(
+                            Router::with_path("login").post(system_oauth2_access_token::login),
+                        ),
                     ),
             ),
         )

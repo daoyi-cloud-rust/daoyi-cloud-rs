@@ -9,7 +9,7 @@ use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2Access
 use daoyi_cloud_models::models::system::system_users::SystemUsersModel;
 use daoyi_cloud_utils::utils;
 use salvo::prelude::*;
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, NotSet, QueryFilter, Set, TryIntoModel};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 
 pub async fn check_access_token(token: &str) -> AppResult<OAuth2AccessTokenCheckRespDTO> {
     match SystemOauth2AccessToken::find()
@@ -56,7 +56,6 @@ pub async fn create_token_after_login_success(
 ) -> AppResult<AuthLoginRespVO> {
     reset_login_time(&user_model.id).await?;
     let model = system_oauth2_access_token::ActiveModel {
-        id: NotSet,
         user_id: Set(user_model.id),
         user_type: Set(2),
         user_info: Set(serde_json::to_string(&user_model).unwrap()),
@@ -71,10 +70,7 @@ pub async fn create_token_after_login_success(
         tenant_id: Set(user_model.tenant_id),
         ..Default::default()
     };
-    let _result = SystemOauth2AccessToken::insert(model.to_owned())
-        .exec(db::pool())
-        .await?;
-    let model: system_oauth2_access_token::Model = model.try_into_model()?;
+    let model = model.insert(db::pool()).await?;
     let resp_dto = AuthLoginRespVO::from(model);
     Ok(resp_dto)
 }

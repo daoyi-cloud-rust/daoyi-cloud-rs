@@ -29,7 +29,8 @@ header_name = "${TENANT_HEADER_NAME:tenant-id}"
 ignore_urls = [
     "/scalar",
     "/api-doc/**",
-    "/rpc-api/system/oauth2/token/check"
+    "/rpc-api/system/oauth2/token/check",
+    "/admin-api/system/user/gen-password",
 ]
 ignore_tables = []
 
@@ -38,5 +39,6 @@ ignore_urls = [
     "/scalar",
     "/api-doc/**",
     "/rpc-api/system/oauth2/token/check",
-    "/admin-api/system/auth/login"
+    "/admin-api/system/auth/login",
+    "/admin-api/system/user/gen-password",
 ]
