@@ -63,7 +63,7 @@ pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenChec
     if resp.is_success() {
         if let Some(dto) = resp.clone().data() {
             redis_util::pool()
-                .set::<&str, String, String>(token, serde_json::to_string(&dto).unwrap())
+                .set_ex::<&str, String, String>(token, serde_json::to_string(&dto).unwrap(), 3600)
                 .await
                 .expect("redis set error");
         }
