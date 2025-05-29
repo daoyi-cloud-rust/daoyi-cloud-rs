@@ -18,7 +18,7 @@ pub async fn check_access_token(token: &str) -> AppResult<OAuth2AccessTokenCheck
             if v.expires_time.lt(&chrono::Local::now().naive_local()) {
                 v = reset_expires_time(&v.id).await?;
             }
-            let system_users_model = get_system_users_by_id(v.user_id).await?;
+            let system_users_model = get_system_users_by_id(v.user_id, None).await?;
             let mut resp_dto = OAuth2AccessTokenCheckRespDTO::from(v);
             resp_dto.user_info = Some(system_users_model);
             Ok(resp_dto)

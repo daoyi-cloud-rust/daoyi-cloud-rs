@@ -87,7 +87,7 @@ impl Writer for AppError {
             Self::Public(msg) => StatusError::internal_server_error().brief(msg),
             Self::Internal(msg) => {
                 tracing::error!(msg = msg, "internal error");
-                StatusError::internal_server_error()
+                StatusError::internal_server_error().brief(msg)
             }
             Self::HttpStatus(e) => e,
             e => StatusError::internal_server_error()
