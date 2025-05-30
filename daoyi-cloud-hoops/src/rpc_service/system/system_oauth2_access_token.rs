@@ -18,7 +18,7 @@ pub async fn check_access_token_redis(token: &str) -> JsonResult<OAuth2AccessTok
     check_access_token(token).await
 }
 
-pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
+async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
     let check_access_token_url = &config::get().rpc.check_access_token;
     let request_url = format!("{check_access_token_url}?token={token}");
     let response = reqwest::get(request_url).await.map_err(|e| {

@@ -1,6 +1,8 @@
+use crate::rpc_service::system::permission_service::has_any_permission;
 use crate::rpc_service::system::system_oauth2_access_token::check_access_token_redis;
 use daoyi_cloud_config::config;
 use daoyi_cloud_models::models::common_result::CommonResult;
+use daoyi_cloud_models::models::system::permission_check_req_vo::PermissionCheckReqVO;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
 use daoyi_cloud_utils::utils::path_matches;
 use salvo::http::StatusCode;
@@ -31,9 +33,11 @@ impl Handler for SS {
         let auth_middleware_config = &config::get().auth;
         let login_user_key = auth_middleware_config.login_user_key.as_str();
         if let Ok(login_user) = depot.get::<OAuth2AccessTokenCheckRespDTO>(login_user_key) {
-            if self
-                .permissions
-                .contains(&"&login_user.user_id".to_string())
+            if has_any_permission(PermissionCheckReqVO {
+                user_id: login_user.user_id,
+                permissions: self.permissions.to_owned(),
+            })
+            .await
             {
                 ctrl.call_next(req, depot, res).await;
                 return;

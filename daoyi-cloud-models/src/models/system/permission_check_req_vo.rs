@@ -2,11 +2,11 @@ use crate::models::common_result::to_common_response;
 use salvo::http::StatusCode;
 use salvo::oapi;
 use salvo::oapi::{EndpointOutRegister, ToResponse, ToSchema};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::any::type_name;
 
-/// 管理后台 - 账号密码登录 Request VO
-#[derive(Deserialize, ToSchema, Default, Debug)]
+/// 管理后台 - 权限校验 Request VO
+#[derive(Serialize, Deserialize, ToSchema, Default, Debug, Clone)]
 pub struct PermissionCheckReqVO {
     /// 用户编号,示例: 1
     pub user_id: i64,

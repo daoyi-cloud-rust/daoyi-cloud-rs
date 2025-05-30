@@ -23,7 +23,7 @@ pub fn routers() -> Router {
                     .push(
                         Router::with_path("permission").push(
                             Router::with_path("has-any-permissions")
-                                .get(system_oauth2_access_token::check_access_token),
+                                .post(permission_api::has_any_permission),
                         ),
                     ),
             ),
