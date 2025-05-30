@@ -42,3 +42,6 @@ ignore_urls = [
     "/admin-api/system/auth/login",
     "/admin-api/system/user/gen-password",
 ]
+
+[security]
+strength = "${PASSWORD_STRENGTH:4}"

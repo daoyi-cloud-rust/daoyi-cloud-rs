@@ -18,3 +18,4 @@ daoyi-cloud-utils = { workspace = true }
 time = { workspace = true }
 sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql", "macros"] }
 redis = { workspace = true, features = ["connection-manager", "tokio-comp", "r2d2", "json"] }
+bcrypt = { workspace = true }

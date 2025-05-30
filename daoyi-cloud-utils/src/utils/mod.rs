@@ -1,4 +1,5 @@
 pub mod env;
+pub mod password_encoder;
 pub mod path_matches;
 pub mod toml;
 
