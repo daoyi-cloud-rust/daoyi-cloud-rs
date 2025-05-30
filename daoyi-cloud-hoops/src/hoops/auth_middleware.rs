@@ -1,10 +1,55 @@
 use crate::rpc_service::system::system_oauth2_access_token::check_access_token_redis;
 use daoyi_cloud_config::config;
 use daoyi_cloud_models::models::common_result::CommonResult;
+use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
 use daoyi_cloud_utils::utils::path_matches;
 use salvo::http::StatusCode;
 use salvo::http::header::ToStrError;
-use salvo::{Depot, FlowCtrl, Request, Response, handler};
+use salvo::{Depot, FlowCtrl, Handler, Request, Response, async_trait, handler};
+
+pub struct SS {
+    permissions: Vec<String>,
+}
+
+impl SS {
+    pub fn has_permission(permission: String) -> Self {
+        Self {
+            permissions: vec![permission],
+        }
+    }
+}
+
+#[async_trait]
+impl Handler for SS {
+    async fn handle(
+        &self,
+        req: &mut Request,
+        depot: &mut Depot,
+        res: &mut Response,
+        ctrl: &mut FlowCtrl,
+    ) {
+        let auth_middleware_config = &config::get().auth;
+        let login_user_key = auth_middleware_config.login_user_key.as_str();
+        if let Ok(login_user) = depot.get::<OAuth2AccessTokenCheckRespDTO>(login_user_key) {
+            if self
+                .permissions
+                .contains(&"&login_user.user_id".to_string())
+            {
+                ctrl.call_next(req, depot, res).await;
+                return;
+            } else {
+                res.render(CommonResult::<String>::build(
+                    StatusCode::FORBIDDEN,
+                    None,
+                    Some("当前操作没有权限.".to_string()),
+                ));
+                ctrl.skip_rest();
+                return;
+            }
+        }
+        ctrl.call_next(req, depot, res).await;
+    }
+}
 
 #[handler]
 pub async fn auth_middleware(

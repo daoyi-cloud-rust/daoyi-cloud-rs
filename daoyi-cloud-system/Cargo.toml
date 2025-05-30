@@ -13,3 +13,4 @@ daoyi-cloud-models = { workspace = true }
 daoyi-cloud-config = { workspace = true }
 daoyi-cloud-service = { workspace = true }
 daoyi-cloud-utils = { workspace = true }
+daoyi-cloud-hoops = { workspace = true }
