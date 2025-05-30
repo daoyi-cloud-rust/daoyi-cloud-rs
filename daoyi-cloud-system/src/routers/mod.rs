@@ -1,3 +1,4 @@
+mod permission_api;
 mod system_oauth2_access_token;
 mod system_users;
 
@@ -8,11 +9,24 @@ use salvo::prelude::*;
 pub fn routers() -> Router {
     Router::new()
         .push(
-            Router::with_path("rpc-api").push(Router::with_path("system").get(root_handler).push(
-                Router::with_path("oauth2").push(Router::with_path("token").push(
-                    Router::with_path("check").get(system_oauth2_access_token::check_access_token),
-                )),
-            )),
+            Router::with_path("rpc-api").push(
+                Router::with_path("system")
+                    .get(root_handler)
+                    .push(
+                        Router::with_path("oauth2").push(
+                            Router::with_path("token").push(
+                                Router::with_path("check")
+                                    .get(system_oauth2_access_token::check_access_token),
+                            ),
+                        ),
+                    )
+                    .push(
+                        Router::with_path("permission").push(
+                            Router::with_path("has-any-permissions")
+                                .get(system_oauth2_access_token::check_access_token),
+                        ),
+                    ),
+            ),
         )
         .push(
             Router::with_path("admin-api").push(
