@@ -1,19 +1,29 @@
 use daoyi_cloud_config::db;
+use daoyi_cloud_entities::entities::system::prelude::SystemDept;
 use daoyi_cloud_entities::entities::system::system_dept;
 use daoyi_cloud_models::models::common_result::AppResult;
+use daoyi_cloud_models::models::error::AppError;
 use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
-use sea_orm::{ActiveModelTrait, Set};
+use salvo::http::{StatusCode, StatusError};
+use sea_orm::ColumnTrait;
+use sea_orm::QueryFilter;
+use sea_orm::{ActiveModelTrait, EntityTrait, Set};
 
 pub async fn create_dept(
     login_user: OAuth2AccessTokenCheckRespDTO,
     req_vo: DeptSaveReqVo,
 ) -> AppResult<system_dept::Model> {
+    // 校验父部门的有效性
+    let _ = validate_parent_dept(&req_vo.id, &req_vo.parent_id).await?;
+    // 校验部门名的唯一性
+    let _ = validate_dept_name_unique(&req_vo.id, &req_vo.parent_id, &req_vo.name).await?;
+    // 插入部门
     let model = system_dept::ActiveModel {
         email: Set(req_vo.email),
         leader_user_id: Set(req_vo.leader_user_id),
         name: Set(req_vo.name),
-        parent_id: Set(req_vo.parent_id.unwrap_or(0)),
+        parent_id: Set(req_vo.parent_id.unwrap_or(system_dept::PARENT_ID_ROOT)),
         phone: Set(req_vo.phone),
         sort: Set(req_vo.sort),
         status: Set(req_vo.status),
@@ -24,4 +34,81 @@ pub async fn create_dept(
     };
     let model = model.insert(db::pool()).await?;
     Ok(model)
+}
+
+async fn validate_dept_name_unique(
+    id: &Option<i64>,
+    parent_id: &Option<i64>,
+    name: &String,
+) -> AppResult<()> {
+    let parent_id = parent_id.unwrap_or(system_dept::PARENT_ID_ROOT);
+    let option = SystemDept::find()
+        .filter(system_dept::Column::Name.eq(name))
+        .filter(system_dept::Column::ParentId.eq(parent_id))
+        .one(db::pool())
+        .await?;
+    if option.is_none() {
+        return Ok(());
+    }
+    // 如果 id 为空，说明不用比较是否为相同 id 的部门
+    if id.is_none() || id.unwrap() != option.unwrap().id {
+        return Err(AppError::HttpStatus(
+            StatusError::from_code(StatusCode::BAD_REQUEST)
+                .unwrap()
+                .brief("已经存在该名字的部门"),
+        ));
+    }
+    Ok(())
+}
+
+async fn validate_parent_dept(id: &Option<i64>, parent_id: &Option<i64>) -> AppResult<()> {
+    if parent_id.is_none() || parent_id.unwrap() == system_dept::PARENT_ID_ROOT {
+        return Ok(());
+    }
+    // 1. 不能设置自己为父部门
+    if id.is_some() && id.unwrap() == parent_id.unwrap() {
+        return Err(AppError::HttpStatus(
+            StatusError::from_code(StatusCode::BAD_REQUEST)
+                .unwrap()
+                .brief("不能设置自己为父部门"),
+        ));
+    }
+    // 2. 父部门不存在
+    let option = SystemDept::find_by_id(parent_id.unwrap())
+        .one(db::pool())
+        .await?;
+    if option.is_none() {
+        return Err(AppError::HttpStatus(
+            StatusError::from_code(StatusCode::BAD_REQUEST)
+                .unwrap()
+                .brief("父部门不存在"),
+        ));
+    }
+    // 3. 递归校验父部门，如果父部门是自己的子部门，则报错，避免形成环路
+    if id.is_none() {
+        return Ok(());
+    }
+    let mut parent = option.unwrap();
+    loop {
+        // 3.1 校验环路
+        let parent_id = parent.parent_id;
+        if parent_id == id.unwrap() {
+            return Err(AppError::HttpStatus(
+                StatusError::from_code(StatusCode::BAD_REQUEST)
+                    .unwrap()
+                    .brief("不能设置自己的子部门为父部门"),
+            ));
+        }
+        // 3.2 继续递归下一级父部门
+        if parent_id == system_dept::PARENT_ID_ROOT {
+            break;
+        }
+        let option = SystemDept::find_by_id(parent_id).one(db::pool()).await?;
+        if option.is_none() {
+            break;
+        }
+        parent = option.unwrap();
+    }
+
+    Ok(())
 }

@@ -3,23 +3,32 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
+pub static PARENT_ID_ROOT: i64 = 0;
+
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "system_dept")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i64,
     pub name: String,
+    #[sea_orm(default_value = 0)]
     pub parent_id: i64,
+    #[sea_orm(default_value = 0)]
     pub sort: i32,
     pub leader_user_id: Option<i64>,
     pub phone: Option<String>,
     pub email: Option<String>,
+    #[sea_orm(default_value = 0)]
     pub status: i8,
     pub creator: Option<String>,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
+    #[sea_orm(default_value = 0)]
     pub tenant_id: i64,
 }
 
