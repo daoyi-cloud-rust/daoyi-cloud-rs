@@ -2,7 +2,6 @@ use daoyi_cloud_config::{config, redis_util};
 use daoyi_cloud_models::models::common_result::{CommonResult, JsonResult};
 use daoyi_cloud_models::models::error::AppError;
 use daoyi_cloud_models::models::system::permission_check_req_vo::PermissionCheckReqVO;
-use redis::AsyncCommands;
 use reqwest::StatusCode;
 use salvo::http::StatusError;
 use tracing::log;
@@ -13,16 +12,12 @@ fn gen_redis_key(user_id: &i64, permissions: &Vec<String>) -> String {
     format!("has_any_permission:{}:{}", user_id, vec.join("|"))
 }
 pub async fn has_any_permission(check_req_vo: PermissionCheckReqVO) -> bool {
-    let result = redis_util::pool()
-        .get::<&str, String>(
-            gen_redis_key(&(check_req_vo.user_id), &(check_req_vo.permissions)).as_str(),
-        )
-        .await;
-    if let Ok(json_str) = result {
-        let dto: Result<&str, _> = serde_json::from_str(&json_str);
-        if let Ok(dto) = dto {
-            return "true".eq(dto);
-        }
+    if let Some(json_str) = redis_util::get_json_value::<String>(
+        gen_redis_key(&(check_req_vo.user_id), &(check_req_vo.permissions)).as_str(),
+    )
+    .await
+    {
+        return json_str.eq("true");
     }
     let result = check_permission(check_req_vo).await;
     if result.is_ok() {
@@ -82,14 +77,12 @@ async fn check_permission(check_req_vo: PermissionCheckReqVO) -> JsonResult<Stri
     })?;
     if resp.is_success() {
         if let Some(dto) = resp.clone().data() {
-            redis_util::pool()
-                .set_ex::<&str, String, String>(
-                    gen_redis_key(&(check_req_vo.user_id), &(check_req_vo.permissions)).as_str(),
-                    serde_json::to_string(&dto).unwrap(),
-                    60,
-                )
-                .await
-                .expect("redis set error");
+            redis_util::set_json_value::<String>(
+                gen_redis_key(&(check_req_vo.user_id), &(check_req_vo.permissions)).as_str(),
+                Some(60 * 10), // 10分钟
+                &dto,
+            )
+            .await;
         }
         return Ok(resp);
     }

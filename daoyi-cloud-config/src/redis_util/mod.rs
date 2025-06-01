@@ -1,11 +1,13 @@
 use crate::config::redis_config::RedisConfig;
 use redis::aio::ConnectionManagerConfig;
 use redis::{AsyncCommands, Client};
+use serde::Serialize;
+use serde::de::DeserializeOwned;
 use std::sync::OnceLock;
 use std::time::Duration;
 
-pub type Redis = redis::aio::ConnectionManager;
-pub static REDIS_POOL: OnceLock<Redis> = OnceLock::new();
+type Redis = redis::aio::ConnectionManager;
+static REDIS_POOL: OnceLock<Redis> = OnceLock::new();
 
 pub async fn init(config: &RedisConfig) {
     let url = config.uri.to_owned();
@@ -50,6 +52,94 @@ pub async fn init(config: &RedisConfig) {
     println!("{:?}", result1);
 }
 
-pub fn pool() -> Redis {
+fn pool() -> Redis {
     REDIS_POOL.get().expect("redis pool should set").to_owned()
+}
+
+static CACHED_REDIS_KEY: &str = "cached_keys";
+async fn generate_redis_key_by_method(method_name: &str, suffix: &str) -> String {
+    let key = format!("{}:{}", method_name, suffix);
+    cache_keys(key.to_owned()).await;
+    key
+}
+
+pub async fn clear_cached_keys() {
+    let result = pool().get::<&str, String>(CACHED_REDIS_KEY).await;
+    if let Ok(res_str) = result {
+        let result: Result<Vec<String>, _> = serde_json::from_str(&res_str);
+        if let Ok(list) = result {
+            for key in list {
+                let _ = pool().del::<&str, String>(key.as_str()).await;
+            }
+        }
+    }
+}
+
+pub async fn cache_keys(key: String) {
+    let result = pool().get::<&str, String>(CACHED_REDIS_KEY).await;
+    if let Ok(res_str) = result {
+        let result: Result<Vec<String>, _> = serde_json::from_str(&res_str);
+        if let Ok(mut list) = result {
+            list.push(key);
+            pool()
+                .set::<&str, String, String>(
+                    CACHED_REDIS_KEY,
+                    serde_json::to_string(&list).unwrap(),
+                )
+                .await
+                .expect("redis set error");
+            return;
+        }
+    }
+    pool()
+        .set::<&str, String, String>(
+            CACHED_REDIS_KEY,
+            serde_json::to_string(&Vec::<String>::new()).unwrap(),
+        )
+        .await
+        .expect("redis set error");
+}
+
+pub async fn get_json_value<T>(redis_key: &str) -> Option<T>
+where
+    T: DeserializeOwned,
+{
+    let result = pool().get::<&str, String>(redis_key).await;
+    if let Ok(res_str) = result {
+        let result = serde_json::from_str::<T>(&res_str);
+        if let Ok(list) = result {
+            return Some(list);
+        }
+    }
+    None
+}
+
+pub async fn get_method_cached<T>(method_name: &str, suffix: &str) -> Option<T>
+where
+    T: DeserializeOwned,
+{
+    let redis_key = generate_redis_key_by_method(method_name, suffix).await;
+    get_json_value::<T>(&redis_key).await
+}
+
+pub async fn set_json_value<T>(redis_key: &str, seconds: Option<u64>, value: &T)
+where
+    T: Serialize,
+{
+    pool()
+        .set_ex::<&str, String, String>(
+            redis_key,
+            serde_json::to_string(value).unwrap(),
+            seconds.unwrap_or(60 * 60 * 24 * 30 * 12), // 1 year
+        )
+        .await
+        .expect("redis set error");
+}
+
+pub async fn set_method_cache<T>(method_name: &str, suffix: &str, seconds: Option<u64>, value: &T)
+where
+    T: Serialize,
+{
+    let redis_key = generate_redis_key_by_method(method_name, suffix).await;
+    set_json_value::<T>(&redis_key, seconds, value).await;
 }

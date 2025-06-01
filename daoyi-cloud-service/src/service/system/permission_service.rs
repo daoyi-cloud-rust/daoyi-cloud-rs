@@ -1,4 +1,3 @@
-use crate::service::system::generate_redis_key_by_table_name;
 use daoyi_cloud_config::{db, redis_util};
 use daoyi_cloud_entities::entities::system::prelude::{
     SystemMenu, SystemRole, SystemRoleMenu, SystemUserRole,
@@ -9,7 +8,6 @@ use daoyi_cloud_entities::entities::system::{
 use daoyi_cloud_models::models::system::system_role::SystemRoleModel;
 use daoyi_cloud_utils::enums::role_code_enum::RoleCodeEnum;
 use itertools::Itertools;
-use redis::AsyncCommands;
 use sea_orm::*;
 
 pub async fn has_any_permissions(user_id: i64, permissions: Vec<String>) -> bool {
@@ -59,20 +57,13 @@ pub async fn roles_has_permission(role_list: &Vec<SystemRoleModel>, permission: 
 }
 
 pub async fn get_role_id_list_by_menu_id(menu_id: i64) -> Vec<i64> {
-    let redis_key = generate_redis_key_by_table_name(
+    if let Some(list) = redis_util::get_method_cached::<Vec<i64>>(
         "get_role_id_list_by_menu_id",
         menu_id.to_string().as_str(),
-    );
-    let result = redis_util::pool()
-        .get::<String, String>(redis_key.to_owned())
-        .await;
-    if let Ok(res_str) = result {
-        let result: Result<Vec<i64>, _> = serde_json::from_str(&res_str);
-        if let Ok(list) = result {
-            if !list.is_empty() {
-                return list;
-            }
-        }
+    )
+    .await
+    {
+        return list;
     }
     let select = SystemRoleMenu::find()
         .filter(system_role_menu::Column::Deleted.eq(false))
@@ -80,32 +71,24 @@ pub async fn get_role_id_list_by_menu_id(menu_id: i64) -> Vec<i64> {
     let result = select.all(db::pool()).await;
     if let Ok(list) = result {
         let menu_ids: Vec<i64> = list.into_iter().map(|x| x.menu_id).unique().collect();
-        if !menu_ids.is_empty() {
-            redis_util::pool()
-                .set_ex::<&str, String, String>(
-                    redis_key.as_str(),
-                    serde_json::to_string(&menu_ids).unwrap(),
-                    60,
-                )
-                .await
-                .expect("redis set error");
-        }
+        redis_util::set_method_cache(
+            "get_role_id_list_by_menu_id",
+            menu_id.to_string().as_str(),
+            None,
+            &menu_ids,
+        )
+        .await;
+        return menu_ids;
     }
     vec![]
 }
 
 pub async fn get_menu_id_list_by_permission(permission: &str) -> Vec<i64> {
-    let redis_key = generate_redis_key_by_table_name("get_menu_id_list_by_permission", permission);
-    let result = redis_util::pool()
-        .get::<String, String>(redis_key.to_owned())
-        .await;
-    if let Ok(res_str) = result {
-        let result: Result<Vec<i64>, _> = serde_json::from_str(&res_str);
-        if let Ok(list) = result {
-            if !list.is_empty() {
-                return list;
-            }
-        }
+    if let Some(list) =
+        redis_util::get_method_cached::<Vec<i64>>("get_menu_id_list_by_permission", permission)
+            .await
+    {
+        return list;
     }
     let mut menu_id_list: Vec<i64> = Vec::new();
     let select = SystemMenu::find()
@@ -118,32 +101,24 @@ pub async fn get_menu_id_list_by_permission(permission: &str) -> Vec<i64> {
             menu_id_list = menu_ids;
         }
     }
-    redis_util::pool()
-        .set_ex::<&str, String, String>(
-            redis_key.as_str(),
-            serde_json::to_string(&menu_id_list).unwrap(),
-            60,
-        )
-        .await
-        .expect("redis set error");
+    redis_util::set_method_cache(
+        "get_menu_id_list_by_permission",
+        permission,
+        None,
+        &menu_id_list,
+    )
+    .await;
     menu_id_list
 }
 
 pub async fn get_enable_role_list_by_user_id(user_id: i64) -> Vec<SystemRoleModel> {
-    let redis_key = generate_redis_key_by_table_name(
+    if let Some(list) = redis_util::get_method_cached::<Vec<SystemRoleModel>>(
         "get_enable_role_list_by_user_id",
         user_id.to_string().as_str(),
-    );
-    let result = redis_util::pool()
-        .get::<String, String>(redis_key.to_owned())
-        .await;
-    if let Ok(res_str) = result {
-        let result: Result<Vec<SystemRoleModel>, _> = serde_json::from_str(&res_str);
-        if let Ok(list) = result {
-            if !list.is_empty() {
-                return list;
-            }
-        }
+    )
+    .await
+    {
+        return list;
     }
     let mut roles: Vec<SystemRoleModel> = Vec::new();
     let select = SystemUserRole::find()
@@ -164,13 +139,12 @@ pub async fn get_enable_role_list_by_user_id(user_id: i64) -> Vec<SystemRoleMode
             }
         }
     }
-    redis_util::pool()
-        .set_ex::<&str, String, String>(
-            redis_key.as_str(),
-            serde_json::to_string(&roles).unwrap(),
-            60,
-        )
-        .await
-        .expect("redis set error");
+    redis_util::set_method_cache(
+        "get_enable_role_list_by_user_id",
+        user_id.to_string().as_str(),
+        None,
+        &roles,
+    )
+    .await;
     roles
 }

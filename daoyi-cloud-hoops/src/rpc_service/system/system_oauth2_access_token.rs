@@ -2,18 +2,14 @@ use daoyi_cloud_config::{config, redis_util};
 use daoyi_cloud_models::models::common_result::{CommonResult, JsonResult, json_ok};
 use daoyi_cloud_models::models::error::AppError;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
-use redis::AsyncCommands;
 use reqwest::StatusCode;
 use salvo::http::StatusError;
 use tracing::log;
 
 pub async fn check_access_token_redis(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
-    let result = redis_util::pool().get::<&str, String>(token).await;
-    if let Ok(json_str) = result {
-        let dto: Result<OAuth2AccessTokenCheckRespDTO, _> = serde_json::from_str(&json_str);
-        if let Ok(dto) = dto {
-            return json_ok(dto);
-        }
+    let result = redis_util::get_json_value::<OAuth2AccessTokenCheckRespDTO>(token).await;
+    if let Some(dto) = result {
+        return json_ok(dto);
     }
     check_access_token(token).await
 }
@@ -62,10 +58,12 @@ async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenCheckRes
         })?;
     if resp.is_success() {
         if let Some(dto) = resp.clone().data() {
-            redis_util::pool()
-                .set_ex::<&str, String, String>(token, serde_json::to_string(&dto).unwrap(), 3600)
-                .await
-                .expect("redis set error");
+            redis_util::set_json_value::<OAuth2AccessTokenCheckRespDTO>(
+                token,
+                Some(60 * 10), // 10分钟
+                &dto,
+            )
+            .await;
         }
         return Ok(resp);
     }
