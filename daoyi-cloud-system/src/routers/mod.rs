@@ -1,4 +1,5 @@
 mod permission_api;
+mod redis_api;
 mod system_oauth2_access_token;
 mod system_users;
 
@@ -46,6 +47,13 @@ pub fn routers() -> Router {
                     .push(
                         Router::with_path("auth").push(
                             Router::with_path("login").post(system_oauth2_access_token::login),
+                        ),
+                    )
+                    .push(
+                        Router::with_path("redis").push(
+                            Router::with_path("clear")
+                                .hoop(SS::has_permission("system:redis:clear".to_string()))
+                                .post(redis_api::clear_cache),
                         ),
                     ),
             ),

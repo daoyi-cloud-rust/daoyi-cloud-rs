@@ -9,23 +9,30 @@ use tracing::log;
 fn gen_redis_key(user_id: &i64, permissions: &Vec<String>) -> String {
     let mut vec = permissions.to_owned();
     vec.sort();
-    format!("has_any_permission:{}:{}", user_id, vec.join("|"))
+    format!("{}:{}", user_id, vec.join("|"))
 }
 pub async fn has_any_permission(check_req_vo: PermissionCheckReqVO) -> bool {
-    if let Some(json_str) = redis_util::get_json_value::<String>(
-        gen_redis_key(&(check_req_vo.user_id), &(check_req_vo.permissions)).as_str(),
-    )
-    .await
+    let suffix = gen_redis_key(&(check_req_vo.user_id), &(check_req_vo.permissions));
+    if let Some(json_str) =
+        redis_util::get_method_cached::<String>("has_any_permission", &suffix).await
     {
         return json_str.eq("true");
     }
     let result = check_permission(check_req_vo).await;
     if result.is_ok() {
-        return "true".eq(result
+        let x = "true".eq(result
             .unwrap()
             .data()
             .unwrap_or_else(|| "false".to_string())
             .as_str());
+        redis_util::set_method_cache::<String>(
+            "has_any_permission",
+            &suffix,
+            Some(60 * 10), // 10分钟
+            &x.to_string(),
+        )
+        .await;
+        return x;
     }
     false
 }
@@ -76,14 +83,6 @@ async fn check_permission(check_req_vo: PermissionCheckReqVO) -> JsonResult<Stri
         )
     })?;
     if resp.is_success() {
-        if let Some(dto) = resp.clone().data() {
-            redis_util::set_json_value::<String>(
-                gen_redis_key(&(check_req_vo.user_id), &(check_req_vo.permissions)).as_str(),
-                Some(60 * 10), // 10分钟
-                &dto,
-            )
-            .await;
-        }
         return Ok(resp);
     }
     Err(AppError::HttpStatus(

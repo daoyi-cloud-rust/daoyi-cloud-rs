@@ -6,15 +6,13 @@ use reqwest::StatusCode;
 use salvo::http::StatusError;
 use tracing::log;
 
-pub async fn check_access_token_redis(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
-    let result = redis_util::get_json_value::<OAuth2AccessTokenCheckRespDTO>(token).await;
+pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
+    let result =
+        redis_util::get_method_cached::<OAuth2AccessTokenCheckRespDTO>("check_access_token", token)
+            .await;
     if let Some(dto) = result {
         return json_ok(dto);
     }
-    check_access_token(token).await
-}
-
-async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
     let check_access_token_url = &config::get().rpc.check_access_token;
     let request_url = format!("{check_access_token_url}?token={token}");
     let response = reqwest::get(request_url).await.map_err(|e| {
@@ -58,7 +56,8 @@ async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenCheckRes
         })?;
     if resp.is_success() {
         if let Some(dto) = resp.clone().data() {
-            redis_util::set_json_value::<OAuth2AccessTokenCheckRespDTO>(
+            redis_util::set_method_cache::<OAuth2AccessTokenCheckRespDTO>(
+                "check_access_token",
                 token,
                 Some(60 * 10), // 10分钟
                 &dto,

@@ -1,5 +1,5 @@
 use crate::rpc_service::system::permission_service::has_any_permission;
-use crate::rpc_service::system::system_oauth2_access_token::check_access_token_redis;
+use crate::rpc_service::system::system_oauth2_access_token::check_access_token;
 use daoyi_cloud_config::config;
 use daoyi_cloud_models::models::common_result::CommonResult;
 use daoyi_cloud_models::models::system::permission_check_req_vo::PermissionCheckReqVO;
@@ -76,7 +76,7 @@ pub async fn auth_middleware(
                     depot.get::<i64>(tenant_middleware_config.header_name.as_str())
                 {
                     println!("tenant_id: {}", tenant_id);
-                    let result = check_access_token_redis(token).await;
+                    let result = check_access_token(token).await;
                     match result {
                         Ok(resp) => {
                             if let Some(resp_dto) = resp.data() {

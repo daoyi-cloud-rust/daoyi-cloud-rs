@@ -63,19 +63,42 @@ async fn generate_redis_key_by_method(method_name: &str, suffix: &str) -> String
     key
 }
 
-pub async fn clear_cached_keys() {
-    let result = pool().get::<&str, String>(CACHED_REDIS_KEY).await;
-    if let Ok(res_str) = result {
-        let result: Result<Vec<String>, _> = serde_json::from_str(&res_str);
-        if let Ok(list) = result {
-            for key in list {
-                let _ = pool().del::<&str, String>(key.as_str()).await;
+pub async fn clear_cached_key(del_key: &str) {
+    let res = pool().del::<&str, String>(del_key).await;
+    if let Ok(_) = res {
+        let result = pool().get::<&str, String>(CACHED_REDIS_KEY).await;
+        if let Ok(res_str) = result {
+            let result: Result<Vec<String>, _> = serde_json::from_str(&res_str);
+            if let Ok(mut list) = result {
+                let index = list.iter().position(|x| x == del_key);
+                if let Some(posi) = index {
+                    list.remove(posi);
+                    pool()
+                        .set::<&str, String, String>(
+                            CACHED_REDIS_KEY,
+                            serde_json::to_string(&list).unwrap(),
+                        )
+                        .await
+                        .expect("redis set error");
+                }
             }
         }
     }
 }
 
-pub async fn cache_keys(key: String) {
+pub async fn clear_all_cached_keys() {
+    let result = pool().get::<&str, String>(CACHED_REDIS_KEY).await;
+    if let Ok(res_str) = result {
+        let result: Result<Vec<String>, _> = serde_json::from_str(&res_str);
+        if let Ok(list) = result {
+            for key in list {
+                clear_cached_key(key.as_str()).await;
+            }
+        }
+    }
+}
+
+async fn cache_keys(key: String) {
     let result = pool().get::<&str, String>(CACHED_REDIS_KEY).await;
     if let Ok(res_str) = result {
         let result: Result<Vec<String>, _> = serde_json::from_str(&res_str);
@@ -100,7 +123,7 @@ pub async fn cache_keys(key: String) {
         .expect("redis set error");
 }
 
-pub async fn get_json_value<T>(redis_key: &str) -> Option<T>
+async fn get_json_value<T>(redis_key: &str) -> Option<T>
 where
     T: DeserializeOwned,
 {
@@ -122,7 +145,7 @@ where
     get_json_value::<T>(&redis_key).await
 }
 
-pub async fn set_json_value<T>(redis_key: &str, seconds: Option<u64>, value: &T)
+async fn set_json_value<T>(redis_key: &str, seconds: Option<u64>, value: &T)
 where
     T: Serialize,
 {

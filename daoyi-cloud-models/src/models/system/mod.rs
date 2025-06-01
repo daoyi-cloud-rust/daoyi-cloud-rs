@@ -1,5 +1,6 @@
 pub mod auth_login_req_vo;
 pub mod auth_login_resp_vo;
+pub mod clear_redis_cache_req_vo;
 pub mod permission_check_req_vo;
 pub mod system_menu;
 pub mod system_oauth2_access_token;
