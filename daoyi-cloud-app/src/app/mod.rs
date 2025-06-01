@@ -23,6 +23,10 @@ pub async fn start(router: Router) {
             "📖 Open API Page: https://{}/scalar",
             listen_addr.replace("0.0.0.0", "127.0.0.1")
         );
+        println!(
+            "🔑 Open API JSON: https://{}/api-doc/openapi.json",
+            listen_addr.replace("0.0.0.0", "127.0.0.1")
+        );
         // println!(
         //     "🔑 Login Page: https://{}/login",
         //     listen_addr.replace("0.0.0.0", "127.0.0.1")
@@ -35,6 +39,10 @@ pub async fn start(router: Router) {
     } else {
         println!(
             "📖 Open API 页面: http://{}/scalar",
+            config.web.listen_addr.replace("0.0.0.0", "127.0.0.1")
+        );
+        println!(
+            "🔑 Open API JSON: http://{}/api-doc/openapi.json",
             config.web.listen_addr.replace("0.0.0.0", "127.0.0.1")
         );
         // println!(

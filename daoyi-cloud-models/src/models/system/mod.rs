@@ -1,5 +1,9 @@
 pub mod auth_login_req_vo;
 pub mod auth_login_resp_vo;
 pub mod permission_check_req_vo;
+pub mod system_menu;
 pub mod system_oauth2_access_token;
+pub mod system_role;
+pub mod system_role_menu;
+pub mod system_user_role;
 pub mod system_users;

@@ -47,6 +47,7 @@ derive_more = "2"
 chrono = "0"
 reqwest = "0"
 uuid = "1"
+itertools = "0"
 daoyi-cloud-app = { path = "daoyi-cloud-app", version = "0.1.0" }
 daoyi-cloud-config = { path = "daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entities = { path = "daoyi-cloud-entities", version = "0.1.0" }
