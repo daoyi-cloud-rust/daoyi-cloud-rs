@@ -15,9 +15,10 @@ pub struct Empty {}
 
 impl EndpointOutRegister for Empty {
     fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
-        operation
-            .responses
-            .insert(StatusCode::OK.as_str(), Self::to_response(components));
+        operation.responses.insert(
+            StatusCode::OK.canonical_reason().unwrap(),
+            Self::to_response(components),
+        );
     }
 }
 
@@ -75,14 +76,14 @@ impl<T> CommonResult<T> {
         Self {
             code: 0,
             data: None,
-            msg: StatusCode::OK.to_string(),
+            msg: StatusCode::OK.canonical_reason().unwrap().to_string(),
         }
     }
     pub fn success(data: T) -> Self {
         Self {
             code: 0,
             data: Some(data),
-            msg: StatusCode::OK.to_string(),
+            msg: StatusCode::OK.canonical_reason().unwrap().to_string(),
         }
     }
 
@@ -90,7 +91,7 @@ impl<T> CommonResult<T> {
         Self {
             code: u64::from(code.as_u16()),
             data,
-            msg: msg.unwrap_or_else(|| code.to_string()),
+            msg: msg.unwrap_or_else(|| code.canonical_reason().unwrap().to_string()),
         }
     }
 
@@ -135,9 +136,10 @@ where
     T: ToSchema + EndpointOutRegister,
 {
     fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
-        operation
-            .responses
-            .insert(StatusCode::OK.as_str(), Self::to_response(components));
+        operation.responses.insert(
+            StatusCode::OK.canonical_reason().unwrap(),
+            Self::to_response(components),
+        );
         T::register(components, operation);
     }
 }
