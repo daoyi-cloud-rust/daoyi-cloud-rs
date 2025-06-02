@@ -5,9 +5,7 @@ use daoyi_cloud_models::models::biz_error;
 use daoyi_cloud_models::models::common_result::AppResult;
 use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
-use sea_orm::ColumnTrait;
-use sea_orm::QueryFilter;
-use sea_orm::{ActiveModelTrait, EntityTrait, Set};
+use sea_orm::*;
 
 pub async fn create_dept(
     login_user: OAuth2AccessTokenCheckRespDTO,
@@ -35,6 +33,42 @@ pub async fn create_dept(
     Ok(model)
 }
 
+pub async fn delete_dept(_login_user: OAuth2AccessTokenCheckRespDTO, id: i64) -> AppResult<()> {
+    // 校验是否存在
+    let model = validate_dept_exists(&id).await?;
+    // 校验是否有子部门
+    let res = validate_dept_has_children(&id).await?;
+    if res {
+        return biz_error::DEPT_EXITS_CHILDREN.to_app_result();
+    }
+    // 删除部门
+    let mut model = model.into_active_model();
+    model.deleted = Set(true);
+    model.update(db::pool()).await?;
+    Ok(())
+}
+
+async fn validate_dept_has_children(id: &i64) -> AppResult<bool> {
+    let list = SystemDept::find()
+        .filter(system_dept::Column::Deleted.eq(false))
+        .filter(system_dept::Column::ParentId.eq(id.to_owned()))
+        .all(db::pool())
+        .await?;
+    Ok(!list.is_empty())
+}
+
+async fn validate_dept_exists(id: &i64) -> AppResult<system_dept::Model> {
+    let option = SystemDept::find()
+        .filter(system_dept::Column::Deleted.eq(false))
+        .filter(system_dept::Column::Id.eq(id.to_owned()))
+        .one(db::pool())
+        .await?;
+    if option.is_none() {
+        return Err(biz_error::DEPT_NOT_FOUND.to_app_error());
+    }
+    Ok(option.unwrap())
+}
+
 async fn validate_dept_name_unique(
     id: &Option<i64>,
     parent_id: &Option<i64>,
@@ -42,6 +76,7 @@ async fn validate_dept_name_unique(
 ) -> AppResult<()> {
     let parent_id = parent_id.unwrap_or(system_dept::PARENT_ID_ROOT);
     let option = SystemDept::find()
+        .filter(system_dept::Column::Deleted.eq(false))
         .filter(system_dept::Column::Name.eq(name))
         .filter(system_dept::Column::ParentId.eq(parent_id))
         .one(db::pool())
@@ -65,7 +100,9 @@ async fn validate_parent_dept(id: &Option<i64>, parent_id: &Option<i64>) -> AppR
         return biz_error::DEPT_PARENT_ERROR.to_app_result();
     }
     // 2. 父部门不存在
-    let option = SystemDept::find_by_id(parent_id.unwrap())
+    let option = SystemDept::find()
+        .filter(system_dept::Column::Deleted.eq(false))
+        .filter(system_dept::Column::Id.eq(parent_id.unwrap()))
         .one(db::pool())
         .await?;
     if option.is_none() {
@@ -86,7 +123,11 @@ async fn validate_parent_dept(id: &Option<i64>, parent_id: &Option<i64>) -> AppR
         if parent_id == system_dept::PARENT_ID_ROOT {
             break;
         }
-        let option = SystemDept::find_by_id(parent_id).one(db::pool()).await?;
+        let option = SystemDept::find()
+            .filter(system_dept::Column::Deleted.eq(false))
+            .filter(system_dept::Column::Id.eq(parent_id))
+            .one(db::pool())
+            .await?;
         if option.is_none() {
             break;
         }

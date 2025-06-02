@@ -35,11 +35,17 @@ pub fn routers() -> Router {
                 Router::with_path("system")
                     .get(root_handler)
                     .push(
-                        Router::with_path("dept").push(
-                            Router::with_path("create")
-                                .hoop(SS::has_permission("system:dept:create".to_string()))
-                                .post(system_dept_controller::create),
-                        ),
+                        Router::with_path("dept")
+                            .push(
+                                Router::with_path("create")
+                                    .hoop(SS::has_permission("system:dept:create".to_string()))
+                                    .post(system_dept_controller::create_dept),
+                            )
+                            .push(
+                                Router::with_path("delete")
+                                    .hoop(SS::has_permission("system:dept:delete".to_string()))
+                                    .delete(system_dept_controller::delete_dept),
+                            ),
                     )
                     .push(
                         Router::with_path("user")
