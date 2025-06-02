@@ -7,7 +7,12 @@ use salvo::{FlowCtrl, Response, handler};
 pub async fn http_error_handler(&self, res: &mut Response, ctrl: &mut FlowCtrl) {
     let error_msg = match res.take_body() {
         ResBody::Error(e) => e.brief,
-        _ => "Unknown error".to_string(),
+        _ => res
+            .status_code
+            .unwrap()
+            .canonical_reason()
+            .unwrap()
+            .to_string(),
     };
 
     res.render(CommonResult::<String>::from_status_code(
