@@ -37,7 +37,7 @@ pub fn empty_ok() -> JsonResult<Empty> {
 #[derive(Debug, Serialize, ToSchema, Deserialize, Clone)]
 pub struct CommonResult<T> {
     /// 状态码
-    code: u16,
+    code: u64,
     /// 数据
     data: Option<T>,
     /// 错误信息
@@ -48,7 +48,7 @@ impl<T> CommonResult<T> {
     pub fn msg(self) -> String {
         self.msg
     }
-    pub fn code(&self) -> u16 {
+    pub fn code(&self) -> u64 {
         self.code
     }
     pub fn data(self) -> Option<T> {
@@ -56,7 +56,7 @@ impl<T> CommonResult<T> {
     }
 
     pub fn is_success(&self) -> bool {
-        self.code == StatusCode::OK.as_u16()
+        self.code == 0
     }
 
     pub fn is_fail(&self) -> bool {
@@ -73,22 +73,22 @@ impl<T> CommonResult<T> {
 
     pub fn empty_success() -> Self {
         Self {
-            code: StatusCode::OK.as_u16(),
+            code: 0,
             data: None,
             msg: StatusCode::OK.to_string(),
         }
     }
     pub fn success(data: T) -> Self {
         Self {
-            code: StatusCode::OK.as_u16(),
+            code: 0,
             data: Some(data),
             msg: StatusCode::OK.to_string(),
         }
     }
 
-    pub fn build(code: StatusCode, data: Option<T>, msg: Option<String>) -> Self {
+    pub fn from_status_code(code: StatusCode, data: Option<T>, msg: Option<String>) -> Self {
         Self {
-            code: code.as_u16(),
+            code: u64::from(code.as_u16()),
             data,
             msg: msg.unwrap_or_else(|| code.to_string()),
         }
@@ -97,20 +97,25 @@ impl<T> CommonResult<T> {
     pub fn error(e: anyhow::Error) -> Self {
         let res = if e.downcast_ref::<AppError>().is_some() {
             match e.downcast_ref::<AppError>() {
+                Some(AppError::Biz(code, msg)) => Self {
+                    code: code.to_owned(),
+                    data: None,
+                    msg: msg.to_owned(),
+                },
                 Some(AppError::HttpStatus(status)) => Self {
-                    code: status.code.as_u16(),
+                    code: u64::from(status.code.as_u16()),
                     data: None,
                     msg: status.brief.to_string(),
                 },
                 _ => Self {
-                    code: StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+                    code: u64::from(StatusCode::INTERNAL_SERVER_ERROR.as_u16()),
                     data: None,
                     msg: e.to_string(),
                 },
             }
         } else {
             Self {
-                code: StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+                code: u64::from(StatusCode::INTERNAL_SERVER_ERROR.as_u16()),
                 data: None,
                 msg: e.to_string(),
             }

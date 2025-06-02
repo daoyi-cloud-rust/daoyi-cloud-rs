@@ -86,7 +86,7 @@ async fn check_permission(check_req_vo: PermissionCheckReqVO) -> JsonResult<Stri
         return Ok(resp);
     }
     Err(AppError::HttpStatus(
-        StatusError::from_code(StatusCode::from_u16(resp.code()).unwrap())
+        StatusError::from_code(StatusCode::from_u16(resp.code().try_into().unwrap()).unwrap())
             .unwrap()
             .brief(resp.msg()),
     ))

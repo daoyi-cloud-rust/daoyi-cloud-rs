@@ -1,6 +1,7 @@
 use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::system::prelude::SystemDept;
 use daoyi_cloud_entities::entities::system::system_dept;
+use daoyi_cloud_models::models::biz_error;
 use daoyi_cloud_models::models::common_result::AppResult;
 use daoyi_cloud_models::models::error::AppError;
 use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
@@ -52,11 +53,7 @@ async fn validate_dept_name_unique(
     }
     // 如果 id 为空，说明不用比较是否为相同 id 的部门
     if id.is_none() || id.unwrap() != option.unwrap().id {
-        return Err(AppError::HttpStatus(
-            StatusError::from_code(StatusCode::BAD_REQUEST)
-                .unwrap()
-                .brief("已经存在该名字的部门"),
-        ));
+        return biz_error::DEPT_NAME_DUPLICATE.to_app_result();
     }
     Ok(())
 }

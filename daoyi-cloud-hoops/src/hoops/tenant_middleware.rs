@@ -20,7 +20,7 @@ pub async fn tenant_middleware(
             // 修改租户ID
             depot.insert(header_name, tenant_id);
         } else {
-            res.render(CommonResult::<String>::build(
+            res.render(CommonResult::<String>::from_status_code(
                 StatusCode::BAD_REQUEST,
                 None,
                 Some("租户ID错误.".to_string()),
@@ -33,7 +33,7 @@ pub async fn tenant_middleware(
         if tenant_middleware_config.enabled()
             && !path_matches::path_any_matches(&tenant_middleware_config.ignore_urls, &path)
         {
-            res.render(CommonResult::<String>::build(
+            res.render(CommonResult::<String>::from_status_code(
                 StatusCode::BAD_REQUEST,
                 None,
                 Some("请求的租户标识未传递，请进行排查.".to_string()),

@@ -1,3 +1,4 @@
+use crate::models::biz_error::ErrorCode;
 use crate::models::common_result::CommonResult;
 use salvo::http::{ParseError, StatusCode, StatusError};
 use salvo::oapi::{self, EndpointOutRegister, ToSchema};
@@ -52,6 +53,9 @@ pub enum AppError {
     /// Deserialization of configuration in toml file to rust struct failed
     #[error("Failed to deserialize the configuration of prefix \"{0}\": {1}")]
     DeserializeErr(&'static str, toml::de::Error),
+
+    #[error("{1}")]
+    Biz(u64, String),
 }
 impl AppError {
     pub fn public<S: Into<String>>(msg: S) -> Self {
@@ -66,6 +70,14 @@ impl AppError {
     pub fn from_io(kind: ErrorKind, msg: &str) -> Self {
         AppError::IOError(io::Error::new(kind, msg))
     }
+
+    pub fn biz(error_code: ErrorCode) -> Self {
+        Self::Biz(error_code.code, error_code.msg.to_string())
+    }
+
+    pub fn biz_code(code: u64, msg: &str) -> Self {
+        Self::Biz(code, msg.to_string())
+    }
 }
 
 /// Contains the return value of AppError
@@ -74,6 +86,13 @@ pub type Result<T> = std::result::Result<T, AppError>;
 #[async_trait]
 impl Writer for AppError {
     async fn write(mut self, _req: &mut Request, _depot: &mut Depot, res: &mut Response) {
+        match &self {
+            Self::Biz(_code, _msg) => {
+                res.render(CommonResult::<()>::error(anyhow::Error::from(self)));
+                return;
+            }
+            _ => {}
+        }
         let code = match &self {
             Self::HttpStatus(e) => e.code,
             _ => StatusCode::INTERNAL_SERVER_ERROR,

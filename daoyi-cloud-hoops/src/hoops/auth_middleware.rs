@@ -42,7 +42,7 @@ impl Handler for SS {
                 ctrl.call_next(req, depot, res).await;
                 return;
             } else {
-                res.render(CommonResult::<String>::build(
+                res.render(CommonResult::<String>::from_status_code(
                     StatusCode::FORBIDDEN,
                     None,
                     Some("当前操作没有权限.".to_string()),
@@ -80,9 +80,19 @@ pub async fn auth_middleware(
                     match result {
                         Ok(resp) => {
                             if let Some(resp_dto) = resp.data() {
-                                depot.insert(login_user_key, resp_dto);
+                                if resp_dto.tenant_id == tenant_id.to_owned() {
+                                    depot.insert(login_user_key, resp_dto);
+                                } else {
+                                    res.render(CommonResult::<String>::from_status_code(
+                                        StatusCode::UNAUTHORIZED,
+                                        None,
+                                        Some("租户ID不匹配.".to_string()),
+                                    ));
+                                    ctrl.skip_rest();
+                                    return;
+                                }
                             } else {
-                                res.render(CommonResult::<String>::build(
+                                res.render(CommonResult::<String>::from_status_code(
                                     StatusCode::UNAUTHORIZED,
                                     None,
                                     Some("Token无效.".to_string()),
@@ -98,7 +108,7 @@ pub async fn auth_middleware(
                         }
                     }
                 } else {
-                    res.render(CommonResult::<String>::build(
+                    res.render(CommonResult::<String>::from_status_code(
                         StatusCode::UNAUTHORIZED,
                         None,
                         Some("租户ID错误.".to_string()),
@@ -107,7 +117,7 @@ pub async fn auth_middleware(
                     return;
                 }
             } else {
-                res.render(CommonResult::<String>::build(
+                res.render(CommonResult::<String>::from_status_code(
                     StatusCode::UNAUTHORIZED,
                     None,
                     Some("Token无效.".to_string()),
@@ -116,7 +126,7 @@ pub async fn auth_middleware(
                 return;
             }
         } else {
-            res.render(CommonResult::<String>::build(
+            res.render(CommonResult::<String>::from_status_code(
                 StatusCode::UNAUTHORIZED,
                 None,
                 Some("Token无效.".to_string()),
@@ -127,7 +137,7 @@ pub async fn auth_middleware(
     } else {
         let path = String::from(req.uri().path());
         if !path_matches::path_any_matches(&auth_middleware_config.ignore_urls, &path) {
-            res.render(CommonResult::<String>::build(
+            res.render(CommonResult::<String>::from_status_code(
                 StatusCode::UNAUTHORIZED,
                 None,
                 Some("未登录.".to_string()),

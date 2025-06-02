@@ -67,7 +67,7 @@ pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenChec
         return Ok(resp);
     }
     Err(AppError::HttpStatus(
-        StatusError::from_code(StatusCode::from_u16(resp.code()).unwrap())
+        StatusError::from_code(StatusCode::from_u16(resp.code().try_into().unwrap()).unwrap())
             .unwrap()
             .brief(resp.msg()),
     ))

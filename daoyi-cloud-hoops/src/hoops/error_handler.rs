@@ -1,7 +1,7 @@
 use daoyi_cloud_models::models::common_result::CommonResult;
 use salvo::http::ResBody;
 use salvo::prelude::*;
-use salvo::{handler, FlowCtrl, Response};
+use salvo::{FlowCtrl, Response, handler};
 
 #[handler]
 pub async fn http_error_handler(&self, res: &mut Response, ctrl: &mut FlowCtrl) {
@@ -10,7 +10,7 @@ pub async fn http_error_handler(&self, res: &mut Response, ctrl: &mut FlowCtrl) 
         _ => "Unknown error".to_string(),
     };
 
-    res.render(CommonResult::<String>::build(
+    res.render(CommonResult::<String>::from_status_code(
         res.status_code.unwrap(),
         None,
         Some(error_msg),
