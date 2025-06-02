@@ -15,7 +15,7 @@ ulid = { workspace = true }
 cookie = { workspace = true }
 sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-mysql", "macros"] }
 daoyi-cloud-entities = { workspace = true }
-daoyi-cloud-utils = { workspace = true }
+daoyi-cloud-common = { workspace = true }
 daoyi-cloud-app = { workspace = true }
 daoyi-cloud-models = { workspace = true }
 daoyi-cloud-config = { workspace = true }

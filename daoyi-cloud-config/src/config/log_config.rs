@@ -4,7 +4,7 @@ use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::fmt;
 
 use super::default_true;
-use daoyi_cloud_utils::utils::toml::Configurable;
+use daoyi_cloud_common::utils::toml::Configurable;
 use tracing_appender::rolling;
 
 const FORMAT_PRETTY: &str = "pretty";

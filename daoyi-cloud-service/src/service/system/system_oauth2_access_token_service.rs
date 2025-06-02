@@ -1,4 +1,5 @@
 use crate::service::system::system_users_service::{get_system_users_by_id, reset_login_time};
+use daoyi_cloud_common::utils;
 use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::system::prelude::SystemOauth2AccessToken;
 use daoyi_cloud_entities::entities::system::system_oauth2_access_token;
@@ -7,7 +8,6 @@ use daoyi_cloud_models::models::error::AppError;
 use daoyi_cloud_models::models::system::auth_login_resp_vo::AuthLoginRespVO;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
 use daoyi_cloud_models::models::system::system_users::SystemUsersModel;
-use daoyi_cloud_utils::utils;
 use salvo::prelude::*;
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 

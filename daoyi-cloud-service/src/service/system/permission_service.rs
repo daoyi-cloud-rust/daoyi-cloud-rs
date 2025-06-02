@@ -1,3 +1,4 @@
+use daoyi_cloud_common::enums::role_code_enum::RoleCodeEnum;
 use daoyi_cloud_config::{db, redis_util};
 use daoyi_cloud_entities::entities::system::prelude::{
     SystemMenu, SystemRole, SystemRoleMenu, SystemUserRole,
@@ -6,7 +7,6 @@ use daoyi_cloud_entities::entities::system::{
     system_menu, system_role, system_role_menu, system_user_role,
 };
 use daoyi_cloud_models::models::system::system_role::SystemRoleModel;
-use daoyi_cloud_utils::enums::role_code_enum::RoleCodeEnum;
 use itertools::Itertools;
 use sea_orm::*;
 

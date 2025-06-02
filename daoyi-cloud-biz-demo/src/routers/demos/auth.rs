@@ -6,12 +6,12 @@ use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 use std::any::type_name;
 
+use daoyi_cloud_common::utils;
 use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::demos::users::Model;
 use daoyi_cloud_entities::entities::demos::{prelude::Users, users};
 use daoyi_cloud_hoops::hoops::jwt;
 use daoyi_cloud_models::models::common_result::{JsonResult, json_ok, to_common_response};
-use daoyi_cloud_utils::utils;
 
 #[derive(Deserialize, ToSchema, Default, Debug)]
 pub struct LoginInData {

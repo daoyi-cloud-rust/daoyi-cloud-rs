@@ -1,5 +1,5 @@
 use crate::config::default_true_str;
-use daoyi_cloud_utils::utils::toml::Configurable;
+use daoyi_cloud_common::utils::toml::Configurable;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]

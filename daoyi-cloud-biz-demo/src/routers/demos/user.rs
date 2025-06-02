@@ -9,13 +9,13 @@ use std::any::type_name;
 use ulid::Ulid;
 use validator::Validate;
 
+use daoyi_cloud_common::utils;
 use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::demos::{prelude::Users, users};
 use daoyi_cloud_models::models::SafeUser;
 use daoyi_cloud_models::models::common_result::{
     EmptyResult, JsonResult, empty_ok, json_ok, to_common_response,
 };
-use daoyi_cloud_utils::utils;
 
 #[derive(Deserialize, Debug, Validate, ToSchema, Default)]
 pub struct CreateInData {

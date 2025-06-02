@@ -18,6 +18,6 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 time = { workspace = true }
 daoyi-cloud-config = { workspace = true }
-daoyi-cloud-utils = { workspace = true }
+daoyi-cloud-common = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }
 tracing = { workspace = true }

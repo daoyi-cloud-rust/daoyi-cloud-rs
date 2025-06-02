@@ -53,5 +53,5 @@ daoyi-cloud-config = { path = "daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entities = { path = "daoyi-cloud-entities", version = "0.1.0" }
 daoyi-cloud-hoops = { path = "daoyi-cloud-hoops", version = "0.1.0" }
 daoyi-cloud-models = { path = "daoyi-cloud-models", version = "0.1.0" }
-daoyi-cloud-utils = { path = "daoyi-cloud-utils", version = "0.1.0" }
+daoyi-cloud-common = { path = "daoyi-cloud-common", version = "0.1.0" }
 daoyi-cloud-service = { path = "daoyi-cloud-service", version = "0.1.0" }

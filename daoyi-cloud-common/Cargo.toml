@@ -1,5 +1,5 @@
 [package]
-name = "daoyi-cloud-utils"
+name = "daoyi-cloud-common"
 authors.workspace = true
 edition.workspace = true
 homepage.workspace = true

@@ -19,8 +19,8 @@ use crate::config::rpc_service_config::RpcServiceConfig;
 use crate::config::security_config::SecurityConfig;
 use crate::config::tenant_middleware_config::TenantMiddlewareConfig;
 use crate::{db, redis_util};
-use daoyi_cloud_utils::utils::env as EnvUtils;
-use daoyi_cloud_utils::utils::toml::{ConfigRegistry, Configurable, TomlConfigRegistry};
+use daoyi_cloud_common::utils::env as EnvUtils;
+use daoyi_cloud_common::utils::toml::{ConfigRegistry, Configurable, TomlConfigRegistry};
 pub use db_config::DbConfig;
 
 static CONFIG: OnceLock<ServerConfig> = OnceLock::new();

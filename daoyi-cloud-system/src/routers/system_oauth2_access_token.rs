@@ -1,3 +1,4 @@
+use daoyi_cloud_common::utils;
 use daoyi_cloud_config::config;
 use daoyi_cloud_models::models::common_result::{JsonResult, json_ok};
 use daoyi_cloud_models::models::error::AppError;
@@ -8,7 +9,6 @@ use daoyi_cloud_models::models::system::system_users::SystemUsersModel;
 use daoyi_cloud_service::service::system::system_oauth2_access_token_service;
 use daoyi_cloud_service::service::system::system_oauth2_access_token_service::create_token_after_login_success;
 use daoyi_cloud_service::service::system::system_users_service::get_system_users_by_username;
-use daoyi_cloud_utils::utils;
 use salvo::http::StatusError;
 use salvo::oapi::endpoint;
 use salvo::oapi::extract::{JsonBody, QueryParam};
