@@ -1,10 +1,9 @@
 use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::system::prelude::SystemUsers;
 use daoyi_cloud_entities::entities::system::system_users;
+use daoyi_cloud_models::models::biz_error;
 use daoyi_cloud_models::models::common_result::AppResult;
-use daoyi_cloud_models::models::error::AppError;
 use daoyi_cloud_models::models::system::system_users::SystemUsersModel;
-use salvo::http::{StatusCode, StatusError};
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 
 pub async fn get_system_users_by_id(
@@ -19,7 +18,7 @@ pub async fn get_system_users_by_id(
     }
     match select.one(db::pool()).await? {
         Some(v) => Ok(SystemUsersModel::from(v)),
-        None => Err(AppError::internal(format!("用户不存在 id = {id}"))),
+        None => Err(biz_error::USER_NOT_EXISTS.to_app_error()),
     }
 }
 
@@ -35,7 +34,7 @@ pub async fn get_system_users_by_username(
     }
     match select.one(db::pool()).await? {
         Some(v) => Ok(v),
-        None => Err(AppError::internal("用户名或密码错误.".to_string())),
+        None => Err(biz_error::USER_PASSWORD_FAILED.to_app_error()),
     }
 }
 pub async fn reset_login_time(id: &i64) -> AppResult<()> {
@@ -43,11 +42,7 @@ pub async fn reset_login_time(id: &i64) -> AppResult<()> {
         .one(db::pool())
         .await?
     else {
-        return Err(AppError::HttpStatus(
-            StatusError::from_code(StatusCode::UNAUTHORIZED)
-                .unwrap()
-                .brief("用户不存在."),
-        ));
+        return biz_error::USER_NOT_EXISTS.to_app_result();
     };
     let mut v: system_users::ActiveModel = v.into();
     v.login_date = Set(Some(chrono::Local::now().naive_local()));
