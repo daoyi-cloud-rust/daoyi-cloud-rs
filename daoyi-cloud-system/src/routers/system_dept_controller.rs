@@ -1,4 +1,5 @@
 use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_ok, json_ok};
+use daoyi_cloud_models::models::system::dept_resp_vo::DeptRespVo;
 use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_service::service::get_current_user;
 use daoyi_cloud_service::service::system::system_dept_service;
@@ -22,4 +23,13 @@ pub async fn delete_dept(id: QueryParam<i64>, depot: &mut Depot) -> JsonResult<E
     let id = id.into_inner();
     let _ = system_dept_service::delete_dept(login_user, id).await?;
     empty_ok()
+}
+
+/// 获得部门信息
+#[endpoint(tags("管理后台 - 系统管理 - 部门"))]
+pub async fn get_dept(id: QueryParam<i64>, depot: &mut Depot) -> JsonResult<DeptRespVo> {
+    let login_user = get_current_user(depot);
+    let id = id.into_inner();
+    let vo = system_dept_service::get_dept(login_user, id).await?;
+    json_ok(vo)
 }

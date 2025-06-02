@@ -3,6 +3,7 @@ use daoyi_cloud_entities::entities::system::prelude::SystemDept;
 use daoyi_cloud_entities::entities::system::system_dept;
 use daoyi_cloud_models::models::biz_error;
 use daoyi_cloud_models::models::common_result::AppResult;
+use daoyi_cloud_models::models::system::dept_resp_vo::DeptRespVo;
 use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
 use sea_orm::*;
@@ -46,6 +47,15 @@ pub async fn delete_dept(_login_user: OAuth2AccessTokenCheckRespDTO, id: i64) ->
     model.deleted = Set(true);
     model.update(db::pool()).await?;
     Ok(())
+}
+
+pub async fn get_dept(
+    _login_user: OAuth2AccessTokenCheckRespDTO,
+    id: i64,
+) -> AppResult<DeptRespVo> {
+    // 校验是否存在
+    let model = validate_dept_exists(&id).await?;
+    Ok(model.into())
 }
 
 async fn validate_dept_has_children(id: &i64) -> AppResult<bool> {
