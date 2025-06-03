@@ -1,5 +1,6 @@
 use crate::models::common_result::to_common_response;
 use crate::models::mask_utils::DATE_TIME_FORMAT;
+use crate::models::tree_utils;
 use daoyi_cloud_entities::entities::system::system_dept::Model;
 use salvo::oapi;
 use salvo::prelude::*;
@@ -29,6 +30,24 @@ pub struct DeptRespVo {
     pub status: i8,
     /// 子部门
     pub children: Vec<DeptRespVo>,
+}
+
+impl tree_utils::TreeNode<DeptRespVo> for DeptRespVo {
+    fn id(&self) -> i64 {
+        self.id
+    }
+
+    fn parent_id(&self) -> i64 {
+        self.parent_id
+    }
+
+    fn children(&mut self, list: Vec<DeptRespVo>) {
+        self.children = list;
+    }
+
+    fn sort(&self) -> i32 {
+        self.sort
+    }
 }
 
 impl From<Model> for DeptRespVo {

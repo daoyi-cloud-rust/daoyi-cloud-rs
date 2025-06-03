@@ -4,6 +4,7 @@ pub mod error;
 mod mask_utils;
 pub mod page_result;
 pub mod system;
+pub mod tree_utils;
 
 use crate::models::common_result::to_common_response;
 use salvo::http::StatusCode;
