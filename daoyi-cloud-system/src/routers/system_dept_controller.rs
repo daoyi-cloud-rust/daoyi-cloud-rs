@@ -1,4 +1,6 @@
 use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_ok, json_ok};
+use daoyi_cloud_models::models::page_result::PageResult;
+use daoyi_cloud_models::models::system::dept_list_req_vo::DeptListReqVo;
 use daoyi_cloud_models::models::system::dept_resp_vo::DeptRespVo;
 use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_service::service::get_current_user;
@@ -32,4 +34,16 @@ pub async fn get_dept(id: QueryParam<i64>, depot: &mut Depot) -> JsonResult<Dept
     let id = id.into_inner();
     let vo = system_dept_service::get_dept(login_user, id).await?;
     json_ok(vo)
+}
+
+/// 获取部门列表
+#[endpoint(tags("管理后台 - 系统管理 - 部门"))]
+pub async fn dept_list(
+    params: QueryParam<DeptListReqVo>,
+    depot: &mut Depot,
+) -> JsonResult<PageResult<DeptRespVo>> {
+    let login_user = get_current_user(depot);
+    let params = params.into_inner();
+    let list = system_dept_service::dept_list(login_user, params).await?;
+    json_ok(list)
 }

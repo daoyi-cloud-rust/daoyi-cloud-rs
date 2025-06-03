@@ -1,6 +1,7 @@
 pub mod auth_login_req_vo;
 pub mod auth_login_resp_vo;
 pub mod clear_redis_cache_req_vo;
+pub mod dept_list_req_vo;
 pub mod dept_resp_vo;
 pub mod dept_save_req_vo;
 pub mod permission_check_req_vo;

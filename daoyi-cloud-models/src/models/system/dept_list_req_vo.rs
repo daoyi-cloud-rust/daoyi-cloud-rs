@@ -5,10 +5,10 @@ use salvo::oapi::{EndpointOutRegister, ToResponse, ToSchema};
 use serde::Deserialize;
 use std::any::type_name;
 
-/// 管理后台 - 部门创建/修改 Request VO
+/// 管理后台 - 部门列表查询 Request VO
 #[derive(Deserialize, ToSchema, Default, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct DeptSaveReqVo {
+pub struct DeptListReqVo {
     /// 邮箱
     pub email: Option<String>,
     /// 部门编号
@@ -16,17 +16,15 @@ pub struct DeptSaveReqVo {
     /// 负责人的用户编号
     pub leader_user_id: Option<i64>,
     /// 部门名称
-    pub name: String,
+    pub name: Option<String>,
     /// 父部门 ID
     pub parent_id: Option<i64>,
     /// 联系电话
     pub phone: Option<String>,
-    /// 显示顺序不能为空
-    pub sort: i32,
     /// 状态,见 CommonStatusEnum 枚举
-    pub status: i8,
+    pub status: Option<i8>,
 }
-impl EndpointOutRegister for DeptSaveReqVo {
+impl EndpointOutRegister for DeptListReqVo {
     fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
         operation
             .responses
@@ -34,7 +32,7 @@ impl EndpointOutRegister for DeptSaveReqVo {
     }
 }
 
-impl ToResponse for DeptSaveReqVo {
+impl ToResponse for DeptListReqVo {
     fn to_response(components: &mut oapi::Components) -> oapi::RefOr<oapi::response::Response> {
         let schema_ref = Self::to_schema(components);
         let type_name = type_name::<Self>();

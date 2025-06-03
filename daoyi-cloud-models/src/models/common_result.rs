@@ -36,6 +36,7 @@ pub fn empty_ok() -> JsonResult<Empty> {
 
 /// 通用返回
 #[derive(Debug, Serialize, ToSchema, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct CommonResult<T> {
     /// 状态码
     code: u64,

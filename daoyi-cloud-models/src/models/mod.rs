@@ -2,6 +2,7 @@ pub mod biz_error;
 pub mod common_result;
 pub mod error;
 mod mask_utils;
+pub mod page_result;
 pub mod system;
 
 use crate::models::common_result::to_common_response;

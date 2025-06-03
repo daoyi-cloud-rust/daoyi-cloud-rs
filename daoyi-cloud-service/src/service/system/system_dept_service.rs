@@ -3,6 +3,8 @@ use daoyi_cloud_entities::entities::system::prelude::SystemDept;
 use daoyi_cloud_entities::entities::system::system_dept;
 use daoyi_cloud_models::models::biz_error;
 use daoyi_cloud_models::models::common_result::AppResult;
+use daoyi_cloud_models::models::page_result::PageResult;
+use daoyi_cloud_models::models::system::dept_list_req_vo::DeptListReqVo;
 use daoyi_cloud_models::models::system::dept_resp_vo::DeptRespVo;
 use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
@@ -56,6 +58,13 @@ pub async fn get_dept(
     // 校验是否存在
     let model = validate_dept_exists(&id).await?;
     Ok(model.into())
+}
+
+pub async fn dept_list(
+    _login_user: OAuth2AccessTokenCheckRespDTO,
+    params: DeptListReqVo,
+) -> AppResult<PageResult<DeptRespVo>> {
+    Err(biz_error::DEPT_EXITS_CHILDREN.to_app_error())
 }
 
 async fn validate_dept_has_children(id: &i64) -> AppResult<bool> {
