@@ -1,5 +1,6 @@
 use crate::models::common_result::to_common_response;
-use salvo::{Response, Scribe, http::StatusCode, oapi, prelude::*};
+use salvo::oapi;
+use salvo::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::any::type_name;
 
@@ -19,31 +20,17 @@ pub struct PageResult<T> {
 
 impl<T> PageResult<T> {}
 
-impl<T: Serialize + Send> Scribe for PageResult<T> {
-    fn render(self, res: &mut Response) {
-        res.render(Json(self));
-    }
-}
-
-impl<T> EndpointOutRegister for PageResult<T>
-where
-    T: ToSchema + EndpointOutRegister,
-{
+impl<T: ToSchema + 'static> EndpointOutRegister for PageResult<T> {
     fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {
-        operation.responses.insert(
-            StatusCode::OK.canonical_reason().unwrap(),
-            Self::to_response(components),
-        );
-        T::register(components, operation);
+        operation
+            .responses
+            .insert(StatusCode::OK.as_str(), Self::to_response(components));
     }
 }
 
-impl<C> ToResponse for PageResult<C>
-where
-    C: ToSchema,
-{
+impl<T: ToSchema + 'static> ToResponse for PageResult<T> {
     fn to_response(components: &mut oapi::Components) -> oapi::RefOr<oapi::response::Response> {
-        let schema_ref = <C as ToSchema>::to_schema(components);
+        let schema_ref = Self::to_schema(components);
         let type_name = type_name::<Self>();
         to_common_response(components, type_name, schema_ref)
     }

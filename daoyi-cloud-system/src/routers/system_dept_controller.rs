@@ -39,7 +39,7 @@ pub async fn get_dept(id: QueryParam<i64>, depot: &mut Depot) -> JsonResult<Dept
 /// 获取部门列表
 #[endpoint(tags("管理后台 - 系统管理 - 部门"))]
 pub async fn dept_list(
-    params: QueryParam<DeptListReqVo>,
+    params: JsonBody<DeptListReqVo>,
     depot: &mut Depot,
 ) -> JsonResult<PageResult<DeptRespVo>> {
     let login_user = get_current_user(depot);
