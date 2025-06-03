@@ -18,7 +18,16 @@ pub struct PageResult<T> {
     page_size: u32,
 }
 
-impl<T> PageResult<T> {}
+impl<T> PageResult<T> {
+    pub fn new(list: Vec<T>, total: u64, page_no: u32, page_size: u32) -> Self {
+        Self {
+            list,
+            total,
+            page_no,
+            page_size,
+        }
+    }
+}
 
 impl<T: ToSchema + 'static> EndpointOutRegister for PageResult<T> {
     fn register(components: &mut oapi::Components, operation: &mut oapi::Operation) {

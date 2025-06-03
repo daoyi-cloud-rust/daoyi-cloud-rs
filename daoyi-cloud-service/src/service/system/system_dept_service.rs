@@ -15,9 +15,15 @@ pub async fn create_dept(
     req_vo: DeptSaveReqVo,
 ) -> AppResult<system_dept::Model> {
     // 校验父部门的有效性
-    let _ = validate_parent_dept(&req_vo.id, &req_vo.parent_id).await?;
+    let _ = validate_parent_dept(&req_vo.id, &req_vo.parent_id, &login_user.tenant_id).await?;
     // 校验部门名的唯一性
-    let _ = validate_dept_name_unique(&req_vo.id, &req_vo.parent_id, &req_vo.name).await?;
+    let _ = validate_dept_name_unique(
+        &req_vo.id,
+        &req_vo.parent_id,
+        &req_vo.name,
+        &login_user.tenant_id,
+    )
+    .await?;
     // 插入部门
     let model = system_dept::ActiveModel {
         email: Set(req_vo.email),
@@ -36,11 +42,11 @@ pub async fn create_dept(
     Ok(model)
 }
 
-pub async fn delete_dept(_login_user: OAuth2AccessTokenCheckRespDTO, id: i64) -> AppResult<()> {
+pub async fn delete_dept(login_user: OAuth2AccessTokenCheckRespDTO, id: i64) -> AppResult<()> {
     // 校验是否存在
-    let model = validate_dept_exists(&id).await?;
+    let model = validate_dept_exists(&id, &login_user.tenant_id).await?;
     // 校验是否有子部门
-    let res = validate_dept_has_children(&id).await?;
+    let res = validate_dept_has_children(&id, &login_user.tenant_id).await?;
     if res {
         return biz_error::DEPT_EXITS_CHILDREN.to_app_result();
     }
@@ -51,34 +57,50 @@ pub async fn delete_dept(_login_user: OAuth2AccessTokenCheckRespDTO, id: i64) ->
     Ok(())
 }
 
-pub async fn get_dept(
-    _login_user: OAuth2AccessTokenCheckRespDTO,
-    id: i64,
-) -> AppResult<DeptRespVo> {
+pub async fn get_dept(login_user: OAuth2AccessTokenCheckRespDTO, id: i64) -> AppResult<DeptRespVo> {
     // 校验是否存在
-    let model = validate_dept_exists(&id).await?;
+    let model = validate_dept_exists(&id, &login_user.tenant_id).await?;
     Ok(model.into())
 }
 
 pub async fn dept_list(
-    _login_user: OAuth2AccessTokenCheckRespDTO,
+    login_user: OAuth2AccessTokenCheckRespDTO,
     params: DeptListReqVo,
 ) -> AppResult<PageResult<DeptRespVo>> {
-    Err(biz_error::DEPT_EXITS_CHILDREN.to_app_error())
+    let mut select = SystemDept::find()
+        .filter(system_dept::Column::Deleted.eq(false))
+        .filter(system_dept::Column::TenantId.eq(login_user.tenant_id));
+    if params.name.is_some() {
+        select =
+            select.filter(system_dept::Column::Name.like(format!("%{}%", params.name.unwrap())));
+    }
+    if params.status.is_some() {
+        select = select.filter(system_dept::Column::Status.eq(params.status.unwrap()));
+    }
+    let result = select
+        .all(db::pool())
+        .await?
+        .into_iter()
+        .map(|model| DeptRespVo::from(model))
+        .collect::<Vec<_>>();
+    let total = result.len() as u64;
+    Ok(PageResult::new(result, total, 1, total as u32))
 }
 
-async fn validate_dept_has_children(id: &i64) -> AppResult<bool> {
+async fn validate_dept_has_children(id: &i64, tenant_id: &i64) -> AppResult<bool> {
     let list = SystemDept::find()
         .filter(system_dept::Column::Deleted.eq(false))
+        .filter(system_dept::Column::TenantId.eq(tenant_id.to_owned()))
         .filter(system_dept::Column::ParentId.eq(id.to_owned()))
         .all(db::pool())
         .await?;
     Ok(!list.is_empty())
 }
 
-async fn validate_dept_exists(id: &i64) -> AppResult<system_dept::Model> {
+async fn validate_dept_exists(id: &i64, tenant_id: &i64) -> AppResult<system_dept::Model> {
     let option = SystemDept::find()
         .filter(system_dept::Column::Deleted.eq(false))
+        .filter(system_dept::Column::TenantId.eq(tenant_id.to_owned()))
         .filter(system_dept::Column::Id.eq(id.to_owned()))
         .one(db::pool())
         .await?;
@@ -92,10 +114,12 @@ async fn validate_dept_name_unique(
     id: &Option<i64>,
     parent_id: &Option<i64>,
     name: &String,
+    tenant_id: &i64,
 ) -> AppResult<()> {
     let parent_id = parent_id.unwrap_or(system_dept::PARENT_ID_ROOT);
     let option = SystemDept::find()
         .filter(system_dept::Column::Deleted.eq(false))
+        .filter(system_dept::Column::TenantId.eq(tenant_id.to_owned()))
         .filter(system_dept::Column::Name.eq(name))
         .filter(system_dept::Column::ParentId.eq(parent_id))
         .one(db::pool())
@@ -110,7 +134,11 @@ async fn validate_dept_name_unique(
     Ok(())
 }
 
-async fn validate_parent_dept(id: &Option<i64>, parent_id: &Option<i64>) -> AppResult<()> {
+async fn validate_parent_dept(
+    id: &Option<i64>,
+    parent_id: &Option<i64>,
+    tenant_id: &i64,
+) -> AppResult<()> {
     if parent_id.is_none() || parent_id.unwrap() == system_dept::PARENT_ID_ROOT {
         return Ok(());
     }
@@ -121,6 +149,7 @@ async fn validate_parent_dept(id: &Option<i64>, parent_id: &Option<i64>) -> AppR
     // 2. 父部门不存在
     let option = SystemDept::find()
         .filter(system_dept::Column::Deleted.eq(false))
+        .filter(system_dept::Column::TenantId.eq(tenant_id.to_owned()))
         .filter(system_dept::Column::Id.eq(parent_id.unwrap()))
         .one(db::pool())
         .await?;
@@ -144,6 +173,7 @@ async fn validate_parent_dept(id: &Option<i64>, parent_id: &Option<i64>) -> AppR
         }
         let option = SystemDept::find()
             .filter(system_dept::Column::Deleted.eq(false))
+            .filter(system_dept::Column::TenantId.eq(tenant_id.to_owned()))
             .filter(system_dept::Column::Id.eq(parent_id))
             .one(db::pool())
             .await?;

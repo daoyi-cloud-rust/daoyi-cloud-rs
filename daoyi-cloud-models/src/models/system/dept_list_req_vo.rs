@@ -9,18 +9,8 @@ use std::any::type_name;
 #[derive(Deserialize, ToSchema, Default, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DeptListReqVo {
-    /// 邮箱
-    pub email: Option<String>,
-    /// 部门编号
-    pub id: Option<i64>,
-    /// 负责人的用户编号
-    pub leader_user_id: Option<i64>,
     /// 部门名称
     pub name: Option<String>,
-    /// 父部门 ID
-    pub parent_id: Option<i64>,
-    /// 联系电话
-    pub phone: Option<String>,
     /// 状态,见 CommonStatusEnum 枚举
     pub status: Option<i8>,
 }
