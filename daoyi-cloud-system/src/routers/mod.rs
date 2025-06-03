@@ -60,6 +60,11 @@ pub fn routers() -> Router {
                                 Router::with_path("list-tree")
                                     .hoop(SS::has_permission("system:dept:query".to_string()))
                                     .post(system_dept_controller::dept_list_tree),
+                            )
+                            .push(
+                                Router::with_path("update")
+                                    .hoop(SS::has_permission("system:dept:update".to_string()))
+                                    .put(system_dept_controller::dept_list_tree),
                             ),
                     )
                     .push(

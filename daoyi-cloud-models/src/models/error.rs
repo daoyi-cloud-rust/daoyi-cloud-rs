@@ -21,9 +21,9 @@ pub enum AppError {
     HttpParse(#[from] ParseError),
     #[error("anyhow error:`{0}`")]
     Anyhow(#[from] anyhow::Error),
-    #[error("seaorm db error:`{0}`")]
+    #[error("数据库服务器错误:`{0}`")]
     Seaorm(#[from] sea_orm::DbErr),
-    #[error("validation error:`{0}`")]
+    #[error("参数校验失败:`{0}`")]
     Validation(#[from] validator::ValidationErrors),
 
     /// component not exists

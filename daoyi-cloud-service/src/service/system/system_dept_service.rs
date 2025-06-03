@@ -9,11 +9,13 @@ use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
 use daoyi_cloud_models::models::{biz_error, tree_utils};
 use sea_orm::*;
+use validator::Validate;
 
 pub async fn create_dept(
     login_user: OAuth2AccessTokenCheckRespDTO,
     req_vo: DeptSaveReqVo,
 ) -> AppResult<system_dept::Model> {
+    req_vo.validate()?;
     // 校验父部门的有效性
     let _ = validate_parent_dept(&req_vo.id, &req_vo.parent_id, &login_user.tenant_id).await?;
     // 校验部门名的唯一性
