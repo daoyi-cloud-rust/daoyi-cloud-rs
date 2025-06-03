@@ -11,16 +11,12 @@ pub trait TreeNode<T> {
 #[allow(dead_code)]
 pub struct TreeUtil<T: TreeNode<T>> {
     list: Vec<T>,
-    root_id: i64,
 }
 
 impl<T: TreeNode<T>> TreeUtil<T> {
     #[allow(dead_code)]
-    pub fn build(list: Vec<T>, root_id: Option<i64>) -> TreeUtil<T> {
-        Self {
-            list,
-            root_id: root_id.unwrap_or(0),
-        }
+    pub fn build(list: Vec<T>) -> TreeUtil<T> {
+        Self { list }
     }
 
     #[allow(dead_code)]
@@ -28,6 +24,12 @@ impl<T: TreeNode<T>> TreeUtil<T> {
         // 创建哈希映射以便快速查找节点
         let mut map: HashMap<i64, T> = HashMap::new();
         let mut root_nodes = Vec::new();
+        let mut root_ids = Vec::new();
+        for item in &self.list {
+            if !self.list.iter().any(|x| x.id() == item.parent_id()) {
+                root_ids.push(item.id());
+            }
+        }
         // 先构建所有节点并将其添加到映射中
         for mut item in self.list.into_iter() {
             // 清空子节点列表（准备重新构建）
@@ -43,18 +45,16 @@ impl<T: TreeNode<T>> TreeUtil<T> {
                 .or_insert_with(Vec::new)
                 .push(*id);
         }
-        // 处理根节点（父节点为 0 的节点）
-        if let Some(root_ids) = parent_children.get(&self.root_id) {
-            for &root_id in root_ids {
-                let mut root = map.remove(&root_id).unwrap();
-                // 构建根节点的子节点
-                root.children(TreeUtil::<T>::build_children(
-                    root_id,
-                    &mut map,
-                    &parent_children,
-                ));
-                root_nodes.push(root);
-            }
+        // 处理根节点
+        for root_id in root_ids {
+            let mut root = map.remove(&root_id).unwrap();
+            // 构建根节点的子节点
+            root.children(TreeUtil::<T>::build_children(
+                root_id,
+                &mut map,
+                &parent_children,
+            ));
+            root_nodes.push(root);
         }
         // 按排序值对根节点排序
         root_nodes.sort_by_key(|r| r.sort());

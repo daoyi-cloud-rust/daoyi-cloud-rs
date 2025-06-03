@@ -94,10 +94,7 @@ pub async fn dept_list_tree(
 ) -> AppResult<PageResult<DeptRespVo>> {
     let mut result = dept_list(login_user, params).await?;
     let list: Vec<DeptRespVo> = result.list().to_vec();
-    result.set_list(
-        tree_utils::TreeUtil::<DeptRespVo>::build(list, Some(system_dept::PARENT_ID_ROOT))
-            .build_tree(),
-    );
+    result.set_list(tree_utils::TreeUtil::<DeptRespVo>::build(list).build_tree());
     Ok(result)
 }
 
