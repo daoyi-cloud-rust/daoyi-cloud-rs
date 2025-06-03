@@ -47,3 +47,15 @@ pub async fn dept_list(
     let list = system_dept_service::dept_list(login_user, params).await?;
     json_ok(list)
 }
+
+/// 获取部门树列表
+#[endpoint(tags("管理后台 - 系统管理 - 部门"))]
+pub async fn dept_list_tree(
+    params: JsonBody<DeptListReqVo>,
+    depot: &mut Depot,
+) -> JsonResult<PageResult<DeptRespVo>> {
+    let login_user = get_current_user(depot);
+    let params = params.into_inner();
+    let list = system_dept_service::dept_list_tree(login_user, params).await?;
+    json_ok(list)
+}

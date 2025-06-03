@@ -9,6 +9,7 @@ use daoyi_cloud_models::models::system::dept_resp_vo::DeptRespVo;
 use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
 use sea_orm::*;
+use std::collections::HashMap;
 
 pub async fn create_dept(
     login_user: OAuth2AccessTokenCheckRespDTO,
@@ -77,14 +78,77 @@ pub async fn dept_list(
     if params.status.is_some() {
         select = select.filter(system_dept::Column::Status.eq(params.status.unwrap()));
     }
-    let result = select
+    let mut result = select
         .all(db::pool())
         .await?
         .into_iter()
         .map(|model| DeptRespVo::from(model))
         .collect::<Vec<_>>();
     let total = result.len() as u64;
+    result.sort_by_key(|a| a.sort);
     Ok(PageResult::new(result, total, 1, total as u32))
+}
+
+pub async fn dept_list_tree(
+    login_user: OAuth2AccessTokenCheckRespDTO,
+    params: DeptListReqVo,
+) -> AppResult<PageResult<DeptRespVo>> {
+    let mut result = dept_list(login_user, params).await?;
+    let list: Vec<DeptRespVo> = result.list().to_vec();
+    result.set_list(build_dept_tree(list));
+    Ok(result)
+}
+
+fn build_dept_tree(list: Vec<DeptRespVo>) -> Vec<DeptRespVo> {
+    // 创建哈希映射以便快速查找节点
+    let mut map: HashMap<i64, DeptRespVo> = HashMap::new();
+    let mut root_nodes = Vec::new();
+    // 先构建所有节点并将其添加到映射中
+    for mut dept in list.into_iter() {
+        // 清空子节点列表（准备重新构建）
+        dept.children = Vec::new();
+        map.insert(dept.id, dept);
+    }
+    // 创建父节点 ID 与子节点列表的映射
+    let mut parent_children: HashMap<i64, Vec<i64>> = HashMap::new();
+    for id in map.keys() {
+        let dept = map.get(id).unwrap();
+        parent_children
+            .entry(dept.parent_id)
+            .or_insert_with(Vec::new)
+            .push(*id);
+    }
+    // 递归构建树形结构
+    fn build_children(
+        parent_id: i64,
+        map: &mut HashMap<i64, DeptRespVo>,
+        parent_children: &HashMap<i64, Vec<i64>>,
+    ) -> Vec<DeptRespVo> {
+        let mut children = Vec::new();
+        if let Some(child_ids) = parent_children.get(&parent_id) {
+            for &child_id in child_ids {
+                let mut child = map.remove(&child_id).unwrap();
+                // 递归添加子节点
+                child.children = build_children(child_id, map, parent_children);
+                children.push(child);
+            }
+        }
+        // 按排序值排序
+        children.sort_by_key(|c| c.sort);
+        children
+    }
+    // 处理根节点（父节点为 0 的节点）
+    if let Some(root_ids) = parent_children.get(&system_dept::PARENT_ID_ROOT) {
+        for &root_id in root_ids {
+            let mut root = map.remove(&root_id).unwrap();
+            // 构建根节点的子节点
+            root.children = build_children(root_id, &mut map, &parent_children);
+            root_nodes.push(root);
+        }
+    }
+    // 按排序值对根节点排序
+    root_nodes.sort_by_key(|r| r.sort);
+    root_nodes
 }
 
 async fn validate_dept_has_children(id: &i64, tenant_id: &i64) -> AppResult<bool> {

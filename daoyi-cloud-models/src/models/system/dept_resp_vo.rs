@@ -27,6 +27,8 @@ pub struct DeptRespVo {
     pub sort: i32,
     /// 状态,见 CommonStatusEnum 枚举
     pub status: i8,
+    /// 子部门
+    pub children: Vec<DeptRespVo>,
 }
 
 impl From<Model> for DeptRespVo {
@@ -41,6 +43,7 @@ impl From<Model> for DeptRespVo {
             phone: m.phone,
             sort: m.sort,
             status: m.status,
+            children: Vec::new(),
         }
     }
 }

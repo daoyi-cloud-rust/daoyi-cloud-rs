@@ -19,6 +19,16 @@ pub struct PageResult<T> {
 }
 
 impl<T> PageResult<T> {
+    pub fn list(&self) -> &Vec<T> {
+        &self.list
+    }
+
+    pub fn set_list(&mut self, lv: Vec<T>) {
+        self.list = lv;
+    }
+}
+
+impl<T> PageResult<T> {
     pub fn new(list: Vec<T>, total: u64, page_no: u32, page_size: u32) -> Self {
         Self {
             list,
