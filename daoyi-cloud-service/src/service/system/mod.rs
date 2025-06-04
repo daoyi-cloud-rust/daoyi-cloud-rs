@@ -1,4 +1,5 @@
 pub mod permission_service;
+pub mod system_area_service;
 pub mod system_dept_service;
 pub mod system_menu_service;
 pub mod system_oauth2_access_token_service;
