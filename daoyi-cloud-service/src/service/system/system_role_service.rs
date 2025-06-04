@@ -1,7 +1,8 @@
+use daoyi_cloud_common::constants::redis_key_constants;
 use daoyi_cloud_common::enums::data_scope_enum::DataScopeEnum;
 use daoyi_cloud_common::enums::role_code_enum::RoleCodeEnum;
 use daoyi_cloud_common::enums::role_type_enum::RoleTypeEnum;
-use daoyi_cloud_config::db;
+use daoyi_cloud_config::{db, redis_util};
 use daoyi_cloud_entities::entities::system::prelude::SystemRole;
 use daoyi_cloud_entities::entities::system::system_role;
 use daoyi_cloud_models::models::common_result::AppResult;
@@ -77,13 +78,30 @@ pub async fn delete_role(login_user: OAuth2AccessTokenCheckRespDTO, id: i64) -> 
     let mut model = model.into_active_model();
     model.deleted = Set(true);
     model.update(db::pool()).await?;
+    redis_util::clear_cached_key(&format!("{}:{}", &login_user.tenant_id, id)).await;
     Ok(())
 }
 
 pub async fn get_role(login_user: OAuth2AccessTokenCheckRespDTO, id: i64) -> AppResult<RoleRespVo> {
+    let result = redis_util::get_method_cached::<RoleRespVo>(
+        redis_key_constants::ROLE,
+        &format!("{}:{}", &login_user.tenant_id, id),
+    )
+    .await;
+    if let Some(vo) = result {
+        return Ok(vo);
+    }
     // 校验是否存在
     let model = validate_role_exists(&Some(id), &login_user.tenant_id).await?;
-    Ok(model.into())
+    let resp_vo = model.into();
+    redis_util::set_method_cache::<RoleRespVo>(
+        redis_key_constants::ROLE,
+        &format!("{}:{}", &login_user.tenant_id, id),
+        None,
+        &resp_vo,
+    )
+    .await;
+    Ok(resp_vo)
 }
 
 pub async fn role_list(
@@ -153,6 +171,7 @@ pub async fn update_role(
     model.status = Set(req_vo.status);
     model.updater = Set(Some(login_user.user_id.to_string()));
     let model = model.update(db::pool()).await?;
+    redis_util::clear_cached_key(&format!("{}:{}", &login_user.tenant_id, &model.id)).await;
     Ok(model)
 }
 

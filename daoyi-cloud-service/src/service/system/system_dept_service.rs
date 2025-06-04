@@ -151,7 +151,7 @@ pub async fn update_dept(
 pub async fn get_child_dept_id_list_from_cache(id: &i64, tenant_id: &i64) -> AppResult<Vec<i64>> {
     let result = redis_util::get_method_cached::<Vec<i64>>(
         redis_key_constants::DEPT_CHILDREN_ID_LIST,
-        &format!("{}{}", tenant_id, id),
+        &format!("{}:{}", tenant_id, id),
     )
     .await;
     if let Some(list) = result {
@@ -162,7 +162,7 @@ pub async fn get_child_dept_id_list_from_cache(id: &i64, tenant_id: &i64) -> App
     list.sort();
     redis_util::set_method_cache::<Vec<i64>>(
         redis_key_constants::DEPT_CHILDREN_ID_LIST,
-        &format!("{}{}", tenant_id, id),
+        &format!("{}:{}", tenant_id, id),
         None,
         &list,
     )
