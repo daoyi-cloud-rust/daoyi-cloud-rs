@@ -7,6 +7,7 @@ mod system_menu_controller;
 mod system_oauth2_access_token;
 mod system_operate_log_controller;
 mod system_post_controller;
+mod system_role_controller;
 mod system_users;
 
 use daoyi_cloud_hoops::hoops::auth_middleware::SS;
@@ -156,6 +157,34 @@ pub fn routers() -> Router {
                                 Router::with_path("update")
                                     .hoop(SS::has_permission("system:post:update".to_string()))
                                     .put(system_post_controller::update_post),
+                            ),
+                    )
+                    .push(
+                        Router::with_path("role")
+                            .push(
+                                Router::with_path("create")
+                                    .hoop(SS::has_permission("system:role:create".to_string()))
+                                    .post(system_role_controller::create_role),
+                            )
+                            .push(
+                                Router::with_path("delete")
+                                    .hoop(SS::has_permission("system:role:delete".to_string()))
+                                    .delete(system_role_controller::delete_role),
+                            )
+                            .push(
+                                Router::with_path("get")
+                                    .hoop(SS::has_permission("system:role:query".to_string()))
+                                    .get(system_role_controller::get_role),
+                            )
+                            .push(
+                                Router::with_path("page")
+                                    .hoop(SS::has_permission("system:role:query".to_string()))
+                                    .post(system_role_controller::role_list),
+                            )
+                            .push(
+                                Router::with_path("update")
+                                    .hoop(SS::has_permission("system:role:update".to_string()))
+                                    .put(system_role_controller::update_role),
                             ),
                     )
                     .push(

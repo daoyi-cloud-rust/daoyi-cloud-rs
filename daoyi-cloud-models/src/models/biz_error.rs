@@ -12,6 +12,21 @@ impl ErrorCode {
         Self { code, msg }
     }
 
+    pub fn to_app_error_args(&self, args: Vec<&str>) -> AppError {
+        if args.is_empty() {
+            return AppError::biz_code(self.code, self.msg);
+        }
+        let mut msg = self.msg.to_string();
+        for arg in args {
+            msg = msg.replace("{}", arg);
+        }
+        AppError::biz_code(self.code, &msg)
+    }
+
+    pub fn to_app_result_args<T>(&self, args: Vec<&str>) -> AppResult<T> {
+        Err(self.to_app_error_args(args))
+    }
+
     pub fn to_app_error(&self) -> AppError {
         AppError::biz_code(self.code, self.msg)
     }

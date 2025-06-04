@@ -3,18 +3,20 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, Default)]
 #[sea_orm(table_name = "system_role")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i64,
     pub name: String,
     pub code: String,
+    #[sea_orm(default_value = 0)]
     pub sort: i32,
     pub data_scope: i8,
     pub data_scope_dept_ids: String,
     #[sea_orm(default_value = 0)]
     pub status: i8,
+    #[sea_orm(default_value = 2)]
     pub r#type: i8,
     pub remark: Option<String>,
     pub creator: Option<String>,
