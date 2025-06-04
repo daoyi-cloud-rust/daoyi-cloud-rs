@@ -20,3 +20,4 @@ serde_json = { workspace = true }
 daoyi-cloud-common = { workspace = true }
 itertools = { workspace = true }
 csv = { workspace = true }
+ip2region = { workspace = true }

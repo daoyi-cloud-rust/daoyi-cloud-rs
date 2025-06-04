@@ -40,3 +40,33 @@ pub async fn area_list_tree(
     result.set_list(tree_utils::TreeUtil::<AreaRespVo>::build(list).build_tree());
     Ok(result)
 }
+
+pub async fn get_area_by_ip(
+    login_user: OAuth2AccessTokenCheckRespDTO,
+    csv_path: String,
+    xdb_path: String,
+    ip: String,
+) -> AppResult<String> {
+    let result = area_list(login_user, &csv_path, false).await?;
+    let list: Vec<AreaRespVo> = result.list().to_vec();
+    // 1. 加载xdb数据库文件
+    let searcher = ip2region::Searcher::new(xdb_path)
+        .map_err(|e| AppError::internal(format!("加载xdb数据库文件失败:{}", e.to_string())))?;
+    let result = searcher
+        .search(&ip)
+        .map_err(|e| AppError::internal(format!("查询IP失败:{}", e.to_string())))?;
+    let area_id: i64 = result
+        .parse()
+        .map_err(|_| AppError::internal(format!("区域编号转化失败:{}", result)))?;
+    let area = list
+        .iter()
+        .find(|a| a.id == area_id)
+        .ok_or_else(|| AppError::internal("未找到对应区域"))?;
+    let mut res_name = area.name.to_owned();
+    let mut parent = list.iter().find(|a| a.id == area.parent_id);
+    while parent.is_some() {
+        res_name = format!("{}-{}", &parent.unwrap().name, &res_name);
+        parent = list.iter().find(|a| a.id == parent.unwrap().parent_id);
+    }
+    Ok(res_name.to_owned())
+}

@@ -111,9 +111,15 @@ pub fn routers() -> Router {
                         ),
                     )
                     .push(
-                        Router::with_path("area").push(
-                            Router::with_path("tree").get(system_area_controller::get_area_tree),
-                        ),
+                        Router::with_path("area")
+                            .push(
+                                Router::with_path("tree")
+                                    .get(system_area_controller::get_area_tree),
+                            )
+                            .push(
+                                Router::with_path("get-by-ip")
+                                    .get(system_area_controller::get_area_by_ip),
+                            ),
                     )
                     .push(
                         Router::with_path("user")
