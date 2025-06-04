@@ -31,7 +31,6 @@ pub async fn get_area_by_ip(ip: QueryParam<String, true>, depot: &mut Depot) -> 
     let xdb_path = format!("{}/resources/ip2region.xdb", env!("CARGO_MANIFEST_DIR"));
     let login_user = get_current_user(depot);
     let area_name =
-        system_area_service::get_area_by_ip(login_user, csv_path, xdb_path, ip.into_inner())
-            .await?;
-    json_ok(area_name)
+        system_area_service::get_area_by_ip(login_user, csv_path, xdb_path, ip.into_inner()).await;
+    json_ok(area_name.unwrap_or(String::from("未知")))
 }
