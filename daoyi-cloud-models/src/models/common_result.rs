@@ -5,7 +5,9 @@ use std::any::type_name;
 
 pub type AppResult<T> = Result<T, AppError>;
 pub type JsonResult<T> = Result<CommonResult<T>, AppError>;
-pub type EmptyResult = Result<CommonResult<Empty>, AppError>;
+
+pub type EmptyResult = Result<Empty, AppError>;
+pub type EmptyJsonResult = Result<CommonResult<Empty>, AppError>;
 
 pub fn json_ok<T>(data: T) -> JsonResult<T> {
     Ok(CommonResult::success(data))
@@ -30,8 +32,12 @@ impl ToResponse for Empty {
     }
 }
 
-pub fn empty_ok() -> JsonResult<Empty> {
-    Ok(CommonResult::success(Empty {}))
+pub fn empty_ok() -> EmptyResult {
+    Ok(Empty {})
+}
+
+pub fn empty_json_ok() -> EmptyJsonResult {
+    Ok(CommonResult::empty_success())
 }
 
 /// 通用返回

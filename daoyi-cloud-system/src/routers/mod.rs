@@ -6,6 +6,7 @@ mod system_login_log_controller;
 mod system_menu_controller;
 mod system_oauth2_access_token;
 mod system_operate_log_controller;
+mod system_permission_controller;
 mod system_post_controller;
 mod system_role_controller;
 mod system_users;

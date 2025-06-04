@@ -12,6 +12,7 @@ pub mod menu_resp_vo;
 pub mod menu_save_req_vo;
 pub mod operate_log_page_req_vo;
 pub mod operate_log_resp_vo;
+pub mod permission_assign_role_data_scope_req_vo;
 pub mod permission_check_req_vo;
 pub mod post_page_req_vo;
 pub mod post_resp_vo;

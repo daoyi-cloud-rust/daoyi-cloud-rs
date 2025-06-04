@@ -1,3 +1,4 @@
+use crate::service::system::system_role_service;
 use daoyi_cloud_common::enums::role_code_enum::RoleCodeEnum;
 use daoyi_cloud_config::{db, redis_util};
 use daoyi_cloud_entities::entities::system::prelude::{
@@ -6,9 +7,20 @@ use daoyi_cloud_entities::entities::system::prelude::{
 use daoyi_cloud_entities::entities::system::{
     system_menu, system_role, system_role_menu, system_user_role,
 };
+use daoyi_cloud_models::models::common_result::{EmptyResult, empty_ok};
+use daoyi_cloud_models::models::system::permission_assign_role_data_scope_req_vo::PermissionAssignRoleDataScopeReqVo;
+use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
 use daoyi_cloud_models::models::system::system_role::SystemRoleModel;
 use itertools::Itertools;
 use sea_orm::*;
+
+pub async fn assign_role_data_scope(
+    login_user: OAuth2AccessTokenCheckRespDTO,
+    params: PermissionAssignRoleDataScopeReqVo,
+) -> EmptyResult {
+    let _ = system_role_service::update_role_data_scope(login_user, params).await?;
+    empty_ok()
+}
 
 pub async fn has_any_permissions(user_id: i64, permissions: Vec<String>) -> bool {
     // 如果为空，说明已经有权限

@@ -5,9 +5,10 @@ use daoyi_cloud_common::enums::role_type_enum::RoleTypeEnum;
 use daoyi_cloud_config::{db, redis_util};
 use daoyi_cloud_entities::entities::system::prelude::SystemRole;
 use daoyi_cloud_entities::entities::system::system_role;
-use daoyi_cloud_models::models::common_result::AppResult;
+use daoyi_cloud_models::models::common_result::{AppResult, EmptyResult, empty_ok};
 use daoyi_cloud_models::models::mask_utils::adjust_time_range;
 use daoyi_cloud_models::models::page_result::PageResult;
+use daoyi_cloud_models::models::system::permission_assign_role_data_scope_req_vo::PermissionAssignRoleDataScopeReqVo;
 use daoyi_cloud_models::models::system::role_page_req_vo::RolePageReqVo;
 use daoyi_cloud_models::models::system::role_resp_vo::RoleRespVo;
 use daoyi_cloud_models::models::system::role_save_req_vo::RoleSaveReqVo;
@@ -15,6 +16,21 @@ use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2Access
 use daoyi_cloud_models::models::{biz_error, page_param};
 use sea_orm::*;
 
+pub async fn update_role_data_scope(
+    login_user: OAuth2AccessTokenCheckRespDTO,
+    params: PermissionAssignRoleDataScopeReqVo,
+) -> EmptyResult {
+    // 校验是否可以更新
+    let model = validate_role_for_update(&Some(params.role_id), &login_user.tenant_id).await?;
+    // 更新数据范围
+    let mut model = model.into_active_model();
+    model.data_scope = Set(params.data_scope);
+    model.data_scope_dept_ids =
+        Set(serde_json::to_string(&params.data_scope_dept_ids.unwrap_or(Vec::new())).unwrap());
+    model.updater = Set(Some(login_user.user_id.to_string()));
+    model.update(db::pool()).await?;
+    empty_ok()
+}
 pub async fn create_role(
     login_user: OAuth2AccessTokenCheckRespDTO,
     req_vo: RoleSaveReqVo,
@@ -60,6 +76,16 @@ async fn validate_role_duplicate(
     let _ = validate_role_name_unique(id, name, tenant_id).await?;
     // 2. 是否存在相同编码的角色
     let _ = validate_role_code_unique(id, code, tenant_id).await?;
+    // 校验角色是否可以被更新
+    let _ = validate_role_for_update(id, tenant_id).await?;
+    Ok(model)
+}
+async fn validate_role_for_update(
+    id: &Option<i64>,
+    tenant_id: &i64,
+) -> AppResult<system_role::Model> {
+    // 校验自己存在
+    let model = validate_role_exists(id, tenant_id).await?;
     // 校验角色是否可以被更新
     if id.is_some() && RoleTypeEnum::is_system(model.r#type) {
         return biz_error::ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE.to_app_result();

@@ -14,7 +14,7 @@ use daoyi_cloud_config::db;
 use daoyi_cloud_entities::entities::demos::{prelude::Users, users};
 use daoyi_cloud_models::models::SafeUser;
 use daoyi_cloud_models::models::common_result::{
-    EmptyResult, JsonResult, empty_ok, json_ok, to_common_response,
+    EmptyJsonResult, JsonResult, empty_json_ok, json_ok, to_common_response,
 };
 
 #[derive(Deserialize, Debug, Validate, ToSchema, Default)]
@@ -71,11 +71,11 @@ pub async fn update_user(
 }
 
 #[endpoint(tags("示例"))]
-pub async fn delete_user(user_id: PathParam<String>) -> EmptyResult {
+pub async fn delete_user(user_id: PathParam<String>) -> EmptyJsonResult {
     let user_id = user_id.into_inner();
     let conn = db::pool();
     Users::delete_by_id(user_id).exec(conn).await?;
-    empty_ok()
+    empty_json_ok()
 }
 
 #[derive(Debug, Deserialize, Validate, Extractible, ToSchema)]

@@ -1,5 +1,5 @@
 use daoyi_cloud_models::models::biz_error;
-use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_ok, json_ok};
+use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_json_ok, json_ok};
 use daoyi_cloud_models::models::page_result::PageResult;
 use daoyi_cloud_models::models::system::dept_list_req_vo::DeptListReqVo;
 use daoyi_cloud_models::models::system::dept_resp_vo::DeptRespVo;
@@ -27,7 +27,7 @@ pub async fn delete_dept(id: QueryParam<i64>, depot: &mut Depot) -> JsonResult<E
     let login_user = get_current_user(depot);
     let id = id.into_inner();
     let _ = system_dept_service::delete_dept(login_user, id).await?;
-    empty_ok()
+    empty_json_ok()
 }
 
 /// 获得部门信息

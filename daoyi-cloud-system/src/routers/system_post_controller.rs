@@ -1,5 +1,5 @@
 use daoyi_cloud_models::models::biz_error;
-use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_ok, json_ok};
+use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_json_ok, json_ok};
 use daoyi_cloud_models::models::page_result::PageResult;
 use daoyi_cloud_models::models::system::post_page_req_vo::PostPageReqVo;
 use daoyi_cloud_models::models::system::post_resp_vo::PostRespVo;
@@ -27,7 +27,7 @@ pub async fn delete_post(id: QueryParam<i64>, depot: &mut Depot) -> JsonResult<E
     let login_user = get_current_user(depot);
     let id = id.into_inner();
     let _ = system_post_service::delete_post(login_user, id).await?;
-    empty_ok()
+    empty_json_ok()
 }
 
 /// 获得岗位信息

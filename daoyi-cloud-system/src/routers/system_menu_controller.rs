@@ -1,5 +1,5 @@
 use daoyi_cloud_models::models::biz_error;
-use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_ok, json_ok};
+use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_json_ok, json_ok};
 use daoyi_cloud_models::models::page_result::PageResult;
 use daoyi_cloud_models::models::system::menu_list_req_vo::MenuListReqVo;
 use daoyi_cloud_models::models::system::menu_resp_vo::MenuRespVo;
@@ -27,7 +27,7 @@ pub async fn delete_menu(id: QueryParam<i64>, depot: &mut Depot) -> JsonResult<E
     let login_user = get_current_user(depot);
     let id = id.into_inner();
     let _ = system_menu_service::delete_menu(login_user, id).await?;
-    empty_ok()
+    empty_json_ok()
 }
 
 /// 获得菜单信息

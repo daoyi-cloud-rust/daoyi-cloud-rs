@@ -1,5 +1,5 @@
 use daoyi_cloud_models::models::biz_error;
-use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_ok, json_ok};
+use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_json_ok, json_ok};
 use daoyi_cloud_models::models::page_result::PageResult;
 use daoyi_cloud_models::models::system::role_page_req_vo::RolePageReqVo;
 use daoyi_cloud_models::models::system::role_resp_vo::RoleRespVo;
@@ -27,7 +27,7 @@ pub async fn delete_role(id: QueryParam<i64>, depot: &mut Depot) -> JsonResult<E
     let login_user = get_current_user(depot);
     let id = id.into_inner();
     let _ = system_role_service::delete_role(login_user, id).await?;
-    empty_ok()
+    empty_json_ok()
 }
 
 /// 获得角色信息
