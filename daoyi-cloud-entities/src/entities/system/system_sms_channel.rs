@@ -10,15 +10,19 @@ pub struct Model {
     pub id: i64,
     pub signature: String,
     pub code: String,
+    #[sea_orm(default_value = 0)]
     pub status: i8,
     pub remark: Option<String>,
     pub api_key: String,
     pub api_secret: Option<String>,
     pub callback_url: Option<String>,
     pub creator: Option<String>,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
 }
 

@@ -13,6 +13,7 @@ pub struct Model {
     pub name: String,
     pub logo: String,
     pub description: Option<String>,
+    #[sea_orm(default_value = 0)]
     pub status: i8,
     pub access_token_validity_seconds: i32,
     pub refresh_token_validity_seconds: i32,
@@ -24,9 +25,12 @@ pub struct Model {
     pub resource_ids: Option<String>,
     pub additional_information: Option<String>,
     pub creator: Option<String>,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
 }
 

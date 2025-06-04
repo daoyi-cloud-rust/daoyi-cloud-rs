@@ -12,15 +12,19 @@ pub struct Model {
     pub contact_user_id: Option<i64>,
     pub contact_name: String,
     pub contact_mobile: Option<String>,
+    #[sea_orm(default_value = 0)]
     pub status: i8,
     pub website: Option<String>,
     pub package_id: i64,
     pub expire_time: DateTime,
     pub account_count: i32,
     pub creator: String,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
 }
 

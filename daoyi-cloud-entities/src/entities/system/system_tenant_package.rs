@@ -9,14 +9,18 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i64,
     pub name: String,
+    #[sea_orm(default_value = 0)]
     pub status: i8,
     pub remark: Option<String>,
     #[sea_orm(column_type = "custom(\"LONGTEXT\")")]
     pub menu_ids: String,
     pub creator: String,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
 }
 

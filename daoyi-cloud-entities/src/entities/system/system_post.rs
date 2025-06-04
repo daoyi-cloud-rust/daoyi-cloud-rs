@@ -3,7 +3,7 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize, Default)]
 #[sea_orm(table_name = "system_post")]
 pub struct Model {
     #[sea_orm(primary_key)]
@@ -11,13 +11,18 @@ pub struct Model {
     pub code: String,
     pub name: String,
     pub sort: i32,
+    #[sea_orm(default_value = 0)]
     pub status: i8,
     pub remark: Option<String>,
     pub creator: Option<String>,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
+    #[sea_orm(default_value = 0)]
     pub tenant_id: i64,
 }
 

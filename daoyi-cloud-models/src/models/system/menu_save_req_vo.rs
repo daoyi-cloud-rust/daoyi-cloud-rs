@@ -6,7 +6,7 @@ use serde::Deserialize;
 use std::any::type_name;
 use validator::Validate;
 
-/// 管理后台 - 部门创建/修改 Request VO
+/// 管理后台 - 菜单创建/修改 Request VO
 #[derive(Deserialize, ToSchema, Default, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct MenuSaveReqVo {

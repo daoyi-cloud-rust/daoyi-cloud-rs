@@ -9,6 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i64,
     pub r#type: i8,
+    #[sea_orm(default_value = 0)]
     pub status: i8,
     pub code: String,
     pub name: String,
@@ -19,9 +20,12 @@ pub struct Model {
     pub channel_id: i64,
     pub channel_code: String,
     pub creator: Option<String>,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
 }
 

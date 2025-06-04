@@ -15,10 +15,14 @@ pub struct Model {
     pub approved: bool,
     pub expires_time: DateTime,
     pub creator: Option<String>,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
+    #[sea_orm(default_value = 0)]
     pub tenant_id: i64,
 }
 

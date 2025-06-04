@@ -6,6 +6,7 @@ mod system_login_log_controller;
 mod system_menu_controller;
 mod system_oauth2_access_token;
 mod system_operate_log_controller;
+mod system_post_controller;
 mod system_users;
 
 use daoyi_cloud_hoops::hoops::auth_middleware::SS;
@@ -128,6 +129,34 @@ pub fn routers() -> Router {
                                 .hoop(SS::has_permission("system:login-log:query".to_string()))
                                 .post(system_login_log_controller::page_login_log),
                         ),
+                    )
+                    .push(
+                        Router::with_path("post")
+                            .push(
+                                Router::with_path("create")
+                                    .hoop(SS::has_permission("system:post:create".to_string()))
+                                    .post(system_post_controller::create_post),
+                            )
+                            .push(
+                                Router::with_path("delete")
+                                    .hoop(SS::has_permission("system:post:delete".to_string()))
+                                    .delete(system_post_controller::delete_post),
+                            )
+                            .push(
+                                Router::with_path("get")
+                                    .hoop(SS::has_permission("system:post:query".to_string()))
+                                    .get(system_post_controller::get_post),
+                            )
+                            .push(
+                                Router::with_path("page")
+                                    .hoop(SS::has_permission("system:post:query".to_string()))
+                                    .post(system_post_controller::post_list),
+                            )
+                            .push(
+                                Router::with_path("update")
+                                    .hoop(SS::has_permission("system:post:update".to_string()))
+                                    .put(system_post_controller::update_post),
+                            ),
                     )
                     .push(
                         Router::with_path("user")
