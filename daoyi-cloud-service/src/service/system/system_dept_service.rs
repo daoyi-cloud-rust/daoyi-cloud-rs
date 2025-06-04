@@ -99,7 +99,7 @@ pub async fn dept_list(
         .collect::<Vec<_>>();
     let total = result.len() as u64;
     result.sort_by_key(|a| a.sort);
-    Ok(PageResult::new(result, total, 1, total as u32))
+    Ok(PageResult::build(result, total, 1, total as i32))
 }
 
 pub async fn dept_list_tree(

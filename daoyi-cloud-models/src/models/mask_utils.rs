@@ -1,7 +1,27 @@
+use chrono::{NaiveDateTime, NaiveTime};
 use sea_orm::prelude::DateTime;
 use serde::Serializer;
 
-pub static DATE_TIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+pub const DATE_TIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+
+/// 调整时间范围
+pub fn adjust_time_range(vec: Vec<String>) -> [NaiveDateTime; 2] {
+    // 解析原始时间字符串
+    let start = chrono::NaiveDateTime::parse_from_str(&vec[0], DATE_TIME_FORMAT).unwrap();
+    let end = chrono::NaiveDateTime::parse_from_str(&vec[1], DATE_TIME_FORMAT).unwrap();
+
+    // 调整开始时间为当天的00:00:00
+    let adjusted_start =
+        NaiveDateTime::new(start.date(), NaiveTime::from_hms_opt(0, 0, 0).unwrap());
+
+    // 调整结束时间为当天的23:59:59.999999999
+    let adjusted_end = NaiveDateTime::new(
+        end.date(),
+        NaiveTime::from_hms_nano_opt(23, 59, 59, 999_999_999).unwrap(),
+    );
+
+    [adjusted_start, adjusted_end]
+}
 
 /// 手机号脱敏函数
 pub fn mask_phone<S>(phone: &str, serializer: S) -> Result<S::Ok, S::Error>

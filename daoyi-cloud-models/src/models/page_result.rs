@@ -13,9 +13,11 @@ pub struct PageResult<T> {
     /// 总量
     total: u64,
     /// 页码，从 1 开始
-    page_no: u32,
+    page_no: i32,
     /// 每页条数，最大值为 100，-1 不分页，查询所有数据
-    page_size: u32,
+    page_size: i32,
+    /// 总页数
+    total_page: u32,
 }
 
 impl<T> PageResult<T> {
@@ -29,12 +31,13 @@ impl<T> PageResult<T> {
 }
 
 impl<T> PageResult<T> {
-    pub fn new(list: Vec<T>, total: u64, page_no: u32, page_size: u32) -> Self {
+    pub fn build(list: Vec<T>, total: u64, page_no: i32, page_size: i32) -> Self {
         Self {
             list,
             total,
             page_no,
             page_size,
+            total_page: (total as f64 / page_size as f64).ceil() as u32,
         }
     }
 }

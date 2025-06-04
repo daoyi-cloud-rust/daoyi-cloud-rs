@@ -1,7 +1,8 @@
 pub mod biz_error;
 pub mod common_result;
 pub mod error;
-mod mask_utils;
+pub mod mask_utils;
+pub mod page_param;
 pub mod page_result;
 pub mod system;
 pub mod tree_utils;

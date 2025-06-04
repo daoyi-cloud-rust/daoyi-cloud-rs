@@ -3,6 +3,7 @@ mod redis_api;
 mod system_dept_controller;
 mod system_menu_controller;
 mod system_oauth2_access_token;
+mod system_operate_log_controller;
 mod system_users;
 
 use daoyi_cloud_hoops::hoops::auth_middleware::SS;
@@ -100,6 +101,13 @@ pub fn routers() -> Router {
                                     .hoop(SS::has_permission("system:menu:update".to_string()))
                                     .put(system_menu_controller::update_menu),
                             ),
+                    )
+                    .push(
+                        Router::with_path("operate-log").push(
+                            Router::with_path("page")
+                                .hoop(SS::has_permission("system:operate-log:query".to_string()))
+                                .post(system_operate_log_controller::page_operate_log),
+                        ),
                     )
                     .push(
                         Router::with_path("user")

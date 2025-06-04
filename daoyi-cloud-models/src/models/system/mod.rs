@@ -7,6 +7,8 @@ pub mod dept_save_req_vo;
 pub mod menu_list_req_vo;
 pub mod menu_resp_vo;
 pub mod menu_save_req_vo;
+pub mod operate_log_page_req_vo;
+pub mod operate_log_resp_vo;
 pub mod permission_check_req_vo;
 pub mod system_menu;
 pub mod system_oauth2_access_token;
