@@ -2,6 +2,7 @@ mod permission_api;
 mod redis_api;
 mod system_area_controller;
 mod system_dept_controller;
+mod system_login_log_controller;
 mod system_menu_controller;
 mod system_oauth2_access_token;
 mod system_operate_log_controller;
@@ -120,6 +121,13 @@ pub fn routers() -> Router {
                                 Router::with_path("get-by-ip")
                                     .get(system_area_controller::get_area_by_ip),
                             ),
+                    )
+                    .push(
+                        Router::with_path("login-log").push(
+                            Router::with_path("page")
+                                .hoop(SS::has_permission("system:login-log:query".to_string()))
+                                .post(system_login_log_controller::page_login_log),
+                        ),
                     )
                     .push(
                         Router::with_path("user")

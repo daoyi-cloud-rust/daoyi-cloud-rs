@@ -5,6 +5,8 @@ pub mod clear_redis_cache_req_vo;
 pub mod dept_list_req_vo;
 pub mod dept_resp_vo;
 pub mod dept_save_req_vo;
+pub mod login_log_page_req_vo;
+pub mod login_log_resp_vo;
 pub mod menu_list_req_vo;
 pub mod menu_resp_vo;
 pub mod menu_save_req_vo;
