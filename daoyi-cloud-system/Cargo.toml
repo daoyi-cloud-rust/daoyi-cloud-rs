@@ -14,3 +14,4 @@ daoyi-cloud-config = { workspace = true }
 daoyi-cloud-service = { workspace = true }
 daoyi-cloud-common = { workspace = true }
 daoyi-cloud-hoops = { workspace = true }
+validator = { workspace = true, features = ["derive"] }

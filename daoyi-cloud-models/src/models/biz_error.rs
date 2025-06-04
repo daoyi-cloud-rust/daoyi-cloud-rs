@@ -16,7 +16,7 @@ impl ErrorCode {
         AppError::biz_code(self.code, self.msg)
     }
 
-    pub fn to_app_result(&self) -> AppResult<()> {
+    pub fn to_app_result<T>(&self) -> AppResult<T> {
         Err(self.to_app_error())
     }
 }

@@ -64,7 +64,7 @@ pub fn routers() -> Router {
                             .push(
                                 Router::with_path("update")
                                     .hoop(SS::has_permission("system:dept:update".to_string()))
-                                    .put(system_dept_controller::dept_list_tree),
+                                    .put(system_dept_controller::update_dept),
                             ),
                     )
                     .push(

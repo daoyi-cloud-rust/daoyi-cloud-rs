@@ -9,13 +9,11 @@ use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
 use daoyi_cloud_models::models::{biz_error, tree_utils};
 use sea_orm::*;
-use validator::Validate;
 
 pub async fn create_dept(
     login_user: OAuth2AccessTokenCheckRespDTO,
     req_vo: DeptSaveReqVo,
 ) -> AppResult<system_dept::Model> {
-    req_vo.validate()?;
     // 校验父部门的有效性
     let _ = validate_parent_dept(&req_vo.id, &req_vo.parent_id, &login_user.tenant_id).await?;
     // 校验部门名的唯一性
@@ -98,6 +96,36 @@ pub async fn dept_list_tree(
     let list: Vec<DeptRespVo> = result.list().to_vec();
     result.set_list(tree_utils::TreeUtil::<DeptRespVo>::build(list).build_tree());
     Ok(result)
+}
+
+pub async fn update_dept(
+    login_user: OAuth2AccessTokenCheckRespDTO,
+    req_vo: DeptSaveReqVo,
+) -> AppResult<system_dept::Model> {
+    // 校验是否存在
+    let model = validate_dept_exists(&req_vo.id.unwrap(), &login_user.tenant_id).await?;
+    // 校验父部门的有效性
+    let _ = validate_parent_dept(&req_vo.id, &req_vo.parent_id, &login_user.tenant_id).await?;
+    // 校验部门名的唯一性
+    let _ = validate_dept_name_unique(
+        &req_vo.id,
+        &req_vo.parent_id,
+        &req_vo.name,
+        &login_user.tenant_id,
+    )
+    .await?;
+    // 插入部门
+    let mut model = model.into_active_model();
+    model.email = Set(req_vo.email);
+    model.leader_user_id = Set(req_vo.leader_user_id);
+    model.name = Set(req_vo.name);
+    model.parent_id = Set(req_vo.parent_id.unwrap_or(system_dept::PARENT_ID_ROOT));
+    model.phone = Set(req_vo.phone);
+    model.sort = Set(req_vo.sort);
+    model.status = Set(req_vo.status);
+    model.updater = Set(Some(login_user.user_id.to_string()));
+    let model = model.update(db::pool()).await?;
+    Ok(model)
 }
 
 async fn validate_dept_has_children(id: &i64, tenant_id: &i64) -> AppResult<bool> {

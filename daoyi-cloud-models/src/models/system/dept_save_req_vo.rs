@@ -31,6 +31,7 @@ pub struct DeptSaveReqVo {
     /// 显示顺序不能为空
     pub sort: i32,
     /// 状态,见 CommonStatusEnum 枚举
+    #[validate(range(min = 0, max = 1, message = "状态值不正确"))]
     pub status: i8,
 }
 impl EndpointOutRegister for DeptSaveReqVo {

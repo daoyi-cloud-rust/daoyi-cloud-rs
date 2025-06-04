@@ -1,3 +1,4 @@
+use daoyi_cloud_models::models::biz_error;
 use daoyi_cloud_models::models::common_result::{Empty, JsonResult, empty_ok, json_ok};
 use daoyi_cloud_models::models::page_result::PageResult;
 use daoyi_cloud_models::models::system::dept_list_req_vo::DeptListReqVo;
@@ -8,12 +9,14 @@ use daoyi_cloud_service::service::system::system_dept_service;
 use salvo::oapi::endpoint;
 use salvo::oapi::extract::{JsonBody, QueryParam};
 use salvo::{Depot, Writer};
+use validator::Validate;
 
 /// 创建部门
 #[endpoint(tags("管理后台 - 系统管理 - 部门"))]
 pub async fn create_dept(params: JsonBody<DeptSaveReqVo>, depot: &mut Depot) -> JsonResult<String> {
     let login_user = get_current_user(depot);
     let vo = params.into_inner();
+    vo.validate()?;
     let model = system_dept_service::create_dept(login_user, vo).await?;
     json_ok(model.id.to_string())
 }
@@ -58,4 +61,17 @@ pub async fn dept_list_tree(
     let params = params.into_inner();
     let list = system_dept_service::dept_list_tree(login_user, params).await?;
     json_ok(list)
+}
+
+/// 更新部门
+#[endpoint(tags("管理后台 - 系统管理 - 部门"))]
+pub async fn update_dept(params: JsonBody<DeptSaveReqVo>, depot: &mut Depot) -> JsonResult<String> {
+    let login_user = get_current_user(depot);
+    let vo = params.into_inner();
+    vo.validate()?;
+    if vo.id.is_none() {
+        return biz_error::DEPT_NOT_FOUND.to_app_result();
+    }
+    let model = system_dept_service::update_dept(login_user, vo).await?;
+    json_ok(model.id.to_string())
 }
