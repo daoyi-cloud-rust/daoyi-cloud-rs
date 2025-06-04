@@ -98,6 +98,20 @@ pub async fn clear_all_cached_keys() {
     }
 }
 
+pub async fn clear_cache_by_prefix(prefix: &str) {
+    let result = pool().get::<&str, String>(CACHED_REDIS_KEY).await;
+    if let Ok(res_str) = result {
+        let result: Result<Vec<String>, _> = serde_json::from_str(&res_str);
+        if let Ok(list) = result {
+            for key in list {
+                if key.starts_with(prefix) {
+                    clear_cached_key(key.as_str()).await;
+                }
+            }
+        }
+    }
+}
+
 async fn cache_keys(key: String) {
     let result = pool().get::<&str, String>(CACHED_REDIS_KEY).await;
     if let Ok(res_str) = result {

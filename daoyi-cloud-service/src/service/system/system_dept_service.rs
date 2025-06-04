@@ -1,4 +1,5 @@
-use daoyi_cloud_config::db;
+use daoyi_cloud_common::constants::redis_key_constants;
+use daoyi_cloud_config::{db, redis_util};
 use daoyi_cloud_entities::entities::system::prelude::SystemDept;
 use daoyi_cloud_entities::entities::system::system_dept;
 use daoyi_cloud_models::models::common_result::AppResult;
@@ -8,6 +9,7 @@ use daoyi_cloud_models::models::system::dept_resp_vo::DeptRespVo;
 use daoyi_cloud_models::models::system::dept_save_req_vo::DeptSaveReqVo;
 use daoyi_cloud_models::models::system::system_oauth2_access_token::OAuth2AccessTokenCheckRespDTO;
 use daoyi_cloud_models::models::{biz_error, tree_utils};
+use itertools::Itertools;
 use sea_orm::*;
 
 pub async fn create_dept(
@@ -39,6 +41,12 @@ pub async fn create_dept(
         ..Default::default()
     };
     let model = model.insert(db::pool()).await?;
+    redis_util::clear_cache_by_prefix(&format!(
+        "{}:{}",
+        redis_key_constants::DEPT_CHILDREN_ID_LIST,
+        &login_user.tenant_id
+    ))
+    .await;
     Ok(model)
 }
 
@@ -54,6 +62,12 @@ pub async fn delete_dept(login_user: OAuth2AccessTokenCheckRespDTO, id: i64) -> 
     let mut model = model.into_active_model();
     model.deleted = Set(true);
     model.update(db::pool()).await?;
+    redis_util::clear_cache_by_prefix(&format!(
+        "{}:{}",
+        redis_key_constants::DEPT_CHILDREN_ID_LIST,
+        &login_user.tenant_id
+    ))
+    .await;
     Ok(())
 }
 
@@ -125,7 +139,61 @@ pub async fn update_dept(
     model.status = Set(req_vo.status);
     model.updater = Set(Some(login_user.user_id.to_string()));
     let model = model.update(db::pool()).await?;
+    redis_util::clear_cache_by_prefix(&format!(
+        "{}:{}",
+        redis_key_constants::DEPT_CHILDREN_ID_LIST,
+        &login_user.tenant_id
+    ))
+    .await;
     Ok(model)
+}
+
+pub async fn get_child_dept_id_list_from_cache(id: &i64, tenant_id: &i64) -> AppResult<Vec<i64>> {
+    let result = redis_util::get_method_cached::<Vec<i64>>(
+        redis_key_constants::DEPT_CHILDREN_ID_LIST,
+        &format!("{}{}", tenant_id, id),
+    )
+    .await;
+    if let Some(list) = result {
+        return Ok(list);
+    }
+    let list = get_child_dept_list(&vec![id.to_owned()], tenant_id).await?;
+    let mut list = list.iter().map(|model| model.id).collect::<Vec<_>>();
+    list.sort();
+    redis_util::set_method_cache::<Vec<i64>>(
+        redis_key_constants::DEPT_CHILDREN_ID_LIST,
+        &format!("{}{}", tenant_id, id),
+        None,
+        &list,
+    )
+    .await;
+    Ok(list)
+}
+
+async fn get_child_dept_list(
+    ids: &Vec<i64>,
+    tenant_id: &i64,
+) -> AppResult<Vec<system_dept::Model>> {
+    let mut children = Vec::new();
+    let mut parent_ids = ids.to_vec();
+    loop {
+        let mut list = SystemDept::find()
+            .filter(system_dept::Column::Deleted.eq(false))
+            .filter(system_dept::Column::TenantId.eq(tenant_id.to_owned()))
+            .filter(system_dept::Column::ParentId.is_in(parent_ids))
+            .all(db::pool())
+            .await?;
+        if list.is_empty() {
+            break;
+        }
+        parent_ids = list
+            .iter()
+            .map(|model| model.id)
+            .unique()
+            .collect::<Vec<_>>();
+        children.append(&mut list);
+    }
+    Ok(children)
 }
 
 async fn validate_dept_has_children(id: &i64, tenant_id: &i64) -> AppResult<bool> {
@@ -188,20 +256,15 @@ async fn validate_parent_dept(
         return biz_error::DEPT_PARENT_ERROR.to_app_result();
     }
     // 2. 父部门不存在
-    let option = SystemDept::find()
-        .filter(system_dept::Column::Deleted.eq(false))
-        .filter(system_dept::Column::TenantId.eq(tenant_id.to_owned()))
-        .filter(system_dept::Column::Id.eq(parent_id.unwrap()))
-        .one(db::pool())
-        .await?;
-    if option.is_none() {
+    let option = validate_dept_exists(&parent_id.to_owned().unwrap(), tenant_id).await;
+    if option.is_err() {
         return biz_error::DEPT_PARENT_NOT_EXITS.to_app_result();
     }
     // 3. 递归校验父部门，如果父部门是自己的子部门，则报错，避免形成环路
     if id.is_none() {
         return Ok(());
     }
-    let mut parent = option.unwrap();
+    let mut parent = option?;
     loop {
         // 3.1 校验环路
         let parent_id = parent.parent_id;
@@ -212,16 +275,11 @@ async fn validate_parent_dept(
         if parent_id == system_dept::PARENT_ID_ROOT {
             break;
         }
-        let option = SystemDept::find()
-            .filter(system_dept::Column::Deleted.eq(false))
-            .filter(system_dept::Column::TenantId.eq(tenant_id.to_owned()))
-            .filter(system_dept::Column::Id.eq(parent_id))
-            .one(db::pool())
-            .await?;
-        if option.is_none() {
+        let option = validate_dept_exists(&parent_id, tenant_id).await;
+        if option.is_err() {
             break;
         }
-        parent = option.unwrap();
+        parent = option?;
     }
 
     Ok(())
