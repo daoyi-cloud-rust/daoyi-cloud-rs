@@ -3,6 +3,8 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
+/// 菜单编号 - 根节点
+pub static ID_ROOT: i64 = 0;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "system_menu")]
 pub struct Model {
@@ -11,20 +13,29 @@ pub struct Model {
     pub name: String,
     pub permission: String,
     pub r#type: i8,
+    #[sea_orm(default_value = 0)]
     pub sort: i32,
+    #[sea_orm(default_value = 0)]
     pub parent_id: i64,
     pub path: Option<String>,
     pub icon: Option<String>,
     pub component: Option<String>,
     pub component_name: Option<String>,
+    #[sea_orm(default_value = 0)]
     pub status: i8,
+    #[sea_orm(default_value = true)]
     pub visible: bool,
+    #[sea_orm(default_value = true)]
     pub keep_alive: bool,
+    #[sea_orm(default_value = true)]
     pub always_show: bool,
     pub creator: Option<String>,
+    #[sea_orm(default_expr = "Expr::current_timestamp()")]
     pub create_time: DateTime,
     pub updater: Option<String>,
+    #[sea_orm(on_update = "Expr::current_timestamp()")]
     pub update_time: DateTime,
+    #[sea_orm(default_value = false)]
     pub deleted: bool,
 }
 

@@ -1,6 +1,7 @@
 mod permission_api;
 mod redis_api;
 mod system_dept_controller;
+mod system_menu_controller;
 mod system_oauth2_access_token;
 mod system_users;
 
@@ -65,6 +66,39 @@ pub fn routers() -> Router {
                                 Router::with_path("update")
                                     .hoop(SS::has_permission("system:dept:update".to_string()))
                                     .put(system_dept_controller::update_dept),
+                            ),
+                    )
+                    .push(
+                        Router::with_path("menu")
+                            .push(
+                                Router::with_path("create")
+                                    .hoop(SS::has_permission("system:menu:create".to_string()))
+                                    .post(system_menu_controller::create_menu),
+                            )
+                            .push(
+                                Router::with_path("delete")
+                                    .hoop(SS::has_permission("system:menu:delete".to_string()))
+                                    .delete(system_menu_controller::delete_menu),
+                            )
+                            .push(
+                                Router::with_path("get")
+                                    .hoop(SS::has_permission("system:menu:query".to_string()))
+                                    .get(system_menu_controller::get_menu),
+                            )
+                            .push(
+                                Router::with_path("list")
+                                    .hoop(SS::has_permission("system:menu:query".to_string()))
+                                    .post(system_menu_controller::menu_list),
+                            )
+                            .push(
+                                Router::with_path("list-tree")
+                                    .hoop(SS::has_permission("system:menu:query".to_string()))
+                                    .post(system_menu_controller::menu_list_tree),
+                            )
+                            .push(
+                                Router::with_path("update")
+                                    .hoop(SS::has_permission("system:menu:update".to_string()))
+                                    .put(system_menu_controller::update_menu),
                             ),
                     )
                     .push(
