@@ -1,6 +1,18 @@
-[package]
-name = "daoyi-cloud-rs"
+[workspace]
+members = [
+    ".",
+    "daoyi-cloud-system"
+]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
+
+[workspace.dependencies]
+
+[package]
+name = "daoyi-cloud-rs"
+version = { workspace = true }
+edition = { workspace = true }
 
 [dependencies]
