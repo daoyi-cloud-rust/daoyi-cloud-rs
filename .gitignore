@@ -7,3 +7,6 @@ Cargo.lock
 logs
 **/*.local
 **/*.prod
+**/application.yaml
+**/application-local.yaml
+**/application-prod.yaml
