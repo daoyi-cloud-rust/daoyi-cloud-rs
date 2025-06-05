@@ -1,6 +1,7 @@
 [workspace]
 members = [
     ".",
+    "daoyi-cloud-logger",
     "daoyi-cloud-system"
 ]
 
@@ -9,8 +10,12 @@ version = "0.1.0"
 edition = "2024"
 
 [workspace.dependencies]
-axum = { version = "0.8.4" }
+axum = { version = "0.8.4", features = ["macros"] }
 tokio = { version = "1.45.1", features = ["full"] }
+tracing = { version = "0.1.41", features = ["async-await"] }
+tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter", "chrono", "time"] }
+time = { version = "0.3.41", features = ["local-offset"] }
+daoyi-cloud-logger = { path = "daoyi-cloud-logger", version = "0.1.0" }
 
 [package]
 name = "daoyi-cloud-rs"
