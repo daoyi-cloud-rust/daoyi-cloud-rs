@@ -9,6 +9,8 @@ version = "0.1.0"
 edition = "2024"
 
 [workspace.dependencies]
+axum = { version = "0.8.4" }
+tokio = { version = "1.45.1", features = ["full"] }
 
 [package]
 name = "daoyi-cloud-rs"
