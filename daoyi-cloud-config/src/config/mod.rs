@@ -1,8 +1,10 @@
 #![allow(dead_code)]
+pub mod database;
 pub mod server;
 
 use anyhow::Context;
 use daoyi_cloud_logger::logger;
+pub use database::DatabaseConfig;
 use serde::Deserialize;
 pub use server::ServerConfig;
 use std::path::PathBuf;
@@ -13,8 +15,9 @@ static CONFIG: LazyLock<AppConfig> =
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
     #[serde(default = "default_app_name")]
-    pub app_name: String,
-    pub server: ServerConfig,
+    app_name: String,
+    server: ServerConfig,
+    database: DatabaseConfig,
 }
 
 impl AppConfig {
@@ -38,6 +41,15 @@ impl AppConfig {
             .with_context(|| "Failed to load config.")?
             .try_deserialize()
             .with_context(|| "Failed to deserialize config.")
+    }
+    pub fn app_name(&self) -> &str {
+        &self.app_name
+    }
+    pub fn server(&self) -> &ServerConfig {
+        &self.server
+    }
+    pub fn database(&self) -> &DatabaseConfig {
+        &self.database
     }
 }
 

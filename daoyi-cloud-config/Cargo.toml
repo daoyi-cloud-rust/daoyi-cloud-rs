@@ -7,4 +7,6 @@ edition.workspace = true
 config = { workspace = true }
 serde = { workspace = true }
 anyhow = { workspace = true }
+sea-orm = { workspace = true }
+num_cpus = { workspace = true }
 daoyi-cloud-logger = { workspace = true }

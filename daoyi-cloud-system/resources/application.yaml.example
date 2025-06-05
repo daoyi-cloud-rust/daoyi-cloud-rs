@@ -1,0 +1,6 @@
+app_name: daoyi-cloud-rs-system
+server:
+  port: 8081
+database:
+  url: postgresql://postgresql:postgresql@127.0.0.1/postgresql
+  schema: public
