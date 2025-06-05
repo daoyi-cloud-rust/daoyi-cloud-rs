@@ -1,4 +1,5 @@
 use crate::service::system::system_role_service;
+use daoyi_cloud_common::constants::redis_key_constants;
 use daoyi_cloud_common::enums::role_code_enum::RoleCodeEnum;
 use daoyi_cloud_config::{db, redis_util};
 use daoyi_cloud_entities::entities::system::prelude::{
@@ -70,7 +71,7 @@ pub async fn roles_has_permission(role_list: &Vec<SystemRoleModel>, permission: 
 
 pub async fn get_role_id_list_by_menu_id(menu_id: i64) -> Vec<i64> {
     if let Some(list) = redis_util::get_method_cached::<Vec<i64>>(
-        "get_role_id_list_by_menu_id",
+        redis_key_constants::MENU_ROLE_ID_LIST,
         menu_id.to_string().as_str(),
     )
     .await
@@ -84,7 +85,7 @@ pub async fn get_role_id_list_by_menu_id(menu_id: i64) -> Vec<i64> {
     if let Ok(list) = result {
         let menu_ids: Vec<i64> = list.into_iter().map(|x| x.menu_id).unique().collect();
         redis_util::set_method_cache(
-            "get_role_id_list_by_menu_id",
+            redis_key_constants::MENU_ROLE_ID_LIST,
             menu_id.to_string().as_str(),
             None,
             &menu_ids,
@@ -96,9 +97,11 @@ pub async fn get_role_id_list_by_menu_id(menu_id: i64) -> Vec<i64> {
 }
 
 pub async fn get_menu_id_list_by_permission(permission: &str) -> Vec<i64> {
-    if let Some(list) =
-        redis_util::get_method_cached::<Vec<i64>>("get_menu_id_list_by_permission", permission)
-            .await
+    if let Some(list) = redis_util::get_method_cached::<Vec<i64>>(
+        redis_key_constants::PERMISSION_MENU_ID_LIST,
+        permission,
+    )
+    .await
     {
         return list;
     }
@@ -114,7 +117,7 @@ pub async fn get_menu_id_list_by_permission(permission: &str) -> Vec<i64> {
         }
     }
     redis_util::set_method_cache(
-        "get_menu_id_list_by_permission",
+        redis_key_constants::PERMISSION_MENU_ID_LIST,
         permission,
         None,
         &menu_id_list,
@@ -125,7 +128,7 @@ pub async fn get_menu_id_list_by_permission(permission: &str) -> Vec<i64> {
 
 pub async fn get_enable_role_list_by_user_id(user_id: i64) -> Vec<SystemRoleModel> {
     if let Some(list) = redis_util::get_method_cached::<Vec<SystemRoleModel>>(
-        "get_enable_role_list_by_user_id",
+        redis_key_constants::USER_ROLE_ID_LIST,
         user_id.to_string().as_str(),
     )
     .await
@@ -152,7 +155,7 @@ pub async fn get_enable_role_list_by_user_id(user_id: i64) -> Vec<SystemRoleMode
         }
     }
     redis_util::set_method_cache(
-        "get_enable_role_list_by_user_id",
+        redis_key_constants::USER_ROLE_ID_LIST,
         user_id.to_string().as_str(),
         None,
         &roles,
