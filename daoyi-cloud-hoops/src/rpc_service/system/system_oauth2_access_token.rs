@@ -1,3 +1,4 @@
+use daoyi_cloud_common::constants::redis_key_constants;
 use daoyi_cloud_config::{config, redis_util};
 use daoyi_cloud_models::models::common_result::{CommonResult, JsonResult, json_ok};
 use daoyi_cloud_models::models::error::AppError;
@@ -7,9 +8,11 @@ use salvo::http::StatusError;
 use tracing::log;
 
 pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenCheckRespDTO> {
-    let result =
-        redis_util::get_method_cached::<OAuth2AccessTokenCheckRespDTO>("check_access_token", token)
-            .await;
+    let result = redis_util::get_method_cached::<OAuth2AccessTokenCheckRespDTO>(
+        redis_key_constants::OAUTH2_ACCESS_TOKEN,
+        token,
+    )
+    .await;
     if let Some(dto) = result {
         return json_ok(dto);
     }
@@ -57,9 +60,9 @@ pub async fn check_access_token(token: &str) -> JsonResult<OAuth2AccessTokenChec
     if resp.is_success() {
         if let Some(dto) = resp.clone().data() {
             redis_util::set_method_cache::<OAuth2AccessTokenCheckRespDTO>(
-                "check_access_token",
+                redis_key_constants::OAUTH2_ACCESS_TOKEN,
                 token,
-                Some(60 * 10), // 10分钟
+                Some(60 * 60 * 24 * 365), // 一年
                 &dto,
             )
             .await;

@@ -30,6 +30,8 @@ pub const USER_ROLE_ID_LIST: &str = "user_role_ids";
 */
 pub const MENU_ROLE_ID_LIST: &str = "menu_role_ids";
 
+/// 拥有指定权限的缓存
+pub const HAS_ANY_PERMISSION: &str = "has_any_permission";
 /**
  * 拥有权限对应的菜单编号数组的缓存
  * <p>
@@ -54,7 +56,7 @@ pub const OAUTH_CLIENT: &str = "oauth_client";
  * <p>
  * 由于动态过期时间，使用 RedisTemplate 操作
 */
-pub const OAUTH2_ACCESS_TOKEN: &str = "oauth2_access_token:%s";
+pub const OAUTH2_ACCESS_TOKEN: &str = "oauth2_access_token";
 
 /**
  * 站内信模版的缓存

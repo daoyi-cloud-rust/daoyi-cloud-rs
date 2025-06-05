@@ -1,3 +1,4 @@
+use daoyi_cloud_common::constants::redis_key_constants;
 use daoyi_cloud_config::{config, redis_util};
 use daoyi_cloud_models::models::common_result::{CommonResult, JsonResult};
 use daoyi_cloud_models::models::error::AppError;
@@ -14,7 +15,8 @@ fn gen_redis_key(user_id: &i64, permissions: &Vec<String>) -> String {
 pub async fn has_any_permission(check_req_vo: PermissionCheckReqVO) -> bool {
     let suffix = gen_redis_key(&(check_req_vo.user_id), &(check_req_vo.permissions));
     if let Some(json_str) =
-        redis_util::get_method_cached::<String>("has_any_permission", &suffix).await
+        redis_util::get_method_cached::<String>(redis_key_constants::HAS_ANY_PERMISSION, &suffix)
+            .await
     {
         return json_str.eq("true");
     }
@@ -26,9 +28,9 @@ pub async fn has_any_permission(check_req_vo: PermissionCheckReqVO) -> bool {
             .unwrap_or_else(|| "false".to_string())
             .as_str());
         redis_util::set_method_cache::<String>(
-            "has_any_permission",
+            redis_key_constants::HAS_ANY_PERMISSION,
             &suffix,
-            Some(60 * 10), // 10分钟
+            Some(60 * 60 * 24 * 365), // 一年
             &x.to_string(),
         )
         .await;
