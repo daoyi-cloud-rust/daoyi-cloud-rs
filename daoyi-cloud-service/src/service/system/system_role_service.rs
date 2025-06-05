@@ -50,6 +50,7 @@ pub async fn create_role(
         remark: Set(req_vo.remark),
         sort: Set(req_vo.sort),
         status: Set(req_vo.status),
+        r#type: Set(RoleTypeEnum::Custom.code()),
         data_scope: Set(DataScopeEnum::All.code()),
         creator: Set(Some(login_user.user_id.to_string())),
         updater: Set(Some(login_user.user_id.to_string())),
