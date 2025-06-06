@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = [
+members = ["daoyi-cloud-api",
     "daoyi-cloud-config",
     "daoyi-cloud-demo",
     "daoyi-cloud-entity",
@@ -26,4 +26,5 @@ daoyi-cloud-logger = { path = "daoyi-cloud-logger", version = "0.1.0" }
 daoyi-cloud-config = { path = "daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entity = { path = "daoyi-cloud-entity", version = "0.1.0" }
 daoyi-cloud-server = { path = "daoyi-cloud-server", version = "0.1.0" }
+daoyi-cloud-api = { path = "daoyi-cloud-api", version = "0.1.0" }
 
