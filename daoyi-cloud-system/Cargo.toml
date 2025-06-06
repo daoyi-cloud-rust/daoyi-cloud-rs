@@ -7,5 +7,6 @@ edition = { workspace = true }
 axum = { workspace = true }
 tokio = { workspace = true }
 anyhow = { workspace = true }
-daoyi-cloud-logger = { workspace = true }
+#daoyi-cloud-logger = { workspace = true }
 daoyi-cloud-config = { workspace = true }
+daoyi-cloud-server = { workspace = true }

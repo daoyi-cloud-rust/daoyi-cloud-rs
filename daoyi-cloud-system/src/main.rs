@@ -1,8 +1,6 @@
 use axum::{Router, debug_handler, routing};
 use daoyi_cloud_config::config;
-use daoyi_cloud_config::config::database;
-use daoyi_cloud_logger::logger;
-use tokio::net::TcpListener;
+use daoyi_cloud_server::app;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -10,14 +8,9 @@ async fn main() -> anyhow::Result<()> {
     unsafe {
         std::env::set_var("APP_ROOT", env!("CARGO_MANIFEST_DIR"));
     }
-    logger::init(Some("debug"));
-    database::init().await?;
     let router = Router::new().route("/", routing::get(hello_world));
-    let port = config::get().server().port();
-    let listener = TcpListener::bind(format!("0.0.0.0:{port}")).await?;
-    logger::debug!("Listening on {}://{}", "http", listener.local_addr()?);
-    axum::serve(listener, router).await?;
-    Ok(())
+
+    app::run(router).await
 }
 
 #[debug_handler]
