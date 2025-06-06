@@ -27,7 +27,7 @@ async fn main() -> anyhow::Result<()> {
 
 #[debug_handler]
 async fn get_users() -> impl IntoResponse {
-    let users = SystemUsers::find().all(database::pool0()).await.unwrap();
+    let users = SystemUsers::find().all(database::pool1()).await.unwrap();
     axum::Json(users)
 }
 
