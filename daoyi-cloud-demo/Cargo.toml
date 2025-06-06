@@ -9,5 +9,5 @@ tokio = { workspace = true }
 anyhow = { workspace = true }
 sea-orm = { workspace = true }
 daoyi-cloud-entity = { workspace = true }
-daoyi-cloud-logger = { workspace = true }
+daoyi-cloud-server = { workspace = true }
 daoyi-cloud-config = { workspace = true }
