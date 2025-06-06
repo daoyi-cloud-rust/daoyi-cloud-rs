@@ -1,1 +1,1 @@
-mod demo;
+pub mod demo;
