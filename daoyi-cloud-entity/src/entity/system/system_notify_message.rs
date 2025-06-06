@@ -4,24 +4,21 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(schema_name = "daoyi-system", table_name = "system_users")]
+#[sea_orm(table_name = "system_notify_message")]
 #[serde(rename_all = "camelCase")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i64,
-    pub username: String,
-    pub password: String,
-    pub nickname: String,
-    pub remark: Option<String>,
-    pub dept_id: Option<i64>,
-    pub post_ids: Option<String>,
-    pub email: Option<String>,
-    pub mobile: Option<String>,
-    pub sex: Option<i16>,
-    pub avatar: Option<String>,
-    pub status: i16,
-    pub login_ip: Option<String>,
-    pub login_date: Option<DateTime>,
+    pub user_id: i64,
+    pub user_type: i8,
+    pub template_id: i64,
+    pub template_code: String,
+    pub template_nickname: String,
+    pub template_content: String,
+    pub template_type: i32,
+    pub template_params: String,
+    pub read_status: bool,
+    pub read_time: Option<DateTime>,
     pub creator: Option<String>,
     pub create_time: DateTime,
     pub updater: Option<String>,

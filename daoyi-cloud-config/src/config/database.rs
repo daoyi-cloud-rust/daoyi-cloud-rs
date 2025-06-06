@@ -4,7 +4,13 @@ use daoyi_cloud_logger::logger;
 use sea_orm::{ConnectOptions, ConnectionTrait, Database, DatabaseConnection, Statement};
 use serde::Deserialize;
 use std::cmp::max;
+use std::sync::OnceLock;
 use std::time::Duration;
+
+static SEA_ORM_POOL_0: OnceLock<DatabaseConnection> = OnceLock::new();
+static SEA_ORM_POOL_1: OnceLock<DatabaseConnection> = OnceLock::new();
+static SEA_ORM_POOL_2: OnceLock<DatabaseConnection> = OnceLock::new();
+static SEA_ORM_POOL_3: OnceLock<DatabaseConnection> = OnceLock::new();
 
 #[derive(Debug, Deserialize)]
 pub struct DatabaseConfig {
@@ -56,8 +62,7 @@ impl DatabaseConfig {
     }
 }
 
-pub async fn init() -> anyhow::Result<DatabaseConnection> {
-    let database_config = crate::config::get().database();
+async fn init_datasource(database_config: &DatabaseConfig) -> anyhow::Result<DatabaseConnection> {
     let mut options = ConnectOptions::new(database_config.url());
     let cpus = num_cpus::get() as u32;
     options
@@ -74,9 +79,42 @@ pub async fn init() -> anyhow::Result<DatabaseConnection> {
     }
     let db = Database::connect(options).await?;
     db.ping().await?;
-    logger::debug!("Database connected.");
+    logger::debug!("Database [{}] connected.", database_config.url());
     log_database_info(&db).await?;
     Ok(db)
+}
+
+pub async fn init() -> anyhow::Result<()> {
+    let config = crate::config::get();
+    let database_config = config.datasource_0();
+    let db = init_datasource(&database_config).await?;
+    SEA_ORM_POOL_0.set(db).expect("sea-orm pool should be set");
+    if let Some(database_config) = config.datasource_1() {
+        let db = init_datasource(&database_config).await?;
+        SEA_ORM_POOL_1.set(db).expect("sea-orm pool should be set");
+    }
+    if let Some(database_config) = config.datasource_2() {
+        let db = init_datasource(&database_config).await?;
+        SEA_ORM_POOL_2.set(db).expect("sea-orm pool should be set");
+    }
+    if let Some(database_config) = config.datasource_3() {
+        let db = init_datasource(&database_config).await?;
+        SEA_ORM_POOL_3.set(db).expect("sea-orm pool should be set");
+    }
+    Ok(())
+}
+
+pub fn pool0() -> &'static DatabaseConnection {
+    SEA_ORM_POOL_0.get().expect("sea-orm pool should set")
+}
+pub fn pool1() -> &'static DatabaseConnection {
+    SEA_ORM_POOL_1.get().expect("sea-orm pool should set")
+}
+pub fn pool2() -> &'static DatabaseConnection {
+    SEA_ORM_POOL_2.get().expect("sea-orm pool should set")
+}
+pub fn pool3() -> &'static DatabaseConnection {
+    SEA_ORM_POOL_3.get().expect("sea-orm pool should set")
 }
 
 async fn log_database_info(db: &DatabaseConnection) -> anyhow::Result<()> {

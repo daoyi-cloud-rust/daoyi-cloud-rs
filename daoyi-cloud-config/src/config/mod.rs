@@ -17,7 +17,10 @@ pub struct AppConfig {
     #[serde(default = "default_app_name")]
     app_name: String,
     server: ServerConfig,
-    database: DatabaseConfig,
+    datasource_0: DatabaseConfig,
+    datasource_1: Option<DatabaseConfig>,
+    datasource_2: Option<DatabaseConfig>,
+    datasource_3: Option<DatabaseConfig>,
 }
 
 impl AppConfig {
@@ -48,8 +51,18 @@ impl AppConfig {
     pub fn server(&self) -> &ServerConfig {
         &self.server
     }
-    pub fn database(&self) -> &DatabaseConfig {
-        &self.database
+    pub fn datasource_0(&self) -> &DatabaseConfig {
+        &self.datasource_0
+    }
+
+    pub fn datasource_1(&self) -> &Option<DatabaseConfig> {
+        &self.datasource_1
+    }
+    pub fn datasource_2(&self) -> &Option<DatabaseConfig> {
+        &self.datasource_2
+    }
+    pub fn datasource_3(&self) -> &Option<DatabaseConfig> {
+        &self.datasource_3
     }
 }
 

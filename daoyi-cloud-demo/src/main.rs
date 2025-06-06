@@ -1,7 +1,10 @@
+use axum::response::IntoResponse;
 use axum::{Router, debug_handler, routing};
 use daoyi_cloud_config::config;
 use daoyi_cloud_config::config::database;
+use daoyi_cloud_entity::entity::demo::prelude::*;
 use daoyi_cloud_logger::logger;
+use sea_orm::prelude::*;
 use tokio::net::TcpListener;
 
 #[tokio::main]
@@ -12,12 +15,20 @@ async fn main() -> anyhow::Result<()> {
     }
     logger::init(Some("debug"));
     database::init().await?;
-    let router = Router::new().route("/", routing::get(hello_world));
+    let router = Router::new()
+        .route("/", routing::get(hello_world))
+        .route("/users", routing::get(get_users));
     let port = config::get().server().port();
     let listener = TcpListener::bind(format!("0.0.0.0:{port}")).await?;
     logger::debug!("Listening on {}://{}", "http", listener.local_addr()?);
     axum::serve(listener, router).await?;
     Ok(())
+}
+
+#[debug_handler]
+async fn get_users() -> impl IntoResponse {
+    let users = SystemUsers::find().all(database::pool0()).await.unwrap();
+    axum::Json(users)
 }
 
 #[debug_handler]

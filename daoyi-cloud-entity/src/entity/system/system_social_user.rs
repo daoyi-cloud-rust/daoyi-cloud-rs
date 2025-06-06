@@ -4,24 +4,20 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(schema_name = "daoyi-system", table_name = "system_users")]
+#[sea_orm(table_name = "system_social_user")]
 #[serde(rename_all = "camelCase")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i64,
-    pub username: String,
-    pub password: String,
+    pub id: u64,
+    pub r#type: i8,
+    pub openid: String,
+    pub token: Option<String>,
+    pub raw_token_info: String,
     pub nickname: String,
-    pub remark: Option<String>,
-    pub dept_id: Option<i64>,
-    pub post_ids: Option<String>,
-    pub email: Option<String>,
-    pub mobile: Option<String>,
-    pub sex: Option<i16>,
     pub avatar: Option<String>,
-    pub status: i16,
-    pub login_ip: Option<String>,
-    pub login_date: Option<DateTime>,
+    pub raw_user_info: String,
+    pub code: String,
+    pub state: Option<String>,
     pub creator: Option<String>,
     pub create_time: DateTime,
     pub updater: Option<String>,
