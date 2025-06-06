@@ -2,6 +2,8 @@
 resolver = "3"
 members = [
     "daoyi-cloud-config",
+    "daoyi-cloud-demo",
+    "daoyi-cloud-entity",
     "daoyi-cloud-logger",
     "daoyi-cloud-system"
 ]

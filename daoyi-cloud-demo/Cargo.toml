@@ -1,0 +1,11 @@
+[package]
+name = "daoyi-cloud-demo"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+axum = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+daoyi-cloud-logger = { workspace = true }
+daoyi-cloud-config = { workspace = true }
