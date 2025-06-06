@@ -3,7 +3,9 @@ use axum::{Router, debug_handler, routing};
 use daoyi_cloud_config::config;
 use daoyi_cloud_config::config::database;
 use daoyi_cloud_entity::entity::demo::prelude::*;
+use daoyi_cloud_entity::entity::demo::system_users;
 use daoyi_cloud_logger::logger;
+use sea_orm::Condition;
 use sea_orm::prelude::*;
 use tokio::net::TcpListener;
 
@@ -20,14 +22,28 @@ async fn main() -> anyhow::Result<()> {
         .route("/users", routing::get(get_users));
     let port = config::get().server().port();
     let listener = TcpListener::bind(format!("0.0.0.0:{port}")).await?;
-    logger::debug!("Listening on {}://{}", "http", listener.local_addr()?);
+    logger::info!("Listening on {}://{}", "http", listener.local_addr()?);
     axum::serve(listener, router).await?;
     Ok(())
 }
 
 #[debug_handler]
 async fn get_users() -> impl IntoResponse {
-    let users = SystemUsers::find().all(database::pool1()).await.unwrap();
+    let users = SystemUsers::find()
+        .filter(system_users::Column::Deleted.eq(true))
+        .filter(
+            Condition::all()
+                .add(system_users::Column::Sex.eq(1))
+                .add(system_users::Column::TenantId.gt(18))
+                .add(
+                    Condition::any()
+                        .add(system_users::Column::Username.contains("张"))
+                        .add(system_users::Column::Nickname.contains("李")),
+                ),
+        )
+        .all(database::pool1())
+        .await
+        .unwrap();
     axum::Json(users)
 }
 
