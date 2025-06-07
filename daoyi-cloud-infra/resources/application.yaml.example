@@ -1,0 +1,6 @@
+app_name: daoyi-cloud-rs-infra
+server:
+  port: 8081
+database:
+  url: postgresql://postgresql:postgresql@127.0.0.1:5432/postgresql
+  schema: demo

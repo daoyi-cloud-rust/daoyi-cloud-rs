@@ -1,0 +1,8 @@
+use axum::Router;
+use daoyi_cloud_common::models::app_server::AppState;
+
+mod system;
+
+pub fn routers() -> Router<AppState> {
+    Router::new().nest("/system", system::routers())
+}

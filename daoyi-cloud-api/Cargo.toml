@@ -5,3 +5,5 @@ edition.workspace = true
 
 [dependencies]
 axum = { workspace = true }
+daoyi-cloud-common = { workspace = true }
+daoyi-cloud-config = { workspace = true }

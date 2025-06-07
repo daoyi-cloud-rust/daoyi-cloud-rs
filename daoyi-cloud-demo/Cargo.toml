@@ -11,3 +11,4 @@ sea-orm = { workspace = true }
 daoyi-cloud-entity = { workspace = true }
 daoyi-cloud-server = { workspace = true }
 daoyi-cloud-config = { workspace = true }
+daoyi-cloud-common = { workspace = true }

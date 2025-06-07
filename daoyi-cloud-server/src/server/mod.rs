@@ -1,5 +1,5 @@
-use crate::app::AppState;
 use axum::Router;
+use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_config::config::ServerConfig;
 use daoyi_cloud_logger::logger;
 use std::net::SocketAddr;

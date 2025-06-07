@@ -1,11 +1,11 @@
 use axum::extract::State;
 use axum::response::IntoResponse;
 use axum::{Router, debug_handler, routing};
+use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_config::config;
 use daoyi_cloud_entity::entity::demo::prelude::*;
 use daoyi_cloud_entity::entity::demo::system_users;
 use daoyi_cloud_server::app;
-use daoyi_cloud_server::app::AppState;
 use sea_orm::Condition;
 use sea_orm::prelude::*;
 

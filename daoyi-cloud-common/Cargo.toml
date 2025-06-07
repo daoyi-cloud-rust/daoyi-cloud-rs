@@ -1,0 +1,7 @@
+[package]
+name = "daoyi-cloud-common"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+sea-orm = { workspace = true }

@@ -1,24 +1,14 @@
 use crate::server;
 use axum::Router;
+use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_config::config;
 use daoyi_cloud_config::config::database;
 use daoyi_cloud_logger::logger;
-use sea_orm::DatabaseConnection;
-
-#[derive(Clone)]
-pub struct AppState {
-    pub db: &'static DatabaseConnection,
-}
-
-impl AppState {
-    pub fn new(db: &'static DatabaseConnection) -> Self {
-        Self { db }
-    }
-}
 
 pub async fn run(router: Router<AppState>) -> anyhow::Result<()> {
     logger::init(Some("debug"));
     logger::info!("Starting app server...");
+    logger::debug!("router: {:#?}", router);
 
     database::init().await?;
     let db = database::pool0();

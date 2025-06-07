@@ -1,5 +1,5 @@
 [package]
-name = "daoyi-cloud-server"
+name = "daoyi-cloud-infra"
 version.workspace = true
 edition.workspace = true
 
@@ -8,5 +8,5 @@ axum = { workspace = true }
 tokio = { workspace = true }
 anyhow = { workspace = true }
 daoyi-cloud-common = { workspace = true }
-daoyi-cloud-config = { workspace = true }
-daoyi-cloud-logger = { workspace = true }
+daoyi-cloud-server = { workspace = true }
+daoyi-cloud-api = { workspace = true }
