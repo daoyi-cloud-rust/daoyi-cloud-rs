@@ -1,15 +1,8 @@
 [workspace]
 resolver = "3"
 members = [
-    "daoyi-cloud-api",
-    "daoyi-cloud-common",
-    "daoyi-cloud-config",
-    "daoyi-cloud-demo",
-    "daoyi-cloud-entity",
-    "daoyi-cloud-infra",
-    "daoyi-cloud-logger",
-    "daoyi-cloud-server",
-    "daoyi-cloud-system"
+    "lib/*",
+    "bin/*"
 ]
 
 [workspace.package]
@@ -26,10 +19,10 @@ serde = { version = "1.0.219", features = ["derive"] }
 anyhow = { version = "1.0.98" }
 sea-orm = { version = "1.2.0-rc.1", features = ["with-chrono", "debug-print", "sqlx-postgres", "sqlx-mysql", "with-rust_decimal", "runtime-tokio", "runtime-tokio-native-tls"] }
 num_cpus = { version = "1.17.0" }
-daoyi-cloud-logger = { path = "daoyi-cloud-logger", version = "0.1.0" }
-daoyi-cloud-config = { path = "daoyi-cloud-config", version = "0.1.0" }
-daoyi-cloud-entity = { path = "daoyi-cloud-entity", version = "0.1.0" }
-daoyi-cloud-server = { path = "daoyi-cloud-server", version = "0.1.0" }
-daoyi-cloud-api = { path = "daoyi-cloud-api", version = "0.1.0" }
-daoyi-cloud-common = { path = "daoyi-cloud-common", version = "0.1.0" }
+daoyi-cloud-logger = { path = "lib/daoyi-cloud-logger", version = "0.1.0" }
+daoyi-cloud-config = { path = "lib/daoyi-cloud-config", version = "0.1.0" }
+daoyi-cloud-entity = { path = "lib/daoyi-cloud-entity", version = "0.1.0" }
+daoyi-cloud-server = { path = "lib/daoyi-cloud-server", version = "0.1.0" }
+daoyi-cloud-api = { path = "lib/daoyi-cloud-api", version = "0.1.0" }
+daoyi-cloud-common = { path = "lib/daoyi-cloud-common", version = "0.1.0" }
 
