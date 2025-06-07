@@ -1,0 +1,12 @@
+[package]
+name = "daoyi-cloud-member"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+axum = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+daoyi-cloud-common = { workspace = true }
+daoyi-cloud-server = { workspace = true }
+daoyi-cloud-api = { workspace = true }
