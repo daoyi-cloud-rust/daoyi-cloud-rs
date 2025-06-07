@@ -1,13 +1,7 @@
-use axum::extract::State;
-use axum::response::IntoResponse;
-use axum::{Router, debug_handler, routing};
-use daoyi_cloud_common::models::app_server::AppState;
-use daoyi_cloud_config::config;
-use daoyi_cloud_entity::entity::demo::prelude::*;
-use daoyi_cloud_entity::entity::demo::system_users;
+mod routers;
+
+use daoyi_cloud_api::api;
 use daoyi_cloud_server::app;
-use sea_orm::Condition;
-use sea_orm::prelude::*;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -15,32 +9,6 @@ async fn main() -> anyhow::Result<()> {
     unsafe {
         std::env::set_var("APP_ROOT", env!("CARGO_MANIFEST_DIR"));
     }
-    let router = Router::new()
-        .route("/", routing::get(hello_world))
-        .route("/users", routing::get(get_users));
-    app::run(router).await
-}
 
-#[debug_handler]
-async fn get_users(State(AppState { db }): State<AppState>) -> impl IntoResponse {
-    let users = SystemUsers::find()
-        .filter(system_users::Column::Deleted.eq(false))
-        .filter(
-            Condition::all()
-                // .add(system_users::Column::Sex.eq(1))
-                .add(system_users::Column::TenantId.eq(1)), // .add(
-                                                            //     Condition::any()
-                                                            //         .add(system_users::Column::Username.contains("张"))
-                                                            //         .add(system_users::Column::Nickname.contains("李")),
-                                                            // ),
-        )
-        .all(db)
-        .await
-        .unwrap();
-    axum::Json(users)
-}
-
-#[debug_handler]
-async fn hello_world() -> String {
-    format!("Hello, {} ~", config::get().app_name())
+    app::run(api::routers(routers::routers())).await
 }
