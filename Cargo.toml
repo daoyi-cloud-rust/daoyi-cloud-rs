@@ -2,7 +2,8 @@
 resolver = "3"
 members = [
     "lib/*",
-    "bin/*"
+    "bin/*",
+    "example/*"
 ]
 
 [workspace.package]
