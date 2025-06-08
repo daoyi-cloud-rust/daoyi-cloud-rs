@@ -1,3 +1,4 @@
+use axum::extract::Request;
 use axum::{Router, routing};
 use daoyi_cloud_api::api;
 use daoyi_cloud_common::error::{ApiError, ApiResult};
@@ -6,6 +7,7 @@ use daoyi_cloud_config::config::ServerConfig;
 use daoyi_cloud_logger::logger;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
+use tower_http::trace::{DefaultOnResponse, TraceLayer};
 
 pub struct Server {
     config: &'static ServerConfig,
@@ -34,6 +36,16 @@ impl Server {
     }
 
     fn build_router(&self, state: AppState, router: Router<AppState>) -> Router {
+        let tracing = TraceLayer::new_for_http()
+            .make_span_with(|request: &Request| {
+                let method = request.method();
+                let path = request.uri().path();
+                let id = xid::new();
+                tracing::info_span!("Api Request", id = %id, method = %method, path = %path)
+            })
+            .on_request(())
+            .on_failure(())
+            .on_response(DefaultOnResponse::new().level(tracing::Level::INFO));
         Router::new()
             .route("/", routing::get(api::hello_world))
             .merge(router)
@@ -45,6 +57,7 @@ impl Server {
                 logger::warn!("Method Not Allowed.");
                 Err(ApiError::MethodNotAllowed)
             })
+            .layer(tracing)
             .with_state(state)
     }
 }
