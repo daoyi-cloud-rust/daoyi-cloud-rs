@@ -1,3 +1,4 @@
+use crate::latency::LatencyOnResponse;
 use axum::extract::Request;
 use axum::{Router, routing};
 use daoyi_cloud_api::api;
@@ -7,7 +8,7 @@ use daoyi_cloud_config::config::ServerConfig;
 use daoyi_cloud_logger::logger;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
-use tower_http::trace::{DefaultOnResponse, TraceLayer};
+use tower_http::trace::TraceLayer;
 
 pub struct Server {
     config: &'static ServerConfig,
@@ -45,7 +46,7 @@ impl Server {
             })
             .on_request(())
             .on_failure(())
-            .on_response(DefaultOnResponse::new().level(tracing::Level::INFO));
+            .on_response(LatencyOnResponse);
         Router::new()
             .route("/", routing::get(api::hello_world))
             .merge(router)

@@ -7,11 +7,14 @@ use daoyi_cloud_common::error::ApiResult;
 use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_common::response::ApiResponse;
 use daoyi_cloud_entity::entity::system::system_users;
+use daoyi_cloud_logger::logger;
 
+#[tracing::instrument(name = "get_simple_user_list", skip_all, fields(pay_method = "alipay"))]
 #[debug_handler]
 pub async fn get_simple_user_list(
     State(AppState { db }): State<AppState>,
 ) -> ApiResult<Vec<system_users::Model>> {
+    logger::warn!("出了点小错误。。。");
     let users =
         AdminUserService::get_user_list_by_status(db, CommonStatusEnum::Enable.value()).await?;
     ApiResponse::okk(Some(users))
