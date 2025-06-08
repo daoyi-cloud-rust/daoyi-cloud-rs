@@ -14,5 +14,5 @@ pub async fn get_simple_user_list(
 ) -> ApiResult<Vec<system_users::Model>> {
     let users =
         AdminUserService::get_user_list_by_status(db, CommonStatusEnum::Enable.value()).await?;
-    Ok(ApiResponse::ok(Some(users)))
+    ApiResponse::okk(Some(users))
 }

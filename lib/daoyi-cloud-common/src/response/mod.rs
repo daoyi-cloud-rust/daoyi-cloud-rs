@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use crate::error::ApiResult;
 use axum::response::{IntoResponse, Response};
 use serde::{Deserialize, Serialize};
 
@@ -12,17 +13,24 @@ pub struct ApiResponse<T> {
 }
 
 impl<T> ApiResponse<T> {
-    pub fn new(code: i32, msg: String, data: Option<T>) -> Self {
-        ApiResponse { code, msg, data }
+    pub fn new<M: AsRef<str>>(code: i32, msg: M, data: Option<T>) -> Self {
+        ApiResponse {
+            code,
+            msg: String::from(msg.as_ref()),
+            data,
+        }
     }
     pub fn ok(data: Option<T>) -> Self {
-        ApiResponse::new(0, "ok".to_string(), data)
+        ApiResponse::new(0, "OK", data)
+    }
+    pub fn okk(data: Option<T>) -> ApiResult<T> {
+        Ok(ApiResponse::ok(data))
     }
     pub fn err<M: AsRef<str>>(code: i32, msg: M) -> Self {
-        ApiResponse::new(code, String::from(msg.as_ref()), None)
+        ApiResponse::new(code, msg, None)
     }
     pub fn err_msg<M: AsRef<str>>(msg: M) -> Self {
-        ApiResponse::err(1, msg)
+        ApiResponse::err(-1, msg)
     }
 }
 
