@@ -1,6 +1,8 @@
 #![allow(dead_code)]
+
 use crate::utils::serde_util::deserialize_number;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 use validator::{Validate, ValidationError};
 
 /**
@@ -15,7 +17,7 @@ const PAGE_SIZE: i64 = 10;
 #[serde(rename_all = "camelCase")]
 pub struct PageParam {
     /// @Schema(description = "页码，从 1 开始", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    #[validate(range(min = 1, message = "页码必须大于 0"))]
+    #[validate(range(min = 1, message = "页码必须大于 0. "))]
     #[serde(default = "default_page_no", deserialize_with = "deserialize_number")]
     pub page_no: u64,
     /// @Schema(description = "每页条数，最大值为 100，-1 不分页，查询所有数据", requiredMode = Schema.RequiredMode.REQUIRED, example = "10")
@@ -42,10 +44,11 @@ fn validate_page_size(page_size: i64) -> Result<(), ValidationError> {
     }
     // 检查是否在有效范围内且不为0
     if page_size < 1 {
-        return Err(ValidationError::new("每页条数必须大于0或为特殊值-1"));
+        return Err(ValidationError::new("custom")
+            .with_message(Cow::from("每页条数必须大于0或为特殊值-1. ")));
     }
     if page_size > 100 {
-        return Err(ValidationError::new("每页条数最大值为100"));
+        return Err(ValidationError::new("custom").with_message(Cow::from("每页条数不能超过100. ")));
     }
     Ok(())
 }

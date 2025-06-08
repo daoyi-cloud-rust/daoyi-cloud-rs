@@ -1,11 +1,11 @@
 use crate::service::system::user::admin_user_service::AdminUserService;
 use axum::debug_handler;
 use axum::extract::State;
-use axum_valid::Valid;
 use daoyi_cloud_common::enums::EnumItemExt;
 use daoyi_cloud_common::enums::common_status_enum::CommonStatusEnum;
 use daoyi_cloud_common::error::ApiResult;
 use daoyi_cloud_common::models::api_extract::query::Query;
+use daoyi_cloud_common::models::api_extract::valid::Valid;
 use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_common::models::page_result::PageResult;
 use daoyi_cloud_common::response::ApiResponse;
