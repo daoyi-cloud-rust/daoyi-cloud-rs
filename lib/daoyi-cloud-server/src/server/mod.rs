@@ -1,4 +1,6 @@
-use axum::Router;
+use axum::{Router, routing};
+use daoyi_cloud_api::api;
+use daoyi_cloud_common::error::{ApiError, ApiResult};
 use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_config::config::ServerConfig;
 use daoyi_cloud_logger::logger;
@@ -32,6 +34,17 @@ impl Server {
     }
 
     fn build_router(&self, state: AppState, router: Router<AppState>) -> Router {
-        Router::new().merge(router).with_state(state)
+        Router::new()
+            .route("/", routing::get(api::hello_world))
+            .merge(router)
+            .fallback(async || -> ApiResult<()> {
+                logger::warn!("Not Found.");
+                Err(ApiError::NotFound)
+            })
+            .method_not_allowed_fallback(async || -> ApiResult<()> {
+                logger::warn!("Method Not Allowed.");
+                Err(ApiError::MethodNotAllowed)
+            })
+            .with_state(state)
     }
 }

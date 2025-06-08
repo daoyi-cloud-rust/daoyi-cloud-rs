@@ -18,6 +18,7 @@ tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter", "chr
 config = { version = "0.15.11", features = ["yaml"] }
 serde = { version = "1.0.219", features = ["derive"] }
 anyhow = { version = "1.0.98" }
+thiserror = { version = "2.0.12" }
 sea-orm = { version = "1.2.0-rc.1", features = ["with-chrono", "debug-print", "sqlx-postgres", "sqlx-mysql", "with-rust_decimal", "runtime-tokio", "runtime-tokio-native-tls"] }
 num_cpus = { version = "1.17.0" }
 daoyi-cloud-logger = { path = "lib/daoyi-cloud-logger", version = "0.1.0" }

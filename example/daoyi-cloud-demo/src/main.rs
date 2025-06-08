@@ -1,6 +1,5 @@
 mod routers;
 
-use daoyi_cloud_api::api;
 use daoyi_cloud_server::app;
 
 #[tokio::main]
@@ -10,5 +9,5 @@ async fn main() -> anyhow::Result<()> {
         std::env::set_var("APP_ROOT", env!("CARGO_MANIFEST_DIR"));
     }
 
-    app::run(api::routers(routers::routers())).await
+    app::run(routers::routers()).await
 }
