@@ -21,8 +21,9 @@ anyhow = { version = "1.0.98" }
 thiserror = { version = "2.0.12" }
 sea-orm = { version = "1.2.0-rc.1", features = ["with-chrono", "debug-print", "sqlx-postgres", "sqlx-mysql", "with-rust_decimal", "runtime-tokio", "runtime-tokio-native-tls"] }
 num_cpus = { version = "1.17.0" }
-tower-http = { version = "0.6.6", features = ["trace"] }
+tower-http = { version = "0.6.6", features = ["trace", "timeout", "limit", "cors", "normalize-path"] }
 xid = { version = "1.1.1" }
+bytesize = { version = "2.0.1" }
 daoyi-cloud-logger = { path = "lib/daoyi-cloud-logger", version = "0.1.0" }
 daoyi-cloud-config = { path = "lib/daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entity = { path = "lib/daoyi-cloud-entity", version = "0.1.0" }
