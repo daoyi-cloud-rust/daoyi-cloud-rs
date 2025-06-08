@@ -2,7 +2,7 @@ use crate::response::ApiResponse;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 
-pub type ApiResult<T> = Result<T, ApiError>;
+pub type ApiResult<T> = Result<ApiResponse<T>, ApiError>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ApiError {

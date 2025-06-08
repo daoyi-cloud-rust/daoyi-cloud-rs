@@ -18,10 +18,10 @@ impl<T> ApiResponse<T> {
     pub fn ok(data: Option<T>) -> Self {
         ApiResponse::new(0, "ok".to_string(), data)
     }
-    pub fn err(code: i32, msg: String) -> Self {
-        ApiResponse::new(code, msg, None)
+    pub fn err<M: AsRef<str>>(code: i32, msg: M) -> Self {
+        ApiResponse::new(code, String::from(msg.as_ref()), None)
     }
-    pub fn err_msg(msg: String) -> Self {
+    pub fn err_msg<M: AsRef<str>>(msg: M) -> Self {
         ApiResponse::err(1, msg)
     }
 }
