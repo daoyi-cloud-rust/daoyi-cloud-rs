@@ -1,6 +1,3 @@
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
 use crate::service::system::user::admin_user_service::AdminUserService;
 use axum::debug_handler;
 use axum::extract::State;
