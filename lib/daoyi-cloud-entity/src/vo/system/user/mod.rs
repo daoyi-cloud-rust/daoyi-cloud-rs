@@ -1,8 +1,9 @@
 use daoyi_cloud_common::models::page_param::PageParam;
 use sea_orm::prelude::DateTime;
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct UserPageReqVO {
     /// @Schema(description = "手机号码/用户账号/用户昵称/用户邮箱，模糊匹配", example = "daoyi")
@@ -20,6 +21,7 @@ pub struct UserPageReqVO {
     /// @Schema(description = "角色编号", example = "1024")
     pub role_id: Option<i64>,
     /// 分页参数
+    #[validate(nested)]
     #[serde(flatten)]
     pub pagination: PageParam,
 }

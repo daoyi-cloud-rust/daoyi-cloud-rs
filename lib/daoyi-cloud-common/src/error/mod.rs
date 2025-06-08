@@ -1,4 +1,5 @@
 use crate::response::ApiResponse;
+use axum::extract::rejection::{JsonRejection, PathRejection, QueryRejection};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 
@@ -6,15 +7,21 @@ pub type ApiResult<T> = Result<ApiResponse<T>, ApiError>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ApiError {
-    #[error("Not Found")]
+    #[error("服务器迷路了.")]
     NotFound,
-    #[error("Method Not Allowed")]
+    #[error("请求方法不支持.")]
     MethodNotAllowed,
-    #[error("Db Error: {0}")]
-    DbError(#[from] sea_orm::DbErr),
+    #[error("数据库错误: {0}")]
+    Database(#[from] sea_orm::DbErr),
+    #[error("查询参数错误: {0}")]
+    Query(#[from] QueryRejection),
+    #[error("路径参数错误: {0}")]
+    Path(#[from] PathRejection),
+    #[error("Body参数错误: {0}")]
+    Json(#[from] JsonRejection),
     #[error("{0}")]
     Biz(String),
-    #[error("Error: {0}")]
+    #[error("错误: {0}")]
     Internal(#[from] anyhow::Error),
 }
 
@@ -24,7 +31,8 @@ impl ApiError {
             ApiError::NotFound => StatusCode::NOT_FOUND,
             ApiError::MethodNotAllowed => StatusCode::METHOD_NOT_ALLOWED,
             ApiError::Biz(_) => StatusCode::OK,
-            ApiError::Internal(_) | ApiError::DbError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Internal(_) | ApiError::Database(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Query(_) | ApiError::Path(_) | ApiError::Json(_) => StatusCode::BAD_REQUEST,
         }
     }
 }

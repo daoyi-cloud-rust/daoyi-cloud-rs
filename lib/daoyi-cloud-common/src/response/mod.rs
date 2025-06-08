@@ -30,7 +30,7 @@ impl<T> ApiResponse<T> {
         ApiResponse::new(code, msg, None)
     }
     pub fn err_msg<M: AsRef<str>>(msg: M) -> Self {
-        ApiResponse::err(-1, msg)
+        ApiResponse::err(1, msg)
     }
 }
 
