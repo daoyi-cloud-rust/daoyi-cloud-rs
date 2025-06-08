@@ -4,8 +4,7 @@ use axum::extract::State;
 use daoyi_cloud_common::enums::EnumItemExt;
 use daoyi_cloud_common::enums::common_status_enum::CommonStatusEnum;
 use daoyi_cloud_common::error::ApiResult;
-use daoyi_cloud_common::models::api_extract::query::Query;
-use daoyi_cloud_common::models::api_extract::valid::Valid;
+use daoyi_cloud_common::models::api_extract::valid::ValidQuery;
 use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_common::models::page_result::PageResult;
 use daoyi_cloud_common::response::ApiResponse;
@@ -26,7 +25,7 @@ pub async fn get_simple_user_list(
 #[debug_handler]
 pub async fn get_user_page(
     State(AppState { db }): State<AppState>,
-    Valid(Query(params)): Valid<Query<UserPageReqVO>>,
+    ValidQuery(params): ValidQuery<UserPageReqVO>,
 ) -> ApiResult<PageResult<system_users::Model>> {
     let users = AdminUserService::get_user_page(db, params).await?;
     ApiResponse::okk(Some(users))
