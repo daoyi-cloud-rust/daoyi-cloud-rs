@@ -10,6 +10,8 @@ pub enum ApiError {
     NotFound,
     #[error("Method Not Allowed")]
     MethodNotAllowed,
+    #[error("Db Error: {0}")]
+    DbError(#[from] sea_orm::DbErr),
     #[error("{0}")]
     Biz(String),
     #[error("Error: {0}")]
@@ -22,7 +24,7 @@ impl ApiError {
             ApiError::NotFound => StatusCode::NOT_FOUND,
             ApiError::MethodNotAllowed => StatusCode::METHOD_NOT_ALLOWED,
             ApiError::Biz(_) => StatusCode::OK,
-            ApiError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Internal(_) | ApiError::DbError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
