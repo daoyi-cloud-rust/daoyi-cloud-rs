@@ -2,13 +2,31 @@ pub mod system;
 
 use sea_orm::prelude::DateTime;
 use serde::de::Error;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serializer};
 
 #[derive(Deserialize, Debug)]
 #[serde(untagged)] // 处理多种可能的输入格式
 enum DateTimeVec {
     Array(Vec<String>),
     Single(String),
+}
+
+// 为 DateTime 类型实现自定义序列化
+pub fn serialize_datetime<S>(dt: &DateTime, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let s = format!("{}", dt.format("%Y-%m-%d %H:%M:%S"));
+    serializer.serialize_str(&s)
+}
+pub fn serialize_opt_datetime<S>(dt: &Option<DateTime>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    match dt {
+        Some(dt) => serialize_datetime(dt, serializer),
+        None => serializer.serialize_none(),
+    }
 }
 
 // 自定义反序列化函数
