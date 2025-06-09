@@ -2,7 +2,7 @@
 
 pub mod common_status_enum;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 use validator::ValidationError;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -30,6 +30,16 @@ pub trait EnumItemExt<T> {
     }
 
     fn value_items() -> Vec<T>;
+    fn items() -> Vec<Self>
+    where
+        Self: Sized;
+    fn by_value(value: T) -> Option<Self>
+    where
+        T: PartialEq,
+        Self: Sized,
+    {
+        Self::items().into_iter().find(|item| item.value() == value)
+    }
 
     fn validate_option_value(value: Option<T>) -> Result<(), ValidationError>
     where
@@ -49,4 +59,19 @@ pub trait EnumItemExt<T> {
         }
         Err(ValidationError::new("数据不合法."))
     }
+}
+
+// 通用枚举序列化工具
+pub fn serialize_enum<S, T, E>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    T: EnumItemExt<E>,
+    T: Serialize,
+    E: Serialize,
+{
+    EnumItem {
+        name: value.name(),
+        value: value.value(),
+    }
+    .serialize(serializer)
 }
