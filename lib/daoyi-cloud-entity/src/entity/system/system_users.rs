@@ -2,7 +2,8 @@
 
 use crate::vo::{serialize_datetime, serialize_opt_datetime};
 use daoyi_cloud_common::enums::common_status_enum::CommonStatusEnum;
-use daoyi_cloud_common::enums::serialize_enum;
+use daoyi_cloud_common::enums::sex_enum::SexEnum;
+use daoyi_cloud_common::enums::{serialize_enum, serialize_opt_enum};
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -21,7 +22,11 @@ pub struct Model {
     pub post_ids: Option<String>,
     pub email: Option<String>,
     pub mobile: Option<String>,
-    pub sex: Option<i8>,
+    #[serde(
+        serialize_with = "serialize_opt_enum",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub sex: Option<SexEnum>,
     pub avatar: Option<String>,
     #[serde(serialize_with = "serialize_enum")]
     pub status: CommonStatusEnum,

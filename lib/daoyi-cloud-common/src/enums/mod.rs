@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 pub mod common_status_enum;
+pub mod sex_enum;
 
 use serde::{Deserialize, Serialize, Serializer};
 use validator::ValidationError;
@@ -74,4 +75,16 @@ where
         value: value.value(),
     }
     .serialize(serializer)
+}
+pub fn serialize_opt_enum<S, T, E>(value: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    T: EnumItemExt<E>,
+    T: Serialize,
+    E: Serialize,
+{
+    match value {
+        None => serializer.serialize_none(),
+        Some(v) => serialize_enum(v, serializer),
+    }
 }
