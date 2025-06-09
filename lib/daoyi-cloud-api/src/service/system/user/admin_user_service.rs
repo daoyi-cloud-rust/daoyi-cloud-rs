@@ -43,6 +43,14 @@ impl AdminUserService {
             .apply_if(params.status, |query, status| {
                 query.filter(system_users::Column::Status.eq(status))
             })
+            .apply_if(params.create_time, |query, create_time| {
+                if create_time.len() == 2 {
+                    let start = create_time[0];
+                    let end = create_time[1];
+                    return query.filter(system_users::Column::CreateTime.between(start, end));
+                }
+                query
+            })
             .order_by_desc(system_users::Column::Id);
         if params.pagination.page_size == PAGE_SIZE_NONE {
             let vec = select.all(db).await?;

@@ -6,5 +6,5 @@ pub(crate) fn routers() -> Router<AppState> {
     Router::new()
         .route("/list-all-simple", routing::get(get_simple_user_list))
         .route("/simple-list", routing::get(get_simple_user_list))
-        .route("/page", routing::get(get_user_page))
+        .route("/page", routing::post(get_user_page))
 }

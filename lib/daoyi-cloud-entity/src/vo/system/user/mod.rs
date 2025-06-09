@@ -1,3 +1,4 @@
+use crate::vo::deserialize_optional_datetime_vec;
 use daoyi_cloud_common::models::page_param::PageParam;
 use sea_orm::prelude::DateTime;
 use serde::{Deserialize, Serialize};
@@ -15,6 +16,7 @@ pub struct UserPageReqVO {
     /// @Schema(description = "展示状态，参见 CommonStatusEnum 枚举类", example = "1")
     pub status: Option<i8>,
     /// @Schema(description = "创建时间", example = "[2022-07-01 00:00:00, 2022-07-01 23:59:59]")
+    #[serde(deserialize_with = "deserialize_optional_datetime_vec", default)]
     pub create_time: Option<Vec<DateTime>>,
     /// @Schema(description = "部门编号，同时筛选子部门", example = "1024")
     pub dept_id: Option<i64>,
