@@ -1,5 +1,5 @@
 use crate::enums::{EnumItem, EnumItemExt};
-use sea_orm::{DeriveActiveEnum, EnumIter, Iterable};
+use sea_orm::{ActiveValue, DeriveActiveEnum, EnumIter, IntoActiveValue, Iterable};
 use serde::{Deserialize, Serialize};
 
 /// 性别的枚举值
@@ -12,6 +12,12 @@ pub enum SexEnum {
     MALE,
     #[sea_orm(num_value = 2)]
     FEMALE,
+}
+
+impl IntoActiveValue<SexEnum> for SexEnum {
+    fn into_active_value(self) -> ActiveValue<SexEnum> {
+        ActiveValue::Set(self)
+    }
 }
 
 impl EnumItemExt<i8> for SexEnum {
