@@ -13,3 +13,4 @@ validator = { workspace = true }
 strum = { workspace = true }
 axum-valid = { workspace = true }
 #tracing = { workspace = true }
+regex = { workspace = true }

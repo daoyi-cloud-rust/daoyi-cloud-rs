@@ -27,6 +27,7 @@ bytesize = { version = "2.0.1" }
 validator = { version = "0.20.0", features = ["derive"] }
 axum-valid = { version = "0.23.0", features = ["full_validator"] }
 strum = { version = "0.27.1", features = ["derive"] }
+regex = { version = "1.11.1" }
 daoyi-cloud-logger = { path = "lib/daoyi-cloud-logger", version = "0.1.0" }
 daoyi-cloud-config = { path = "lib/daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entity = { path = "lib/daoyi-cloud-entity", version = "0.1.0" }

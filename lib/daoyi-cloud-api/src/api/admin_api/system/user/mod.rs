@@ -9,8 +9,9 @@ use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_common::models::page_result::PageResult;
 use daoyi_cloud_common::response::ApiResponse;
 use daoyi_cloud_entity::entity::system::system_users;
-use daoyi_cloud_entity::vo::system::user::UserPageReqVO;
+use daoyi_cloud_entity::vo::system::user::{UserPageReqVO, UserSaveReqVo};
 
+/// 获取用户精简信息列表
 // #[tracing::instrument(name = "get_simple_user_list", skip_all, fields(pay_method = "alipay"))]
 #[debug_handler]
 pub async fn get_simple_user_list(
@@ -22,6 +23,7 @@ pub async fn get_simple_user_list(
     ApiResponse::okk(Some(users))
 }
 
+/// 获得用户分页列表
 #[debug_handler]
 pub async fn get_user_page(
     State(AppState { db }): State<AppState>,
@@ -29,4 +31,14 @@ pub async fn get_user_page(
 ) -> ApiResult<PageResult<system_users::Model>> {
     let users = AdminUserService::get_user_page(db, params).await?;
     ApiResponse::okk(Some(users))
+}
+
+/// 新增用户
+#[debug_handler]
+pub async fn create_user(
+    State(AppState { db }): State<AppState>,
+    ValidJson(params): ValidJson<UserSaveReqVo>,
+) -> ApiResult<i64> {
+    let id = AdminUserService::create_user(db, params).await?;
+    ApiResponse::okk(Some(id))
 }

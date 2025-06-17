@@ -2,7 +2,8 @@ use daoyi_cloud_common::models::page_param::PAGE_SIZE_NONE;
 use daoyi_cloud_common::models::page_result::PageResult;
 use daoyi_cloud_entity::entity::system::prelude::SystemUsers;
 use daoyi_cloud_entity::entity::system::system_users;
-use daoyi_cloud_entity::vo::system::user::UserPageReqVO;
+use daoyi_cloud_entity::entity::system::system_users::ActiveModel;
+use daoyi_cloud_entity::vo::system::user::{UserPageReqVO, UserSaveReqVo};
 use sea_orm::prelude::*;
 use sea_orm::*;
 
@@ -66,5 +67,15 @@ impl AdminUserService {
         let items = paginator.fetch_page(params.pagination.page_no - 1).await?;
         let result = PageResult::from_pagination(params.pagination, total, items);
         Ok(result)
+    }
+
+    pub async fn create_user(
+        db: &DatabaseConnection,
+        params: UserSaveReqVo,
+    ) -> anyhow::Result<i64> {
+        let active_model: ActiveModel = params.into();
+        let model = active_model.insert(db).await?;
+        let id = model.id;
+        Ok(id)
     }
 }
