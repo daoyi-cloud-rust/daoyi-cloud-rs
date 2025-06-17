@@ -8,3 +8,4 @@ serde = { workspace = true }
 sea-orm = { workspace = true }
 daoyi-cloud-common = { workspace = true }
 validator = { workspace = true }
+bcrypt = { workspace = true }

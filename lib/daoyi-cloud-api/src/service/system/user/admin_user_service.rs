@@ -1,3 +1,4 @@
+use daoyi_cloud_common::error::biz_error::{USER_NOT_EXISTS, USER_USERNAME_EXISTS};
 use daoyi_cloud_common::models::page_param::PAGE_SIZE_NONE;
 use daoyi_cloud_common::models::page_result::PageResult;
 use daoyi_cloud_entity::entity::system::prelude::SystemUsers;
@@ -71,11 +72,192 @@ impl AdminUserService {
 
     pub async fn create_user(
         db: &DatabaseConnection,
-        params: UserSaveReqVo,
+        mut params: UserSaveReqVo,
     ) -> anyhow::Result<i64> {
+        params.id = None;
+        Self::validate_user_for_create_or_update(
+            db,
+            Option::from(&params.id),
+            Some(&params.username),
+            Option::from(&params.mobile),
+            Option::from(&params.email),
+            Option::from(&params.dept_id),
+            Option::from(&params.post_ids),
+        )
+        .await?;
         let active_model: ActiveModel = params.into();
         let model = active_model.insert(db).await?;
         let id = model.id;
         Ok(id)
+    }
+
+    pub async fn update_user(db: &DatabaseConnection, params: UserSaveReqVo) -> anyhow::Result<()> {
+        let model = Self::validate_user_for_create_or_update(
+            db,
+            Option::from(&params.id),
+            Some(&params.username),
+            Option::from(&params.mobile),
+            Option::from(&params.email),
+            Option::from(&params.dept_id),
+            Option::from(&params.post_ids),
+        )
+        .await?;
+        if model.is_none() {
+            return Err(anyhow::Error::from(USER_NOT_EXISTS.to_app_error()));
+        }
+        let mut model: ActiveModel = model.unwrap().into_active_model();
+        model.avatar = Set(params.avatar);
+        model.dept_id = Set(params.dept_id);
+        model.email = Set(params.email);
+        model.nickname = Set(params.nickname);
+        model.post_ids = Set(Some(
+            params
+                .post_ids
+                .unwrap_or_else(|| vec![])
+                .iter()
+                .map(|pid| pid.to_string())
+                .collect::<Vec<String>>()
+                .join(","),
+        ));
+        model.remark = Set(params.remark);
+        model.sex = Set(params.sex);
+        model.username = Set(params.username);
+        model.update(db).await?;
+        Ok(())
+    }
+
+    pub async fn validate_user_for_create_or_update(
+        db: &DatabaseConnection,
+        id: Option<&i64>,
+        username: Option<&String>,
+        mobile: Option<&String>,
+        email: Option<&String>,
+        _dept_id: Option<&i64>,
+        _post_ids: Option<&Vec<i64>>,
+    ) -> anyhow::Result<Option<system_users::Model>> {
+        // 校验用户存在
+        let model = Self::validate_user_exists(db, id).await?;
+        // 校验用户名唯一
+        Self::validate_username_unique(db, id, username).await?;
+        // 校验手机号唯一
+        Self::validate_mobile_unique(db, id, mobile).await?;
+        // 校验邮箱唯一
+        Self::validate_email_unique(db, id, email).await?;
+        // 校验部门处于开启状态 @todo
+        // 校验岗位处于开启状态 @todo
+        Ok(model)
+    }
+
+    pub async fn validate_email_unique(
+        db: &DatabaseConnection,
+        id: Option<&i64>,
+        email: Option<&String>,
+    ) -> anyhow::Result<()> {
+        if email.is_none() || email.unwrap().is_empty() {
+            return Ok(());
+        }
+        let model = Self::select_by_email(db, email.unwrap()).await?;
+        if model.is_none() {
+            return Ok(());
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if id.is_none() {
+            return Err(anyhow::Error::from(USER_USERNAME_EXISTS.to_app_error()));
+        }
+        if model.unwrap().id != id.unwrap().to_owned() {
+            return Err(anyhow::Error::from(USER_USERNAME_EXISTS.to_app_error()));
+        }
+        Ok(())
+    }
+
+    pub async fn select_by_email(
+        db: &DatabaseConnection,
+        email: &String,
+    ) -> anyhow::Result<Option<system_users::Model>> {
+        let model = SystemUsers::find()
+            .filter(system_users::Column::Email.eq(email))
+            .one(db)
+            .await?;
+        Ok(model)
+    }
+
+    pub async fn validate_mobile_unique(
+        db: &DatabaseConnection,
+        id: Option<&i64>,
+        mobile: Option<&String>,
+    ) -> anyhow::Result<()> {
+        if mobile.is_none() || mobile.unwrap().is_empty() {
+            return Ok(());
+        }
+        let model = Self::select_by_mobile(db, mobile.unwrap()).await?;
+        if model.is_none() {
+            return Ok(());
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if id.is_none() {
+            return Err(anyhow::Error::from(USER_USERNAME_EXISTS.to_app_error()));
+        }
+        if model.unwrap().id != id.unwrap().to_owned() {
+            return Err(anyhow::Error::from(USER_USERNAME_EXISTS.to_app_error()));
+        }
+        Ok(())
+    }
+
+    pub async fn select_by_mobile(
+        db: &DatabaseConnection,
+        mobile: &String,
+    ) -> anyhow::Result<Option<system_users::Model>> {
+        let model = SystemUsers::find()
+            .filter(system_users::Column::Mobile.eq(mobile))
+            .one(db)
+            .await?;
+        Ok(model)
+    }
+
+    pub async fn validate_username_unique(
+        db: &DatabaseConnection,
+        id: Option<&i64>,
+        username: Option<&String>,
+    ) -> anyhow::Result<()> {
+        if username.is_none() || username.unwrap().is_empty() {
+            return Ok(());
+        }
+        let model = Self::select_by_username(db, username.unwrap()).await?;
+        if model.is_none() {
+            return Ok(());
+        }
+        // 如果 id 为空，说明不用比较是否为相同 id 的用户
+        if id.is_none() {
+            return Err(anyhow::Error::from(USER_USERNAME_EXISTS.to_app_error()));
+        }
+        if model.unwrap().id != id.unwrap().to_owned() {
+            return Err(anyhow::Error::from(USER_USERNAME_EXISTS.to_app_error()));
+        }
+        Ok(())
+    }
+
+    pub async fn select_by_username(
+        db: &DatabaseConnection,
+        username: &String,
+    ) -> anyhow::Result<Option<system_users::Model>> {
+        let model = SystemUsers::find()
+            .filter(system_users::Column::Username.eq(username))
+            .one(db)
+            .await?;
+        Ok(model)
+    }
+
+    pub async fn validate_user_exists(
+        db: &DatabaseConnection,
+        id: Option<&i64>,
+    ) -> anyhow::Result<Option<system_users::Model>> {
+        if id.is_none() {
+            return Ok(None);
+        }
+        let model = SystemUsers::find_by_id(id.unwrap().to_owned())
+            .one(db)
+            .await?
+            .ok_or_else(|| USER_NOT_EXISTS.to_app_error())?;
+        Ok(Some(model))
     }
 }

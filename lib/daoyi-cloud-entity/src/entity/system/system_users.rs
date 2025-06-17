@@ -6,6 +6,7 @@ use daoyi_cloud_common::enums::common_status_enum::CommonStatusEnum;
 use daoyi_cloud_common::enums::sex_enum::SexEnum;
 use daoyi_cloud_common::enums::{serialize_enum, serialize_opt_enum};
 use sea_orm::entity::prelude::*;
+use sea_orm::prelude::async_trait::async_trait;
 use sea_orm::*;
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +18,7 @@ pub struct Model {
     pub id: i64,
     pub username: String,
     #[serde(skip_serializing)]
-    pub password: String,
+    pub password: Option<String>,
     pub nickname: String,
     pub remark: Option<String>,
     pub dept_id: Option<i64>,
@@ -56,7 +57,25 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
-impl ActiveModelBehavior for ActiveModel {}
+#[async_trait]
+impl ActiveModelBehavior for ActiveModel {
+    async fn before_save<C>(mut self, _db: &C, insert: bool) -> Result<Self, DbErr>
+    where
+        C: ConnectionTrait,
+    {
+        if insert {
+            if self.password.is_not_set() {
+                self.password = Set(Some(bcrypt::hash("123456", bcrypt::DEFAULT_COST).unwrap()));
+            } else {
+                self.password = Set(Some(
+                    bcrypt::hash(self.password.unwrap().unwrap(), bcrypt::DEFAULT_COST)
+                        .expect("密码加密失败"),
+                ));
+            }
+        }
+        Ok(self)
+    }
+}
 
 impl From<UserSaveReqVo> for ActiveModel {
     fn from(value: UserSaveReqVo) -> Self {

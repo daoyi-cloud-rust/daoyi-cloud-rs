@@ -1,3 +1,5 @@
+pub mod biz_error;
+
 use crate::response::ApiResponse;
 use axum::extract::rejection::{JsonRejection, PathRejection, QueryRejection};
 use axum::http::StatusCode;
@@ -22,8 +24,8 @@ pub enum ApiError {
     Json(#[from] JsonRejection),
     #[error("参数校验失败: {0}")]
     Validation(String),
-    #[error("{0}")]
-    Biz(String),
+    #[error("{1}")]
+    Biz(u64, String),
     #[error("错误: {0}")]
     Internal(#[from] anyhow::Error),
 }
@@ -42,7 +44,7 @@ impl ApiError {
         match self {
             ApiError::NotFound => StatusCode::NOT_FOUND,
             ApiError::MethodNotAllowed => StatusCode::METHOD_NOT_ALLOWED,
-            ApiError::Biz(_) => StatusCode::OK,
+            ApiError::Biz(_, _) => StatusCode::OK,
             ApiError::Internal(_) | ApiError::Database(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Query(_)
             | ApiError::Path(_)

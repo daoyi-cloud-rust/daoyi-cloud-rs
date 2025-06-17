@@ -42,3 +42,13 @@ pub async fn create_user(
     let id = AdminUserService::create_user(db, params).await?;
     ApiResponse::okk(Some(id))
 }
+
+/// 修改用户
+#[debug_handler]
+pub async fn update_user(
+    State(AppState { db }): State<AppState>,
+    ValidJson(params): ValidJson<UserSaveReqVo>,
+) -> ApiResult<bool> {
+    AdminUserService::update_user(db, params).await?;
+    ApiResponse::okk(Some(true))
+}

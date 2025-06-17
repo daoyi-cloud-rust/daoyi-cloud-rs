@@ -54,7 +54,7 @@ pub struct UserSaveReqVo {
     #[validate(length(max = 30, message = "用户昵称长度不能超过30个字符"))]
     pub nickname: String,
     /// 密码
-    pub password: String,
+    pub password: Option<String>,
     /// 岗位编号数组
     pub post_ids: Option<Vec<i64>>,
     /// 备注
