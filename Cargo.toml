@@ -30,6 +30,8 @@ strum = { version = "0.27.1", features = ["derive"] }
 regex = { version = "1.11.1" }
 idgenerator = { version = "2.0.0" }
 bcrypt = { version = "0.17.0" }
+jsonwebtoken = { version = "9.3.1" }
+humantime = { version = "2.2.0" }
 daoyi-cloud-logger = { path = "lib/daoyi-cloud-logger", version = "0.1.0" }
 daoyi-cloud-config = { path = "lib/daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entity = { path = "lib/daoyi-cloud-entity", version = "0.1.0" }

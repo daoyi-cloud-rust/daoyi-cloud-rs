@@ -1,3 +1,4 @@
+pub mod auth;
 pub mod enums;
 pub mod error;
 pub mod id;

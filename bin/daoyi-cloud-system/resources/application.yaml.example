@@ -4,3 +4,11 @@ server:
 database:
   url: postgresql://postgresql:postgresql@127.0.0.1:5432/postgresql
   schema: demo
+auth:
+  header: Authorization
+  prefix: "Bearer "
+  jwt:
+    secret: secret
+    expiration: 3600s
+    audience: audience
+    issuer: issuer

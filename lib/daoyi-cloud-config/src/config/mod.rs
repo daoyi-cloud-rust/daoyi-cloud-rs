@@ -1,7 +1,9 @@
 #![allow(dead_code)]
+pub mod auth;
 pub mod database;
 pub mod server;
 
+use crate::config::auth::AuthConfig;
 use anyhow::Context;
 use daoyi_cloud_logger::logger;
 pub use database::DatabaseConfig;
@@ -17,6 +19,7 @@ pub struct AppConfig {
     #[serde(default = "default_app_name")]
     app_name: String,
     server: ServerConfig,
+    auth: AuthConfig,
     datasource_0: DatabaseConfig,
     datasource_1: Option<DatabaseConfig>,
     datasource_2: Option<DatabaseConfig>,
