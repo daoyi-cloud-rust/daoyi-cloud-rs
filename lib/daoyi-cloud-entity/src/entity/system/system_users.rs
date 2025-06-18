@@ -6,6 +6,7 @@ use daoyi_cloud_common::enums::sex_enum::SexEnum;
 use daoyi_cloud_common::enums::{serialize_enum, serialize_opt_enum};
 use sea_orm::entity::prelude::*;
 use sea_orm::prelude::async_trait::async_trait;
+use sea_orm::sqlx::types::chrono::Local;
 use sea_orm::*;
 use serde::{Deserialize, Serialize};
 
@@ -71,7 +72,9 @@ impl ActiveModelBehavior for ActiveModel {
                         .expect("密码加密失败"),
                 ));
             }
+            self.create_time = Set(Local::now().naive_local());
         }
+        self.update_time = Set(Local::now().naive_local());
         Ok(self)
     }
 }

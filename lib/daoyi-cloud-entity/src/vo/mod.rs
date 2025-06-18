@@ -67,10 +67,7 @@ where
                 }
 
                 if !parsed {
-                    return Err(D::Error::custom(format!(
-                        "Failed to parse datetime: '{}'",
-                        s
-                    )));
+                    return Err(Error::custom(format!("Failed to parse datetime: '{}'", s)));
                 }
             }
         }
