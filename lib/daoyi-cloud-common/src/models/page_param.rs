@@ -11,8 +11,8 @@ use validator::{Validate, ValidationError};
  * 例如说，导出接口，可以设置 {@link #pageSize} 为 -1 不分页，查询所有数据。
 */
 pub const PAGE_SIZE_NONE: i64 = -1;
-const PAGE_NO: u64 = 1;
-const PAGE_SIZE: i64 = 10;
+pub const PAGE_NO: u64 = 1;
+pub const PAGE_SIZE: i64 = 10;
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct PageParam {

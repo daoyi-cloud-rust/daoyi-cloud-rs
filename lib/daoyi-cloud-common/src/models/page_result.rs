@@ -1,4 +1,4 @@
-use crate::models::page_param::{PAGE_SIZE_NONE, PageParam};
+use crate::models::page_param::{PAGE_SIZE, PAGE_SIZE_NONE, PageParam};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -17,7 +17,7 @@ impl<T> PageResult<T> {
             page_size = total;
         }
         if page_size == 0 {
-            page_size = 1;
+            page_size = PAGE_SIZE as u64;
         }
         let total_page = total / page_size + if total % page_size > 0 { 1 } else { 0 };
         PageResult {
