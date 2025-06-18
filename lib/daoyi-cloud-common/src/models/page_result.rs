@@ -12,7 +12,13 @@ pub struct PageResult<T> {
 }
 
 impl<T> PageResult<T> {
-    pub fn new(list: Vec<T>, total: u64, page_no: u64, page_size: u64) -> Self {
+    pub fn new(list: Vec<T>, total: u64, page_no: u64, mut page_size: u64) -> Self {
+        if page_size == 0 {
+            page_size = total;
+        }
+        if page_size == 0 {
+            page_size = 1;
+        }
         let total_page = total / page_size + if total % page_size > 0 { 1 } else { 0 };
         PageResult {
             list,
