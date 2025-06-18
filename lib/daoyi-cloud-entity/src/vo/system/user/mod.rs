@@ -1,6 +1,7 @@
 use crate::entity::system::system_users::ActiveModel;
 use crate::vo::deserialize_optional_datetime_vec;
 use crate::vo::deserialize_optional_id_vec;
+use daoyi_cloud_common::enums::common_status_enum::CommonStatusEnum;
 use daoyi_cloud_common::enums::sex_enum::SexEnum;
 use daoyi_cloud_common::models::page_param::PageParam;
 use daoyi_cloud_common::validation::is_mobile_phone;
@@ -19,7 +20,7 @@ pub struct UserPageReqVO {
     /// @Schema(description = "手机号码，模糊匹配", example = "daoyi")
     pub mobile: Option<String>,
     /// @Schema(description = "展示状态，参见 CommonStatusEnum 枚举类", example = "1")
-    pub status: Option<i8>,
+    pub status: Option<CommonStatusEnum>,
     /// @Schema(description = "创建时间", example = "[2022-07-01 00:00:00, 2022-07-01 23:59:59]")
     #[serde(deserialize_with = "deserialize_optional_datetime_vec", default)]
     pub create_time: Option<Vec<DateTime>>,
