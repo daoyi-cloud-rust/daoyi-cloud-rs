@@ -105,11 +105,8 @@ impl AdminUserService {
             Option::from(&params.dept_id),
             Option::from(&params.post_ids),
         )
-        .await?;
-        if model.is_none() {
-            return Err(anyhow::Error::from(USER_NOT_EXISTS.to_app_error()));
-        }
-        let model = model.unwrap();
+        .await?
+        .unwrap();
         let mut active_model: ActiveModel = params.into_active_model();
         active_model.id = Unchanged(id);
         active_model.password = Unchanged(model.password); // 不修改密码
