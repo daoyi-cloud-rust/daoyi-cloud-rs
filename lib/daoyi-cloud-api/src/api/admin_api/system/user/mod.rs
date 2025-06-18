@@ -4,6 +4,7 @@ use axum::extract::State;
 use daoyi_cloud_common::enums::EnumItemExt;
 use daoyi_cloud_common::enums::common_status_enum::CommonStatusEnum;
 use daoyi_cloud_common::error::ApiResult;
+use daoyi_cloud_common::models::api_extract::path::Path;
 use daoyi_cloud_common::models::api_extract::valid::ValidJson;
 use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_common::models::page_result::PageResult;
@@ -47,8 +48,29 @@ pub async fn create_user(
 #[debug_handler]
 pub async fn update_user(
     State(AppState { db }): State<AppState>,
+    Path(id): Path<i64>,
     ValidJson(params): ValidJson<UserSaveReqVo>,
 ) -> ApiResult<bool> {
-    AdminUserService::update_user(db, params).await?;
+    AdminUserService::update_user(db, id, params).await?;
     ApiResponse::okk(Some(true))
+}
+
+/// 删除用户
+#[debug_handler]
+pub async fn delete_user(
+    State(AppState { db }): State<AppState>,
+    Path(id): Path<i64>,
+) -> ApiResult<bool> {
+    AdminUserService::delete_user(db, id).await?;
+    ApiResponse::okk(Some(true))
+}
+
+/// 获得用户详情
+#[debug_handler]
+pub async fn get_user(
+    State(AppState { db }): State<AppState>,
+    Path(id): Path<i64>,
+) -> ApiResult<system_users::Model> {
+    let res = AdminUserService::validate_user_exists(db, Some(&id)).await?;
+    ApiResponse::okk(res)
 }

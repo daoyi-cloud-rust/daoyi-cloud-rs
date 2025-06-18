@@ -1,3 +1,4 @@
+use crate::entity::system::system_users::ActiveModel;
 use crate::vo::deserialize_optional_datetime_vec;
 use daoyi_cloud_common::enums::sex_enum::SexEnum;
 use daoyi_cloud_common::models::page_param::PageParam;
@@ -32,7 +33,7 @@ pub struct UserPageReqVO {
 }
 
 /// UserSaveReqVO，管理后台 - 用户创建/修改 Request VO
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, DeriveIntoActiveModel)]
 #[serde(rename_all = "camelCase")]
 pub struct UserSaveReqVo {
     /// 用户头像
@@ -45,8 +46,8 @@ pub struct UserSaveReqVo {
         length(max = 50, message = "邮箱长度不能超过50个字符")
     )]
     pub email: Option<String>,
-    /// 用户编号
-    pub id: Option<i64>,
+    // /// 用户编号
+    // pub id: i64,
     /// 手机号码
     #[validate(custom(function = "is_mobile_phone"))]
     pub mobile: Option<String>,
@@ -56,7 +57,7 @@ pub struct UserSaveReqVo {
     /// 密码
     pub password: Option<String>,
     /// 岗位编号数组
-    pub post_ids: Option<Vec<i64>>,
+    pub post_ids: Option<String>,
     /// 备注
     pub remark: Option<String>,
     /// 用户性别，参见 SexEnum 枚举类

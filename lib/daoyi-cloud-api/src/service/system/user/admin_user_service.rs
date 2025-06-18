@@ -72,12 +72,11 @@ impl AdminUserService {
 
     pub async fn create_user(
         db: &DatabaseConnection,
-        mut params: UserSaveReqVo,
+        params: UserSaveReqVo,
     ) -> anyhow::Result<i64> {
-        params.id = None;
         Self::validate_user_for_create_or_update(
             db,
-            Option::from(&params.id),
+            None,
             Some(&params.username),
             Option::from(&params.mobile),
             Option::from(&params.email),
@@ -85,16 +84,21 @@ impl AdminUserService {
             Option::from(&params.post_ids),
         )
         .await?;
-        let active_model: ActiveModel = params.into();
+        let mut active_model: ActiveModel = params.into_active_model();
+        active_model.id = NotSet;
         let model = active_model.insert(db).await?;
         let id = model.id;
         Ok(id)
     }
 
-    pub async fn update_user(db: &DatabaseConnection, params: UserSaveReqVo) -> anyhow::Result<()> {
+    pub async fn update_user(
+        db: &DatabaseConnection,
+        id: i64,
+        params: UserSaveReqVo,
+    ) -> anyhow::Result<()> {
         let model = Self::validate_user_for_create_or_update(
             db,
-            Option::from(&params.id),
+            Some(&id),
             Some(&params.username),
             Option::from(&params.mobile),
             Option::from(&params.email),
@@ -105,24 +109,17 @@ impl AdminUserService {
         if model.is_none() {
             return Err(anyhow::Error::from(USER_NOT_EXISTS.to_app_error()));
         }
-        let mut model: ActiveModel = model.unwrap().into_active_model();
-        model.avatar = Set(params.avatar);
-        model.dept_id = Set(params.dept_id);
-        model.email = Set(params.email);
-        model.nickname = Set(params.nickname);
-        model.post_ids = Set(Some(
-            params
-                .post_ids
-                .unwrap_or_else(|| vec![])
-                .iter()
-                .map(|pid| pid.to_string())
-                .collect::<Vec<String>>()
-                .join(","),
-        ));
-        model.remark = Set(params.remark);
-        model.sex = Set(params.sex);
-        model.username = Set(params.username);
-        model.update(db).await?;
+        let model = model.unwrap();
+        let mut active_model: ActiveModel = params.into_active_model();
+        active_model.id = Unchanged(id);
+        active_model.password = Unchanged(model.password); // 不修改密码
+        active_model.update(db).await?;
+        Ok(())
+    }
+
+    pub async fn delete_user(db: &DatabaseConnection, id: i64) -> anyhow::Result<()> {
+        Self::validate_user_exists(db, Some(&id)).await?;
+        SystemUsers::delete_by_id(id).exec(db).await?;
         Ok(())
     }
 
@@ -133,7 +130,7 @@ impl AdminUserService {
         mobile: Option<&String>,
         email: Option<&String>,
         _dept_id: Option<&i64>,
-        _post_ids: Option<&Vec<i64>>,
+        _post_ids: Option<&String>,
     ) -> anyhow::Result<Option<system_users::Model>> {
         // 校验用户存在
         let model = Self::validate_user_exists(db, id).await?;

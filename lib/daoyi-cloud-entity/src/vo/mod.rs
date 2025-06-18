@@ -1,3 +1,4 @@
+pub mod common;
 pub mod system;
 
 use sea_orm::prelude::DateTime;
