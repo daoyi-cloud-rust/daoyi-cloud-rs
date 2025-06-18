@@ -2,7 +2,7 @@ pub mod common;
 pub mod system;
 
 use sea_orm::prelude::DateTime;
-use serde::de::Error;
+use serde::de::{self, Error, Visitor};
 use serde::{Deserialize, Deserializer, Serializer};
 
 #[derive(Deserialize, Debug)]
@@ -82,4 +82,63 @@ where
     } else {
         Ok(Some(result))
     }
+}
+
+/// 自定义反序列化器：将整数数组转换为逗号分隔的字符串
+pub fn deserialize_optional_id_vec<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    // 定义中间类型，处理可能的null和空数组情况
+    struct OptionalIdVecVisitor;
+
+    impl<'de> Visitor<'de> for OptionalIdVecVisitor {
+        type Value = Option<String>;
+
+        fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+            formatter.write_str("optional array of integers or null")
+        }
+
+        // 处理null值
+        fn visit_none<E>(self) -> Result<Self::Value, E>
+        where
+            E: de::Error,
+        {
+            Ok(None)
+        }
+
+        // 处理Unit类型（某些序列化器用这种形式表示null）
+        fn visit_unit<E>(self) -> Result<Self::Value, E>
+        where
+            E: de::Error,
+        {
+            Ok(None)
+        }
+
+        // 处理空数组
+        fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+        where
+            A: de::SeqAccess<'de>,
+        {
+            if let Some(0) = seq.size_hint() {
+                return Ok(None); // 空数组返回None
+            }
+
+            let mut ids = Vec::new();
+            while let Some(id) = seq.next_element::<i64>()? {
+                ids.push(id.to_string());
+            }
+
+            if ids.is_empty() {
+                Ok(None)
+            } else {
+                // 使用迭代器连接避免临时分配
+                let result = ids.join(",");
+                Ok(Some(result))
+            }
+        }
+    }
+
+    // 使用该访问器进行反序列化
+    deserializer.deserialize_any(OptionalIdVecVisitor)
 }

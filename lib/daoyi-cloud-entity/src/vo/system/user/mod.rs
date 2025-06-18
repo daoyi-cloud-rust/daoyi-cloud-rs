@@ -1,5 +1,6 @@
 use crate::entity::system::system_users::ActiveModel;
 use crate::vo::deserialize_optional_datetime_vec;
+use crate::vo::deserialize_optional_id_vec;
 use daoyi_cloud_common::enums::sex_enum::SexEnum;
 use daoyi_cloud_common::models::page_param::PageParam;
 use daoyi_cloud_common::validation::is_mobile_phone;
@@ -57,6 +58,7 @@ pub struct UserSaveReqVo {
     /// 密码
     pub password: Option<String>,
     /// 岗位编号数组
+    #[serde(deserialize_with = "deserialize_optional_id_vec", default)]
     pub post_ids: Option<String>,
     /// 备注
     pub remark: Option<String>,
