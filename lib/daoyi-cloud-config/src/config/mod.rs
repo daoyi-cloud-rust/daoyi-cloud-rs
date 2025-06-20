@@ -3,6 +3,7 @@ pub mod auth;
 pub mod database;
 pub mod server;
 
+pub mod jwt;
 use crate::config::auth::AuthConfig;
 use anyhow::Context;
 use daoyi_cloud_logger::logger;
@@ -66,6 +67,9 @@ impl AppConfig {
     }
     pub fn datasource_3(&self) -> &Option<DatabaseConfig> {
         &self.datasource_3
+    }
+    pub fn auth(&self) -> &AuthConfig {
+        &self.auth
     }
 }
 

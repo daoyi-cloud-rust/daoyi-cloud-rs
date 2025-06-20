@@ -1,4 +1,5 @@
 use crate::latency::LatencyOnResponse;
+use crate::middleware::get_auth_layer;
 use axum::extract::{DefaultBodyLimit, Request};
 use axum::{Router, routing};
 use bytesize::ByteSize;
@@ -66,6 +67,7 @@ impl Server {
         Router::new()
             .route("/", routing::get(api::hello_world))
             .merge(router)
+            .route_layer(get_auth_layer())
             .fallback(async || -> ApiResult<()> {
                 logger::warn!("Not Found.");
                 Err(ApiError::NotFound)

@@ -1,4 +1,5 @@
-use daoyi_cloud_common::auth::JwtConfig;
+use crate::config::jwt::JwtConfig;
+use axum::http::header;
 use serde::Deserialize;
 
 /// Auth 配置信息
@@ -13,7 +14,7 @@ pub struct AuthConfig {
 }
 
 fn default_header() -> String {
-    "Authorization".to_string()
+    header::AUTHORIZATION.to_string()
 }
 
 fn default_prefix() -> String {

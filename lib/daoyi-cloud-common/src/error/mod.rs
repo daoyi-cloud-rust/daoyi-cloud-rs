@@ -24,6 +24,12 @@ pub enum ApiError {
     Json(#[from] JsonRejection),
     #[error("参数校验失败: {0}")]
     Validation(String),
+    #[error("密码加密错误: {0}")]
+    BcryptError(#[from] bcrypt::BcryptError),
+    #[error("JWT错误: {0}")]
+    JWT(#[from] jsonwebtoken::errors::Error),
+    #[error("未授权：{0}")]
+    Unauthenticated(String),
     #[error("{1}")]
     Biz(u64, String),
     #[error("错误: {0}")]
@@ -45,7 +51,10 @@ impl ApiError {
             ApiError::NotFound => StatusCode::NOT_FOUND,
             ApiError::MethodNotAllowed => StatusCode::METHOD_NOT_ALLOWED,
             ApiError::Biz(_, _) => StatusCode::OK,
-            ApiError::Internal(_) | ApiError::Database(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Internal(_) | ApiError::BcryptError(_) | ApiError::Database(_) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
+            ApiError::JWT(_) | ApiError::Unauthenticated(_) => StatusCode::UNAUTHORIZED,
             ApiError::Query(_)
             | ApiError::Path(_)
             | ApiError::Json(_)
@@ -59,5 +68,11 @@ impl IntoResponse for ApiError {
         let status_code = self.status_code();
         let body = axum::Json(ApiResponse::<()>::err_msg(self.to_string()));
         (status_code, body).into_response()
+    }
+}
+
+impl From<ApiError> for Response {
+    fn from(value: ApiError) -> Self {
+        value.into_response()
     }
 }

@@ -9,5 +9,9 @@ serde = { workspace = true }
 anyhow = { workspace = true }
 sea-orm = { workspace = true }
 num_cpus = { workspace = true }
+jsonwebtoken = { workspace = true }
+xid = { workspace = true }
+serde_json = { workspace = true }
+axum = { workspace = true }
 daoyi-cloud-logger = { workspace = true }
 daoyi-cloud-common = { workspace = true }

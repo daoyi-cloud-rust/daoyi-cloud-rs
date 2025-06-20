@@ -1,9 +1,10 @@
 use crate::entity::system::system_users::ActiveModel;
-use crate::vo::deserialize_optional_datetime_vec;
-use crate::vo::deserialize_optional_id_vec;
 use daoyi_cloud_common::enums::common_status_enum::CommonStatusEnum;
 use daoyi_cloud_common::enums::sex_enum::SexEnum;
 use daoyi_cloud_common::models::page_param::PageParam;
+use daoyi_cloud_common::utils::serde_util::{
+    deserialize_optional_datetime_vec, deserialize_optional_id_vec,
+};
 use daoyi_cloud_common::validation::is_mobile_phone;
 use sea_orm::prelude::*;
 use serde::{Deserialize, Serialize};

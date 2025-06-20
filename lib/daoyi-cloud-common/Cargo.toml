@@ -11,8 +11,9 @@ axum = { workspace = true }
 serde = { workspace = true }
 validator = { workspace = true }
 strum = { workspace = true }
-axum-valid = { workspace = true }
-#tracing = { workspace = true }
 regex = { workspace = true }
 idgenerator = { workspace = true }
 humantime = { workspace = true }
+jsonwebtoken = { workspace = true }
+bcrypt = { workspace = true }
+axum-valid = { workspace = true }

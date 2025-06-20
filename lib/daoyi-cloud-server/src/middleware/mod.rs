@@ -1,0 +1,70 @@
+use axum::body::Body;
+use axum::http::{Request, Response};
+use daoyi_cloud_common::error::ApiError;
+use daoyi_cloud_config::config;
+use daoyi_cloud_config::config::jwt::{JWT, get_jwt};
+use std::pin::Pin;
+use tower_http::auth::{AsyncAuthorizeRequest, AsyncRequireAuthorizationLayer};
+
+#[derive(Clone)]
+pub struct JWTAuth {
+    jwt: &'static JWT,
+}
+
+impl JWTAuth {
+    pub fn new(jwt: &'static JWT) -> Self {
+        Self { jwt }
+    }
+}
+
+impl AsyncAuthorizeRequest<Body> for JWTAuth {
+    type RequestBody = Body;
+    type ResponseBody = Body;
+    type Future = Pin<
+        Box<
+            dyn Future<Output = Result<Request<Self::RequestBody>, Response<Self::ResponseBody>>>
+                + Send
+                + 'static,
+        >,
+    >;
+
+    fn authorize(&mut self, mut request: Request<Body>) -> Self::Future {
+        let jwt = self.jwt;
+        Box::pin(async move {
+            let header_key = &config::get().auth().header;
+            let header_prefix = &config::get().auth().prefix;
+            let token = request
+                .headers()
+                .get(header_key)
+                .map(|value| -> Result<_, ApiError> {
+                    let token = value
+                        .to_str()
+                        .map_err(|_| {
+                            ApiError::Unauthenticated(format!(
+                                "{}请求头不是一个有效的字符串",
+                                header_key
+                            ))
+                        })?
+                        .strip_prefix(header_prefix)
+                        .ok_or_else(|| {
+                            ApiError::Unauthenticated(format!(
+                                "{}请求头必须以{}开头",
+                                header_key, header_prefix
+                            ))
+                        })?;
+                    Ok(token)
+                })
+                .transpose()?
+                .ok_or_else(|| {
+                    ApiError::Unauthenticated(format!("{}请求头不能为空", header_key))
+                })?;
+            let principal = jwt.decode(token).map_err(|err| ApiError::Internal(err))?;
+            request.extensions_mut().insert(principal);
+            Ok(request)
+        })
+    }
+}
+
+pub fn get_auth_layer() -> AsyncRequireAuthorizationLayer<JWTAuth> {
+    AsyncRequireAuthorizationLayer::new(JWTAuth::new(get_jwt()))
+}
