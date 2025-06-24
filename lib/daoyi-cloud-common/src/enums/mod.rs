@@ -1,8 +1,11 @@
 #![allow(dead_code)]
 
 pub mod common_status_enum;
+pub mod login_log_type_enum;
+pub mod login_result_enum;
 pub mod sex_enum;
 pub mod social_type_enum;
+pub mod user_type_enum;
 
 use serde::{Deserialize, Serialize, Serializer};
 use validator::ValidationError;
@@ -11,11 +14,21 @@ use validator::ValidationError;
 pub struct EnumItem<T> {
     pub name: &'static str,
     pub value: T,
+    pub ext: Option<&'static str>,
 }
 
 impl<T> EnumItem<T> {
     pub fn new(value: T, name: &'static str) -> Self {
-        Self { name, value }
+        Self {
+            name,
+            value,
+            ext: None,
+        }
+    }
+
+    pub fn ext(mut self, ext_info: &'static str) -> Self {
+        self.ext = Some(ext_info);
+        self
     }
 }
 
@@ -24,6 +37,10 @@ pub trait EnumItemExt<T> {
     /// 获取枚举值
     fn value(&self) -> T {
         self.item().value
+    }
+
+    fn ext(&self) -> Option<&'static str> {
+        self.item().ext
     }
 
     /// 获取枚举名称
@@ -74,6 +91,7 @@ where
     EnumItem {
         name: value.name(),
         value: value.value(),
+        ext: value.ext(),
     }
     .serialize(serializer)
 }

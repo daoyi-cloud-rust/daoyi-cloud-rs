@@ -63,6 +63,9 @@ impl AppConfig {
     pub fn server(&self) -> &ServerConfig {
         &self.server
     }
+    pub fn captcha(&self) -> &CaptchaConfig {
+        &self.captcha
+    }
     pub fn datasource_0(&self) -> &DatabaseConfig {
         &self.datasource_0
     }

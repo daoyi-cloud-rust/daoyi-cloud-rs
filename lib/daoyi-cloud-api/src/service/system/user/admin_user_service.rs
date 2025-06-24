@@ -1,6 +1,7 @@
 use daoyi_cloud_common::error::biz_error::{USER_NOT_EXISTS, USER_USERNAME_EXISTS};
 use daoyi_cloud_common::models::page_param::PAGE_SIZE_NONE;
 use daoyi_cloud_common::models::page_result::PageResult;
+use daoyi_cloud_common::utils::base64_util::check_password;
 use daoyi_cloud_entity::entity::system::prelude::SystemUsers;
 use daoyi_cloud_entity::entity::system::system_users;
 use daoyi_cloud_entity::entity::system::system_users::ActiveModel;
@@ -162,6 +163,21 @@ impl AdminUserService {
             return Err(anyhow::Error::from(USER_USERNAME_EXISTS.to_app_error()));
         }
         Ok(())
+    }
+
+    /**
+     * 判断密码是否匹配
+     *
+     * @param raw_password     未加密的密码
+     * @param encoded_password 加密后的密码
+     * @return 是否匹配
+     */
+    pub async fn is_password_match(
+        raw_password: &String,
+        encoded_password: &String,
+    ) -> anyhow::Result<bool> {
+        let encoded_password = check_password(raw_password, encoded_password).await?;
+        Ok(encoded_password)
     }
 
     pub async fn select_by_email(

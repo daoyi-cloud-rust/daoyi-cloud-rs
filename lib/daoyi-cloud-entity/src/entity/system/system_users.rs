@@ -3,6 +3,7 @@
 use daoyi_cloud_common::enums::common_status_enum::CommonStatusEnum;
 use daoyi_cloud_common::enums::sex_enum::SexEnum;
 use daoyi_cloud_common::enums::{serialize_enum, serialize_opt_enum};
+use daoyi_cloud_common::utils::base64_util::encode_password;
 use daoyi_cloud_common::utils::serde_util::{serialize_datetime, serialize_opt_datetime};
 use sea_orm::entity::prelude::*;
 use sea_orm::prelude::async_trait::async_trait;
@@ -54,6 +55,12 @@ pub struct Model {
     pub tenant_id: i64,
 }
 
+impl Model {
+    pub fn is_disabled(&self) -> bool {
+        self.status == CommonStatusEnum::Disable
+    }
+}
+
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
@@ -65,10 +72,11 @@ impl ActiveModelBehavior for ActiveModel {
     {
         if insert {
             if self.password.is_not_set() {
-                self.password = Set(Some(bcrypt::hash("123456", bcrypt::DEFAULT_COST).unwrap()));
+                self.password = Set(Some(encode_password("123456").await.unwrap()));
             } else {
                 self.password = Set(Some(
-                    bcrypt::hash(self.password.unwrap().unwrap(), bcrypt::DEFAULT_COST)
+                    encode_password(self.password.unwrap().unwrap().as_str())
+                        .await
                         .expect("密码加密失败"),
                 ));
             }
