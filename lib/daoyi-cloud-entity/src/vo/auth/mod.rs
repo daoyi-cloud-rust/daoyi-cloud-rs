@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 /// AuthLoginReqVO，管理后台 - 账号密码登录 Request VO，如果登录并绑定社交用户，需要传递 social 开头的参数
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Validate)]
+#[derive(Debug, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthLoginReqVo {
     /// 验证码，验证码开启时，需要传递
@@ -21,7 +21,7 @@ pub struct AuthLoginReqVo {
     pub username: String,
 }
 /// AuthLoginRespVO，管理后台 - 登录 Response VO
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthLoginRespVo {
     /// 访问令牌

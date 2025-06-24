@@ -5,7 +5,11 @@ use daoyi_cloud_common::utils::path_matches::path_any_matches;
 use daoyi_cloud_config::config;
 use daoyi_cloud_config::config::jwt::{JWT, get_jwt};
 use std::pin::Pin;
+use std::sync::LazyLock;
 use tower_http::auth::{AsyncAuthorizeRequest, AsyncRequireAuthorizationLayer};
+
+static AUTH_LAYER: LazyLock<AsyncRequireAuthorizationLayer<JWTAuth>> =
+    LazyLock::new(|| AsyncRequireAuthorizationLayer::new(JWTAuth::new(get_jwt())));
 
 #[derive(Clone)]
 pub struct JWTAuth {
@@ -71,6 +75,6 @@ impl AsyncAuthorizeRequest<Body> for JWTAuth {
     }
 }
 
-pub fn get_auth_layer() -> AsyncRequireAuthorizationLayer<JWTAuth> {
-    AsyncRequireAuthorizationLayer::new(JWTAuth::new(get_jwt()))
+pub fn get_auth_layer() -> &'static AsyncRequireAuthorizationLayer<JWTAuth> {
+    &AUTH_LAYER
 }

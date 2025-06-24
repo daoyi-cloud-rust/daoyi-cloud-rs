@@ -12,7 +12,7 @@ static SEA_ORM_POOL_1: OnceLock<DatabaseConnection> = OnceLock::new();
 static SEA_ORM_POOL_2: OnceLock<DatabaseConnection> = OnceLock::new();
 static SEA_ORM_POOL_3: OnceLock<DatabaseConnection> = OnceLock::new();
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 pub struct DatabaseConfig {
     url: Option<String>,
     protocol: Option<String>,

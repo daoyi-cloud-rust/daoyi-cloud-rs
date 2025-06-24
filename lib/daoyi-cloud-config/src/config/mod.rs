@@ -3,8 +3,11 @@ pub mod auth;
 pub mod database;
 pub mod server;
 
+pub mod captcha;
 pub mod jwt;
+
 use crate::config::auth::AuthConfig;
+use crate::config::captcha::CaptchaConfig;
 use anyhow::Context;
 use daoyi_cloud_logger::logger;
 pub use database::DatabaseConfig;
@@ -19,8 +22,13 @@ static CONFIG: LazyLock<AppConfig> =
 pub struct AppConfig {
     #[serde(default = "default_app_name")]
     app_name: String,
+    #[serde(default)]
     server: ServerConfig,
+    #[serde(default)]
     auth: AuthConfig,
+    #[serde(default)]
+    captcha: CaptchaConfig,
+    #[serde(default)]
     datasource_0: DatabaseConfig,
     datasource_1: Option<DatabaseConfig>,
     datasource_2: Option<DatabaseConfig>,
@@ -105,4 +113,8 @@ fn find_app_root() -> anyhow::Result<PathBuf> {
 
 fn default_app_name() -> String {
     "daoyi-cloud".to_string()
+}
+
+fn default_boolean() -> bool {
+    false
 }

@@ -3,7 +3,7 @@ use axum::http::header;
 use serde::Deserialize;
 
 /// Auth 配置信息
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 pub struct AuthConfig {
     #[serde(default = "default_header")]
     pub header: String,
