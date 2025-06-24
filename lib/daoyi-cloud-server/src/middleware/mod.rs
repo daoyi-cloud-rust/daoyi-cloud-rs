@@ -1,6 +1,7 @@
 use axum::body::Body;
 use axum::http::{Request, Response};
 use daoyi_cloud_common::error::ApiError;
+use daoyi_cloud_common::utils::path_matches::path_any_matches;
 use daoyi_cloud_config::config;
 use daoyi_cloud_config::config::jwt::{JWT, get_jwt};
 use std::pin::Pin;
@@ -31,6 +32,11 @@ impl AsyncAuthorizeRequest<Body> for JWTAuth {
     fn authorize(&mut self, mut request: Request<Body>) -> Self::Future {
         let jwt = self.jwt;
         Box::pin(async move {
+            let path = request.uri().path();
+            let ignore_urls = &config::get().auth().ignore_urls;
+            if path_any_matches(ignore_urls, path) {
+                return Ok(request);
+            }
             let header_key = &config::get().auth().header;
             let header_prefix = &config::get().auth().prefix;
             let token = request

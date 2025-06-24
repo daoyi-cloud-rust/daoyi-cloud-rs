@@ -33,6 +33,7 @@ idgenerator = { version = "2.0.0" }
 bcrypt = { version = "0.17.0" }
 jsonwebtoken = { version = "9.3.1" }
 humantime = { version = "2.2.0" }
+wax = { version = "0.6.0" }
 daoyi-cloud-logger = { path = "lib/daoyi-cloud-logger", version = "0.1.0" }
 daoyi-cloud-config = { path = "lib/daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entity = { path = "lib/daoyi-cloud-entity", version = "0.1.0" }

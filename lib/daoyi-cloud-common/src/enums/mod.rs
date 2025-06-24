@@ -2,6 +2,7 @@
 
 pub mod common_status_enum;
 pub mod sex_enum;
+pub mod social_type_enum;
 
 use serde::{Deserialize, Serialize, Serializer};
 use validator::ValidationError;

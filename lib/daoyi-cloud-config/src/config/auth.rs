@@ -11,6 +11,8 @@ pub struct AuthConfig {
     pub prefix: String,
     #[serde(default = "default_jwt_config")]
     pub jwt: JwtConfig,
+    #[serde(default = "default_ignore_urls")]
+    pub ignore_urls: Vec<String>,
 }
 
 fn default_header() -> String {
@@ -23,4 +25,8 @@ fn default_prefix() -> String {
 
 fn default_jwt_config() -> JwtConfig {
     JwtConfig::default()
+}
+
+fn default_ignore_urls() -> Vec<String> {
+    vec![String::from("/health")]
 }

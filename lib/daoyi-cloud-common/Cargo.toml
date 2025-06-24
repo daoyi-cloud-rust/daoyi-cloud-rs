@@ -17,3 +17,4 @@ humantime = { workspace = true }
 jsonwebtoken = { workspace = true }
 bcrypt = { workspace = true }
 axum-valid = { workspace = true }
+wax = { workspace = true }
