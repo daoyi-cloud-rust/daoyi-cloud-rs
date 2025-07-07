@@ -1,4 +1,6 @@
-use daoyi_cloud_common::error::biz_error::{USER_NOT_EXISTS, USER_USERNAME_EXISTS};
+use daoyi_cloud_common::error::biz_error::{
+    PASSWORD_INVALID_HASH, USER_NOT_EXISTS, USER_USERNAME_EXISTS,
+};
 use daoyi_cloud_common::models::page_param::PAGE_SIZE_NONE;
 use daoyi_cloud_common::models::page_result::PageResult;
 use daoyi_cloud_common::utils::base64_util::check_password;
@@ -6,6 +8,7 @@ use daoyi_cloud_entity::entity::system::prelude::SystemUsers;
 use daoyi_cloud_entity::entity::system::system_users;
 use daoyi_cloud_entity::entity::system::system_users::ActiveModel;
 use daoyi_cloud_entity::vo::system::user::{UserPageReqVO, UserSaveReqVo};
+use daoyi_cloud_logger::logger;
 use sea_orm::prelude::*;
 use sea_orm::*;
 
@@ -176,7 +179,12 @@ impl AdminUserService {
         raw_password: &String,
         encoded_password: &String,
     ) -> anyhow::Result<bool> {
-        let encoded_password = check_password(raw_password, encoded_password).await?;
+        let encoded_password = check_password(raw_password, encoded_password)
+            .await
+            .map_err(|err| {
+                logger::error!("密码匹配失败: {:?}", err);
+                anyhow::Error::from(PASSWORD_INVALID_HASH.to_app_error())
+            })?;
         Ok(encoded_password)
     }
 

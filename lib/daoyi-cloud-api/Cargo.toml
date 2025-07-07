@@ -11,5 +11,6 @@ sea-orm = { workspace = true }
 #tracing = { workspace = true }
 daoyi-cloud-common = { workspace = true }
 daoyi-cloud-config = { workspace = true }
-#daoyi-cloud-logger = { workspace = true }
+daoyi-cloud-logger = { workspace = true }
 daoyi-cloud-entity = { workspace = true }
+log = "0.4.27"

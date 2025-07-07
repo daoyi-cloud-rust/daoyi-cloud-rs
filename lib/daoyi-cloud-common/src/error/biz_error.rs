@@ -40,6 +40,7 @@ pub const AUTH_MOBILE_NOT_EXISTS: ErrorCode = ErrorCode::new(1_002_000_007, "手
 pub const AUTH_REGISTER_CAPTCHA_CODE_ERROR: ErrorCode =
     ErrorCode::new(1_002_000_008, "验证码不正确，原因：{}");
 pub const AUTH_EMAIL_NOT_EXISTS: ErrorCode = ErrorCode::new(1_002_000_009, "邮箱不存在");
+pub const PASSWORD_INVALID_HASH: ErrorCode = ErrorCode::new(1_002_000_010, "账号密码不正确");
 
 // ========== 菜单模块 1-002-001-000 ==========
 pub const MENU_NAME_DUPLICATE: ErrorCode = ErrorCode::new(1_002_001_000, "已经存在该名字的菜单");
