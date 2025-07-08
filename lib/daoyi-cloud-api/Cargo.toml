@@ -8,6 +8,7 @@ axum = { workspace = true }
 anyhow = { workspace = true }
 sea-orm = { workspace = true }
 xid = { workspace = true }
+tracing = { workspace = true }
 daoyi-cloud-common = { workspace = true }
 daoyi-cloud-config = { workspace = true }
 daoyi-cloud-logger = { workspace = true }
