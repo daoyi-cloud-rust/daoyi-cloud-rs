@@ -1,7 +1,7 @@
-app_name: daoyi-cloud-rs-system
+app_name: daoyi-cloud-demo
 server:
-  port: 8081
-database:
+  port: 8080
+datasource_0:
   url: postgresql://postgresql:postgresql@127.0.0.1:5432/postgresql
   schema: demo
 auth:
@@ -9,6 +9,9 @@ auth:
   prefix: "Bearer "
   jwt:
     secret: secret
-    expiration: 3600s
-    audience: audience
-    issuer: issuer
+    expiration: 100y
+    audience: daoyi-cloud
+    issuer: daoyi-cloud
+  ignore_urls:
+    - /admin-api/system/auth/encode-password/*
+    - /admin-api/system/auth/login
