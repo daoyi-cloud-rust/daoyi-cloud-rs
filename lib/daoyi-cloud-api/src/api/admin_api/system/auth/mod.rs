@@ -1,13 +1,17 @@
 use crate::service::system::auth::admin_auth_service::AdminAuthService;
-use axum::debug_handler;
+use crate::service::system::user::admin_user_service::AdminUserService;
 use axum::extract::{ConnectInfo, State};
+use axum::{Extension, debug_handler};
 use daoyi_cloud_common::error::ApiResult;
 use daoyi_cloud_common::models::api_extract::path::Path;
 use daoyi_cloud_common::models::api_extract::valid::ValidJson;
 use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_common::response::ApiResponse;
 use daoyi_cloud_common::utils::base64_util;
-use daoyi_cloud_entity::vo::auth::{AuthLoginReqVo, AuthLoginRespVo, AuthPermissionInfoRespVo};
+use daoyi_cloud_config::config::jwt::Principal;
+use daoyi_cloud_entity::vo::auth::{
+    AuthLoginReqVo, AuthLoginRespVo, AuthPermissionInfoRespVo, UserVo,
+};
 use std::net::SocketAddr;
 
 /// 加密密码
@@ -35,8 +39,16 @@ pub async fn login(
 #[debug_handler]
 pub async fn get_permission_info(
     State(AppState { db }): State<AppState>,
+    Extension(principal): Extension<Principal>,
 ) -> ApiResult<AuthPermissionInfoRespVo> {
-    // let id = AdminUserService::create_user(db, params).await?;
-    // ApiResponse::okk(Some(id))
-    todo!()
+    let user = AdminUserService::validate_user_exists(db, Some(&principal.id)).await?;
+    if user.is_none() {
+        return ApiResponse::okk(None);
+    }
+    ApiResponse::okk(Some(AuthPermissionInfoRespVo {
+        menus: vec![],
+        permissions: vec![],
+        roles: vec![],
+        user: user.unwrap().into(),
+    }))
 }

@@ -1,5 +1,6 @@
 use crate::config;
 use daoyi_cloud_common::utils::serde_util::deserialize_duration;
+use daoyi_cloud_common::utils::serde_util::serialize_datetime;
 use jsonwebtoken::{
     Algorithm, DecodingKey, EncodingKey, Header, Validation, get_current_timestamp,
 };
@@ -25,6 +26,7 @@ pub struct Principal {
     /// 授权范围
     pub scopes: Vec<String>,
     /// 过期时间
+    #[serde(serialize_with = "serialize_datetime")]
     pub expires_time: DateTime,
     /// 终端编号
     pub terminal_id: String,

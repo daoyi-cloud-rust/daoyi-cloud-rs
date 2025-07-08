@@ -1,3 +1,4 @@
+use crate::entity::system::system_users;
 use daoyi_cloud_common::enums::social_type_enum::SocialTypeEnum;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -89,13 +90,25 @@ pub struct MenuVo {
 #[serde(rename_all = "camelCase")]
 pub struct UserVo {
     /// 用户头像
-    pub avatar: String,
+    pub avatar: Option<String>,
     /// 部门编号
-    pub dept_id: i64,
+    pub dept_id: Option<i64>,
     /// 用户编号
     pub id: i64,
     /// 用户昵称
     pub nickname: String,
     /// 用户名
     pub username: String,
+}
+
+impl From<system_users::Model> for UserVo {
+    fn from(value: system_users::Model) -> Self {
+        Self {
+            avatar: value.avatar,
+            dept_id: value.dept_id,
+            id: value.id,
+            nickname: value.nickname,
+            username: value.username,
+        }
+    }
 }

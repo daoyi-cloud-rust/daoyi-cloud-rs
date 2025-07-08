@@ -6,5 +6,5 @@ pub(crate) fn routers() -> Router<AppState> {
     Router::new()
         .route("/encode-password/{passwd}", routing::get(encode_password))
         .route("/login", routing::post(login))
-        .route("/get-permission-info", routing::post(get_permission_info))
+        .route("/get-permission-info", routing::get(get_permission_info))
 }
