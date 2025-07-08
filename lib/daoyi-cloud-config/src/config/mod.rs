@@ -5,9 +5,11 @@ pub mod server;
 
 pub mod captcha;
 pub mod jwt;
+pub mod tenant;
 
 use crate::config::auth::AuthConfig;
 use crate::config::captcha::CaptchaConfig;
+use crate::config::tenant::TenantConfig;
 use anyhow::Context;
 use daoyi_cloud_logger::logger;
 pub use database::DatabaseConfig;
@@ -24,6 +26,8 @@ pub struct AppConfig {
     app_name: String,
     #[serde(default)]
     server: ServerConfig,
+    #[serde(default)]
+    tenant: TenantConfig,
     #[serde(default)]
     auth: AuthConfig,
     #[serde(default)]
@@ -78,6 +82,9 @@ impl AppConfig {
     }
     pub fn datasource_3(&self) -> &Option<DatabaseConfig> {
         &self.datasource_3
+    }
+    pub fn tenant(&self) -> &TenantConfig {
+        &self.tenant
     }
     pub fn auth(&self) -> &AuthConfig {
         &self.auth

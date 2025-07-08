@@ -1,7 +1,7 @@
 use crate::latency::LatencyOnResponse;
-use crate::middleware::get_auth_layer;
+use crate::middleware::{jwt_auth, tenant_auth};
 use axum::extract::{DefaultBodyLimit, Request};
-use axum::{Router, routing};
+use axum::{Router, middleware, routing};
 use bytesize::ByteSize;
 use daoyi_cloud_api::api;
 use daoyi_cloud_common::error::{ApiError, ApiResult};
@@ -73,7 +73,8 @@ impl Server {
             .route("/", routing::get(api::hello_world))
             .merge(router)
             .layer(tracing)
-            .route_layer(get_auth_layer())
+            .route_layer(jwt_auth::get_auth_layer())
+            .route_layer(middleware::from_fn(tenant_auth::tenant_auth_middleware))
             .fallback(async || -> ApiResult<()> {
                 logger::warn!("Not Found.");
                 Err(ApiError::NotFound)
