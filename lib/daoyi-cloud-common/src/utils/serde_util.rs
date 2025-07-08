@@ -6,6 +6,8 @@ use std::fmt::Display;
 use std::str::FromStr;
 use std::time::Duration;
 
+pub const DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum StringOrNumber<T> {
@@ -25,7 +27,7 @@ pub fn serialize_datetime<S>(dt: &DateTime, serializer: S) -> Result<S::Ok, S::E
 where
     S: Serializer,
 {
-    let s = format!("{}", dt.format("%Y-%m-%d %H:%M:%S"));
+    let s = format!("{}", dt.format(DATETIME_FORMAT));
     serializer.serialize_str(&s)
 }
 pub fn serialize_opt_datetime<S>(dt: &Option<DateTime>, serializer: S) -> Result<S::Ok, S::Error>
@@ -55,7 +57,7 @@ where
     let mut result = Vec::new();
     for s in input {
         // 尝试多种可能的日期时间格式
-        match DateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S") {
+        match DateTime::parse_from_str(&s, DATETIME_FORMAT) {
             Ok(dt) => result.push(dt),
             Err(_) => {
                 // 尝试其他可能的格式变体

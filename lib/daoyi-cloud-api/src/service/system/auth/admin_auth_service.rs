@@ -6,11 +6,13 @@ use daoyi_cloud_common::enums::user_type_enum::UserTypeEnum;
 use daoyi_cloud_common::error::biz_error::{
     AUTH_LOGIN_BAD_CREDENTIALS, AUTH_LOGIN_CAPTCHA_CODE_ERROR, AUTH_LOGIN_USER_DISABLED,
 };
+use daoyi_cloud_common::utils::serde_util::DATETIME_FORMAT;
 use daoyi_cloud_config::config;
 use daoyi_cloud_config::config::jwt::{Principal, get_jwt};
 use daoyi_cloud_entity::entity::system::system_users;
 use daoyi_cloud_entity::vo::auth::{AuthLoginReqVo, AuthLoginRespVo, CaptchaVerificationReqVO};
 use sea_orm::DatabaseConnection;
+use sea_orm::sqlx::types::chrono::Local;
 
 pub struct AdminAuthService;
 
@@ -46,18 +48,25 @@ impl AdminAuthService {
         // 插入登陆日志
         Self::create_login_log(db, user_id, username, log_type, &LoginResultEnum::Success).await?;
         // 创建访问令牌
+        let jwt = get_jwt();
         let principal = Principal {
             id: user_id.to_owned(),
             user_type: UserTypeEnum::ADMIN.value(),
             info: "".to_string(),
             tenant_id: 0,
             scopes: vec![],
-            expires_time: Default::default(),
-            terminal_id: "".to_string(),
+            expires_time: Local::now().naive_local() + jwt.expiration(),
+            terminal_id: xid::new().to_string(),
         };
-        let access_token = get_jwt().encode(principal)?;
+        let access_token = jwt.encode(principal.clone())?;
         // 构建返回结果
-        todo!("TODO: AdminAuthService::create_token_after_login_success")
+        Ok(AuthLoginRespVo {
+            access_token: access_token.to_string(),
+            expires_time: principal.expires_time.format(DATETIME_FORMAT).to_string(),
+            refresh_token: access_token,
+            terminal_id: principal.terminal_id,
+            user_id: user_id.to_owned(),
+        })
     }
 
     pub async fn create_login_log(

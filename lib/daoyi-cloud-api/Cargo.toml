@@ -7,10 +7,8 @@ edition.workspace = true
 axum = { workspace = true }
 anyhow = { workspace = true }
 sea-orm = { workspace = true }
-#axum-valid = { workspace = true }
-#tracing = { workspace = true }
+xid = { workspace = true }
 daoyi-cloud-common = { workspace = true }
 daoyi-cloud-config = { workspace = true }
 daoyi-cloud-logger = { workspace = true }
 daoyi-cloud-entity = { workspace = true }
-log = "0.4.27"

@@ -75,6 +75,10 @@ pub struct JWT {
 }
 
 impl JWT {
+    pub fn expiration(&self) -> Duration {
+        self.expiration.to_owned()
+    }
+
     pub fn new(config: JwtConfig) -> Self {
         let mut validation = Validation::new(Algorithm::HS256);
         validation.set_audience(&[&config.audience]);
