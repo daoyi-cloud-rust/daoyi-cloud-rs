@@ -2,7 +2,7 @@ use axum::{Router, routing};
 use daoyi_cloud_api::api::admin_api::system::dept::create_dept;
 use daoyi_cloud_common::models::app_server::AppState;
 
-pub(crate) fn routers() -> Router<AppState> {
+pub fn routers() -> Router<AppState> {
     Router::new()
         .route("/create", routing::post(create_dept))
         .route("/delete", routing::delete(create_dept))

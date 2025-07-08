@@ -1,4 +1,3 @@
-pub mod demo;
 pub mod system;
 
 pub trait BaseEntityTrait {
