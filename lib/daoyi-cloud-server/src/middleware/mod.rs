@@ -38,14 +38,15 @@ impl AsyncAuthorizeRequest<Body> for JWTAuth {
         Box::pin(async move {
             let path = request.uri().path();
             let ignore_urls = &config::get().auth().ignore_urls;
-            if path_any_matches(ignore_urls, path) {
-                return Ok(request);
-            }
             let header_key = &config::get().auth().header;
             let header_prefix = &config::get().auth().prefix;
-            let token = request
-                .headers()
-                .get(header_key)
+            let token_in_header = request.headers().get(header_key);
+            if path_any_matches(ignore_urls, path) {
+                if token_in_header.is_none() {
+                    return Ok(request);
+                }
+            }
+            let token = token_in_header
                 .map(|value| -> Result<_, ApiError> {
                     let token = value
                         .to_str()

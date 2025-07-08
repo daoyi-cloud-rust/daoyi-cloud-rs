@@ -9,9 +9,7 @@ use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_common::response::ApiResponse;
 use daoyi_cloud_common::utils::base64_util;
 use daoyi_cloud_config::config::jwt::Principal;
-use daoyi_cloud_entity::vo::auth::{
-    AuthLoginReqVo, AuthLoginRespVo, AuthPermissionInfoRespVo, UserVo,
-};
+use daoyi_cloud_entity::vo::auth::{AuthLoginReqVo, AuthLoginRespVo, AuthPermissionInfoRespVo};
 use std::net::SocketAddr;
 
 /// 加密密码
@@ -41,10 +39,14 @@ pub async fn get_permission_info(
     State(AppState { db }): State<AppState>,
     Extension(principal): Extension<Principal>,
 ) -> ApiResult<AuthPermissionInfoRespVo> {
+    // 1.1 获得用户信息
     let user = AdminUserService::validate_user_exists(db, Some(&principal.id)).await?;
     if user.is_none() {
         return ApiResponse::okk(None);
     }
+    // 1.2 获得角色列表
+    // 1.3 获得菜单列表
+    // 2. 拼接结果返回
     ApiResponse::okk(Some(AuthPermissionInfoRespVo {
         menus: vec![],
         permissions: vec![],

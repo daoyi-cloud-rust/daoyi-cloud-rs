@@ -7,6 +7,7 @@ use daoyi_cloud_api::api;
 use daoyi_cloud_common::error::{ApiError, ApiResult};
 use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_config::config::ServerConfig;
+use daoyi_cloud_config::config::jwt::Principal;
 use daoyi_cloud_logger::logger;
 use std::net::SocketAddr;
 use std::time::Duration;
@@ -59,7 +60,11 @@ impl Server {
                 let method = request.method();
                 let path = request.uri().path();
                 let id = xid::new();
-                tracing::info_span!("Api Request", id = %id, method = %method, path = %path)
+                if let Some(principal) = request.extensions().get::<Principal>() {
+                    tracing::info_span!("Api Request", id = %id, method = %method, path = %path, user_id = %principal.id, user_type = %principal.user_type)
+                } else {
+                    tracing::info_span!("Api Request", id = %id, method = %method, path = %path)
+                }
             })
             .on_request(())
             .on_failure(())
@@ -67,6 +72,7 @@ impl Server {
         Router::new()
             .route("/", routing::get(api::hello_world))
             .merge(router)
+            .layer(tracing)
             .route_layer(get_auth_layer())
             .fallback(async || -> ApiResult<()> {
                 logger::warn!("Not Found.");
@@ -78,7 +84,6 @@ impl Server {
             })
             .layer(timeout)
             .layer(body_limit)
-            .layer(tracing)
             .layer(cors)
             .layer(normalize_path)
             .with_state(state)
