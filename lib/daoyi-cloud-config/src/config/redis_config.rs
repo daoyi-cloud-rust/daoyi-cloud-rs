@@ -77,9 +77,9 @@ impl RedisUtils {
         let result = Self::pool()
             .set_ex::<&str, &str, String>("test", "test123", 10)
             .await;
-        logger::debug!("{:?}", result);
+        logger::debug!("redis init complete {:?}", result);
         let result1 = Self::pool().get::<String, String>("test".to_string()).await;
-        logger::debug!("{:?}", result1);
+        logger::debug!("redis test complete {:?}", result1);
         Ok(())
     }
 
@@ -181,11 +181,14 @@ impl RedisUtils {
         None
     }
 
-    pub async fn get_method_cached<T>(method_name: &str, suffix: &str) -> Option<T>
+    pub async fn get_method_cached<T, M, S>(method_name: M, suffix: S) -> Option<T>
     where
         T: DeserializeOwned,
+        M: ToString,
+        S: ToString,
     {
-        let redis_key = Self::generate_redis_key_by_method(method_name, suffix).await;
+        let redis_key =
+            Self::generate_redis_key_by_method(&method_name.to_string(), &suffix.to_string()).await;
         Self::get_json_value::<T>(&redis_key).await
     }
 
@@ -203,15 +206,18 @@ impl RedisUtils {
             .expect("redis set error");
     }
 
-    pub async fn set_method_cache<T>(
-        method_name: &str,
-        suffix: &str,
+    pub async fn set_method_cache<T, M, S>(
+        method_name: M,
+        suffix: S,
         seconds: Option<u64>,
         value: &T,
     ) where
         T: Serialize,
+        M: ToString,
+        S: ToString,
     {
-        let redis_key = Self::generate_redis_key_by_method(method_name, suffix).await;
+        let redis_key =
+            Self::generate_redis_key_by_method(&method_name.to_string(), &suffix.to_string()).await;
         Self::set_json_value::<T>(&redis_key, seconds, value).await;
     }
 }

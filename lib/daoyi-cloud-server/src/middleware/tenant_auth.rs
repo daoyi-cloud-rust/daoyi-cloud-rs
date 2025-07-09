@@ -1,9 +1,11 @@
 use axum::extract::Request;
 use axum::middleware::Next;
 use axum::response::Response;
+use daoyi_cloud_api::api::feign_client::system::tenant::TenantApi;
 use daoyi_cloud_common::error::ApiError;
 use daoyi_cloud_common::utils::path_matches::path_any_matches;
 use daoyi_cloud_config::config;
+use daoyi_cloud_config::config::redis_config::RedisUtils;
 
 // 租户上下文（将注入请求）
 #[derive(Debug, Clone, Default)]
@@ -76,6 +78,18 @@ pub async fn tenant_auth_middleware(request: Request, next: Next) -> Result<Resp
 }
 
 async fn is_valid_tenant(tenant_id: i64) -> bool {
-    true
-    // todo!()
+    let valid: Option<bool> = RedisUtils::get_method_cached("is_valid_tenant", &tenant_id).await;
+    if valid.is_some() {
+        return valid.unwrap();
+    }
+    let result = TenantApi::valid_tenant(tenant_id).await;
+    if result.is_ok() {
+        let result = result.unwrap();
+        let result = result.data();
+        if result {
+            RedisUtils::set_method_cache("is_valid_tenant", &tenant_id, Some(10), &result).await;
+        }
+        return result;
+    }
+    false
 }

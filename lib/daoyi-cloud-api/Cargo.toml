@@ -10,6 +10,8 @@ sea-orm = { workspace = true }
 xid = { workspace = true }
 tracing = { workspace = true }
 chrono = { workspace = true }
+reqwest = { workspace = true }
+serde_json = { workspace = true }
 daoyi-cloud-common = { workspace = true }
 daoyi-cloud-config = { workspace = true }
 daoyi-cloud-logger = { workspace = true }

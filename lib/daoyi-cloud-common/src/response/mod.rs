@@ -13,6 +13,9 @@ pub struct ApiResponse<T> {
 }
 
 impl<T> ApiResponse<T> {
+    pub fn data(self) -> T {
+        self.data.unwrap()
+    }
     pub fn new<M: AsRef<str>>(code: i32, msg: M, data: Option<T>) -> Self {
         ApiResponse {
             code,

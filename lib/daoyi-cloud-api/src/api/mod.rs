@@ -1,5 +1,6 @@
 pub mod admin_api;
 pub mod app_api;
+pub mod feign_client;
 pub mod rpc_api;
 
 use axum::debug_handler;
