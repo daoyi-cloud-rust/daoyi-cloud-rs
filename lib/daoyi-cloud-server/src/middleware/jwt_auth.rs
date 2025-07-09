@@ -73,7 +73,7 @@ impl AsyncAuthorizeRequest<Body> for JWTAuth {
                 })?;
             let principal = jwt.decode(token).map_err(|err| ApiError::Internal(err))?;
             let tenant = request.extensions().get::<TenantContext>();
-            if tenant_config.enable {
+            if tenant_config.enable && tenant.is_some() {
                 let tenant =
                     tenant.ok_or_else(|| ApiError::Unauthenticated("租户不能为空".to_string()))?;
                 if tenant.id() != principal.tenant_id {
