@@ -12,22 +12,22 @@ edition = "2024"
 
 [workspace.dependencies]
 axum = { version = "0.8.4", features = ["macros"] }
-tokio = { version = "1.45.1", features = ["full"] }
+tokio = { version = "1.46.1", features = ["full"] }
 tracing = { version = "0.1.41", features = ["async-await"] }
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter", "chrono"] }
-config = { version = "0.15.11", features = ["yaml"] }
+config = { version = "0.15.12", features = ["yaml"] }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = { version = "1.0.140" }
 anyhow = { version = "1.0.98" }
 thiserror = { version = "2.0.12" }
-sea-orm = { version = "1.2.0-rc.1", features = ["with-chrono", "debug-print", "sqlx-postgres", "sqlx-mysql", "with-rust_decimal", "runtime-tokio", "runtime-tokio-native-tls"] }
+sea-orm = { version = "2.0.0-rc.1", features = ["with-chrono", "debug-print", "sqlx-postgres", "sqlx-mysql", "with-rust_decimal", "runtime-tokio", "runtime-tokio-native-tls"] }
 chrono = { version = "0.4.41" }
 num_cpus = { version = "1.17.0" }
 tower-http = { version = "0.6.6", features = ["trace", "timeout", "limit", "cors", "normalize-path", "auth"] }
 xid = { version = "1.1.1" }
 bytesize = { version = "2.0.1" }
 validator = { version = "0.20.0", features = ["derive"] }
-axum-valid = { version = "0.23.0", features = ["full_validator"] }
+axum-valid = { version = "0.24.0", features = ["full_validator"] }
 strum = { version = "0.27.1", features = ["derive"] }
 regex = { version = "1.11.1" }
 idgenerator = { version = "2.0.0" }
@@ -35,6 +35,7 @@ bcrypt = { version = "0.17.0" }
 jsonwebtoken = { version = "9.3.1" }
 humantime = { version = "2.2.0" }
 wax = { version = "0.6.0" }
+redis = { version = "0.32.3", features = ["connection-manager", "tokio-comp", "r2d2", "json"] }
 daoyi-cloud-logger = { path = "lib/daoyi-cloud-logger", version = "0.1.0" }
 daoyi-cloud-config = { path = "lib/daoyi-cloud-config", version = "0.1.0" }
 daoyi-cloud-entity = { path = "lib/daoyi-cloud-entity", version = "0.1.0" }

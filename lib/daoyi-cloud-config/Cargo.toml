@@ -13,5 +13,6 @@ jsonwebtoken = { workspace = true }
 xid = { workspace = true }
 serde_json = { workspace = true }
 axum = { workspace = true }
+redis = { workspace = true }
 daoyi-cloud-logger = { workspace = true }
 daoyi-cloud-common = { workspace = true }

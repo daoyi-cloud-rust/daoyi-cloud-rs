@@ -3,7 +3,7 @@ use axum::Router;
 use daoyi_cloud_common::id;
 use daoyi_cloud_common::models::app_server::AppState;
 use daoyi_cloud_config::config;
-use daoyi_cloud_config::config::database;
+use daoyi_cloud_config::config::{database, redis_config};
 use daoyi_cloud_logger::logger;
 
 pub async fn run(router: Router<AppState>) -> anyhow::Result<()> {
@@ -12,6 +12,7 @@ pub async fn run(router: Router<AppState>) -> anyhow::Result<()> {
     logger::info!("Starting app server...");
     logger::debug!("router: {:#?}", router);
 
+    redis_config::init().await?;
     database::init().await?;
     let db = database::pool0();
     let state = AppState::new(db);

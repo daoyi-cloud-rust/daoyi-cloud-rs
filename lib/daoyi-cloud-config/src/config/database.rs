@@ -1,7 +1,7 @@
-#![allow(dead_code)]
-
 use daoyi_cloud_logger::logger;
-use sea_orm::{ConnectOptions, ConnectionTrait, Database, DatabaseConnection, Statement};
+use sea_orm::{
+    ConnectOptions, ConnectionTrait, Database, DatabaseConnection, DbBackend, Statement,
+};
 use serde::Deserialize;
 use std::cmp::max;
 use std::sync::OnceLock;
@@ -123,6 +123,7 @@ async fn log_database_info(db: &DatabaseConnection) -> anyhow::Result<()> {
         sea_orm::DatabaseBackend::MySql => "MySQL",
         sea_orm::DatabaseBackend::Postgres => "PostgreSQL",
         sea_orm::DatabaseBackend::Sqlite => "SQLite",
+        _ => "Unknown",
     };
 
     // 获取版本

@@ -5,10 +5,12 @@ pub mod server;
 
 pub mod captcha;
 pub mod jwt;
+pub mod redis_config;
 pub mod tenant;
 
 use crate::config::auth::AuthConfig;
 use crate::config::captcha::CaptchaConfig;
+use crate::config::redis_config::RedisConfig;
 use crate::config::tenant::TenantConfig;
 use anyhow::Context;
 use daoyi_cloud_logger::logger;
@@ -32,6 +34,8 @@ pub struct AppConfig {
     auth: AuthConfig,
     #[serde(default)]
     captcha: CaptchaConfig,
+    #[serde(default)]
+    redis: RedisConfig,
     #[serde(default)]
     datasource_0: DatabaseConfig,
     datasource_1: Option<DatabaseConfig>,
@@ -69,6 +73,9 @@ impl AppConfig {
     }
     pub fn captcha(&self) -> &CaptchaConfig {
         &self.captcha
+    }
+    pub fn redis(&self) -> &RedisConfig {
+        &self.redis
     }
     pub fn datasource_0(&self) -> &DatabaseConfig {
         &self.datasource_0
