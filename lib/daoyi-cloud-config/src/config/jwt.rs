@@ -1,6 +1,8 @@
 use crate::config;
+use daoyi_cloud_common::utils::serde_util::deserialize_datetime;
 use daoyi_cloud_common::utils::serde_util::deserialize_duration;
 use daoyi_cloud_common::utils::serde_util::serialize_datetime;
+use daoyi_cloud_logger::logger;
 use jsonwebtoken::{
     Algorithm, DecodingKey, EncodingKey, Header, Validation, get_current_timestamp,
 };
@@ -26,7 +28,10 @@ pub struct Principal {
     /// 授权范围
     pub scopes: Vec<String>,
     /// 过期时间
-    #[serde(serialize_with = "serialize_datetime")]
+    #[serde(
+        serialize_with = "serialize_datetime",
+        deserialize_with = "deserialize_datetime"
+    )]
     pub expires_time: DateTime,
     /// 终端编号
     pub terminal_id: String,
@@ -122,7 +127,25 @@ impl JWT {
     pub fn decode(&self, token: &str) -> anyhow::Result<Principal> {
         let claims = jsonwebtoken::decode::<Claims>(token, &self.decode_secret, &self.validation)?;
         let claims = claims.claims;
-        let principal: Principal = serde_json::from_str(&claims.info)?;
+        // logger::debug!("JWT decode claims.info: {:#?}", claims);
+        // // 清理 JSON 字符串（移除控制字符和无效 Unicode）
+        // let cleaned_json = claims
+        //     .info
+        //     .chars()
+        //     .filter(|c| !c.is_control() && c.is_ascii()) // 移除非 ASCII 和控制字符
+        //     .collect::<String>();
+        //
+        // // 记录清理后的 JSON 以便调试
+        // logger::debug!("Cleaned JSON: {}", cleaned_json);
+        // // 验证JSON有效性
+        // let value = serde_json::from_str::<serde_json::Value>(&cleaned_json).map_err(|e| {
+        //     logger::error!("Invalid JSON after cleaning: {}", e);
+        //     e
+        // })?;
+        let principal: Principal = serde_json::from_str(&claims.info).map_err(|e| {
+            logger::error!("Invalid JSON: {} , error: {}", claims.info, e);
+            e
+        })?;
         Ok(principal)
     }
 }

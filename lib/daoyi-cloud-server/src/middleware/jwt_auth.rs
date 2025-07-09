@@ -1,3 +1,4 @@
+use crate::middleware::tenant_auth::TenantContext;
 use axum::body::Body;
 use axum::http::{Request, Response};
 use daoyi_cloud_common::error::ApiError;
@@ -37,6 +38,7 @@ impl AsyncAuthorizeRequest<Body> for JWTAuth {
         let jwt = self.jwt;
         Box::pin(async move {
             let path = request.uri().path();
+            let tenant_config = config::get().tenant();
             let ignore_urls = &config::get().auth().ignore_urls;
             let header_key = &config::get().auth().header;
             let header_prefix = &config::get().auth().prefix;
@@ -70,6 +72,16 @@ impl AsyncAuthorizeRequest<Body> for JWTAuth {
                     ApiError::Unauthenticated(format!("{}请求头不能为空", header_key))
                 })?;
             let principal = jwt.decode(token).map_err(|err| ApiError::Internal(err))?;
+            let tenant = request.extensions().get::<TenantContext>();
+            if tenant_config.enable {
+                let tenant =
+                    tenant.ok_or_else(|| ApiError::Unauthenticated("租户不能为空".to_string()))?;
+                if tenant.id() != principal.tenant_id {
+                    return Err(Response::from(ApiError::Unauthenticated(
+                        "租户不匹配".to_string(),
+                    )));
+                }
+            }
             request.extensions_mut().insert(principal);
             Ok(request)
         })

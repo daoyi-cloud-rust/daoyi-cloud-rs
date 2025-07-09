@@ -1,4 +1,5 @@
 use crate::latency::LatencyOnResponse;
+use crate::middleware::tenant_auth::TenantContext;
 use crate::middleware::{jwt_auth, tenant_auth};
 use axum::extract::{DefaultBodyLimit, Request};
 use axum::{Router, middleware, routing};
@@ -60,10 +61,15 @@ impl Server {
                 let method = request.method();
                 let path = request.uri().path();
                 let id = xid::new();
-                if let Some(principal) = request.extensions().get::<Principal>() {
-                    tracing::info_span!("Api Request", id = %id, method = %method, path = %path, user_id = %principal.id, user_type = %principal.user_type)
+                let tenant_id = if let Some(tenant) = request.extensions().get::<TenantContext>() {
+                    tenant.id()
                 } else {
-                    tracing::info_span!("Api Request", id = %id, method = %method, path = %path)
+                    TenantContext::default().id()
+                };
+                if let Some(principal) = request.extensions().get::<Principal>() {
+                    tracing::info_span!("Api Request", id = %id, method = %method, path = %path, tenant_id = %tenant_id, user_id = %principal.id, user_type = %principal.user_type)
+                } else {
+                    tracing::info_span!("Api Request", id = %id, method = %method, path = %path, tenant_id = %tenant_id)
                 }
             })
             .on_request(())

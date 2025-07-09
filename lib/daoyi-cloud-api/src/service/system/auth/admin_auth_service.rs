@@ -32,6 +32,7 @@ impl AdminAuthService {
         // 创建 Token 令牌，记录登录日志
         Self::create_token_after_login_success(
             db,
+            &model.tenant_id,
             &model.id,
             model.username.as_str(),
             &LoginLogTypeEnum::LoginUsername,
@@ -41,6 +42,7 @@ impl AdminAuthService {
 
     pub async fn create_token_after_login_success(
         db: &DatabaseConnection,
+        tenant_id: &i64,
         user_id: &i64,
         username: &str,
         log_type: &LoginLogTypeEnum,
@@ -53,7 +55,7 @@ impl AdminAuthService {
             id: user_id.to_owned(),
             user_type: UserTypeEnum::ADMIN.value(),
             info: "".to_string(),
-            tenant_id: 0,
+            tenant_id: tenant_id.to_owned(),
             scopes: vec![],
             expires_time: Local::now().naive_local() + jwt.expiration(),
             terminal_id: xid::new().to_string(),

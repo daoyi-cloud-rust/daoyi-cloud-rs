@@ -6,7 +6,7 @@ use daoyi_cloud_common::utils::path_matches::path_any_matches;
 use daoyi_cloud_config::config;
 
 // 租户上下文（将注入请求）
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct TenantContext {
     id: Option<i64>,
     // 可以添加更多租户相关数据，如权限等

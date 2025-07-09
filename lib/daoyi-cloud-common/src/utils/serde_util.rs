@@ -39,6 +39,13 @@ where
         None => serializer.serialize_none(),
     }
 }
+pub fn deserialize_datetime<'de, D>(deserializer: D) -> Result<DateTime, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    DateTime::parse_from_str(&s, DATETIME_FORMAT).map_err(Error::custom)
+}
 
 /// 为 Vec<DateTime> 类型实现自定义序列化
 pub fn deserialize_optional_datetime_vec<'de, D>(
