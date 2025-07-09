@@ -87,7 +87,13 @@ async fn is_valid_tenant(tenant_id: i64) -> bool {
         let result = result.unwrap();
         let result = result.data();
         if result {
-            RedisUtils::set_method_cache("is_valid_tenant", &tenant_id, Some(10), &result).await;
+            RedisUtils::set_method_cache(
+                "is_valid_tenant",
+                &tenant_id,
+                Some(60), // 1分钟
+                &result,
+            )
+            .await;
         }
         return result;
     }
