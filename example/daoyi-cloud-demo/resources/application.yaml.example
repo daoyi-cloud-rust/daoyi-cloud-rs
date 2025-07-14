@@ -1,6 +1,15 @@
 app_name: daoyi-cloud-demo
 server:
   port: 8080
+redis:
+  uri: redis://[:password]@localhost:6379/0
+  # 下面都是可选配置
+#  connection_timeout = 10000        # 连接超时时间，单位毫秒
+#  response_timeout = 1000           # 响应超时时间，单位毫秒
+#  number_of_retries = 6             # 重试次数，间隔时间按指数增长
+#  exponent_base = 2                 # 间隔时间指数基数，单位毫秒
+#  factor = 100                      # 间隔时间增长因子，默认100倍增长
+#  max_delay = 60000                 # 最大间隔时间
 datasource_0:
   url: postgresql://postgresql:postgresql@127.0.0.1:5432/postgresql
   schema: demo
