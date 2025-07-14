@@ -1,4 +1,5 @@
 mod routers;
+mod web;
 
 use daoyi_cloud_server::app;
 
