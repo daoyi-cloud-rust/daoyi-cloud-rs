@@ -44,6 +44,7 @@ humantime = { version = "2.2.0" }
 wax = { version = "0.6.0" }
 redis = { version = "0.32.3", features = ["connection-manager", "tokio-comp", "r2d2", "json"] }
 reqwest = { version = "0.12.22", features = ["json"] }
+openssl-sys = { version = "0.9", features = ["vendored"] } # 交叉编译时需要依赖
 rust-embed = { version = "8.7.2", features = ["axum", "axum-ex", "tokio", "compression", "debug-embed", "include-exclude", "include-flate", "interpolate-folder-path", "mime-guess"] }
 daoyi-cloud-logger = { path = "lib/daoyi-cloud-logger", version = "0.1.0" }
 daoyi-cloud-config = { path = "lib/daoyi-cloud-config", version = "0.1.0" }
